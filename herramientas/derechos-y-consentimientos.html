@@ -297,7 +297,7 @@
       <label class="campo"><span>Dónde se guardan</span><input name="sistema" maxlength="160" placeholder="Ej.: software de remuneraciones"></label>
       <label class="campo"><span>Cuánto tiempo se guardan</span><input name="conservacion" maxlength="160"></label>
       <label class="campo ancho"><span>Quiénes más los reciben (encargados o terceros)</span><input name="encargados" maxlength="200"></label>
-      <label class="marca ancho"><input type="checkbox" name="sensibles"> <span>Incluye datos sensibles<small>Salud, biométricos (huella, rostro), afiliación sindical, vida sexual, origen étnico, creencias, situación socioeconómica.</small></span></label>
+      <label class="marca ancho"><input type="checkbox" name="sensibles"> <span>Incluye datos sensibles<small>Salud, perfil biológico, biométricos (huella, rostro, iris, mano, voz), origen étnico o racial, afiliación política, sindical o gremial, situación socioeconómica, convicciones ideológicas o filosóficas, creencias religiosas, vida sexual, orientación sexual, identidad de género (art. 2 g).</small></span></label>
       <span class="error-campo ancho" id="errUso"></span>
     </div>
     <div class="dlg-pie">
@@ -346,6 +346,28 @@
     <div class="dlg-pie">
       <button type="button" class="btn" data-accion="cerrar-dlg">Cancelar</button>
       <button type="submit" class="btn primario">Registrar</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- Documento de consentimiento biométrico -->
+<dialog id="dlgBio" aria-labelledby="dlgBioTit">
+  <form id="formBio" novalidate>
+    <div class="dlg-cab"><h2 id="dlgBioTit">Documento de consentimiento biométrico</h2><p>Arma el documento que la persona firma antes de registrar su huella o su rostro. La ley exige informarle antes cuatro cosas: el sistema, la finalidad, el plazo y cómo ejercer sus derechos (art. 16 ter).</p></div>
+    <div class="dlg-cuerpo">
+      <label class="campo ancho"><span>Uso de datos</span><select name="usoId"></select></label>
+      <label class="campo"><span>a) Sistema biométrico</span><select name="sistema"></select></label>
+      <label class="campo"><span>Proveedor que lo opera (si hay)</span><input name="proveedor" maxlength="160" placeholder="Ej.: Relojes Control SpA"></label>
+      <label class="campo ancho"><span>Cómo funciona</span><input name="descripcion" maxlength="300" placeholder="Ej.: guarda una plantilla cifrada (un código), no la imagen, y la compara solo con la de quien marca"></label>
+      <label class="campo ancho"><span>b) Para qué, en concreto</span><input name="finalidad" maxlength="240" placeholder="Ej.: registrar la hora de entrada y salida de la jornada"></label>
+      <label class="campo ancho"><span>c) Por cuánto tiempo</span><input name="periodo" maxlength="200" placeholder="Ej.: mientras dure la relación laboral; se suprimen dentro de 30 días desde su término"></label>
+      <label class="campo ancho"><span>Alternativa para quien no acepte</span><input name="alternativa" maxlength="200" placeholder="Ej.: tarjeta de proximidad o clave personal en el mismo reloj"></label>
+      <p class="ancho nota">d) Cómo ejercer derechos: se toma el correo de «Datos de la empresa». El documento va separado del contrato: si el consentimiento se pide dentro del contrato para algo que el contrato no necesita, la ley presume que no fue libre (art. 12). Sin una alternativa real, negarse no es libre.</p>
+      <span class="error-campo ancho" id="errBio"></span>
+    </div>
+    <div class="dlg-pie">
+      <button type="button" class="btn" data-accion="cerrar-dlg">Cancelar</button>
+      <button type="submit" class="btn primario">Generar documento</button>
     </div>
   </form>
 </dialog>
@@ -459,6 +481,9 @@ const CAUSALES_OPO = {
 const DECISIONES = { '': 'Sin decidir', acoge: 'Se acoge', parcial: 'Se acoge en parte', deniega: 'Se deniega' };
 const MEDIOS_CONS = { electronico: 'Medio electrónico (formulario, casilla)', escrito: 'Documento escrito', verbal: 'Declaración verbal registrada', acto: 'Acto afirmativo claro' };
 const MEDIOS_ENVIO = { correo: 'Correo electrónico', carta: 'Carta al domicilio', otro: 'Otro medio' };
+/* Datos biométricos (art. 16 ter): huella, iris, mano, rostro y voz son los ejemplos de la ley. */
+const SISTEMAS_BIO = { huella: 'Huella dactilar', rostro: 'Reconocimiento facial', iris: 'Reconocimiento de iris', mano: 'Geometría de la mano', voz: 'Reconocimiento de voz', otro: 'Otro sistema biométrico' };
+const PISTAS_BIO = { huella: /huella|dactilar/, rostro: /rostro|facial|cara/, iris: /iris/, mano: /\bmano\b/, voz: /\bvoz\b/ };
 
 /* ───────── Utilidades ───────── */
 const $ = (id) => document.getElementById(id);
@@ -618,6 +643,8 @@ const buscarSol = (id) => datos.solicitudes.find((s) => s.id === id);
 const abierta = (s) => !s.respuesta;
 const nombreBase = (b) => (BASES[b] ? BASES[b].nombre : 'Sin base legal');
 const vigentes = (u) => datos.consentimientos.filter((c) => c.usoId === u.id && !c.revocado).length;
+const textoUso = (u) => sinTildes(`${u.nombre} ${u.datos} ${u.sistema}`);
+const esBiometrico = (u) => /biometr/.test(textoUso(u)) || Object.values(PISTAS_BIO).some((re) => re.test(textoUso(u)));
 
 function plazo(s) {
   const vence = sumarDias(s.recepcion, PLAZO + (s.prorroga ? PRORROGA : 0));
@@ -655,7 +682,12 @@ function alertasUso(u) {
   if (u.base === 'consentimiento' && (u.titulares === 'trabajadores' || u.titulares === 'postulantes'))
     a.push(['ambar', '<b>Consentimiento de trabajadores.</b> Si se pide dentro del contrato para algo que no es necesario, la ley presume que no fue libre (art. 12). Revisa si la base correcta es el contrato o una obligación legal, o si este uso sobra.']);
   if (u.sensibles && u.base === 'consentimiento') a.push(['ambar', '<b>Datos sensibles:</b> el consentimiento tiene que ser expreso, por escrito, verbal o por un medio tecnológico equivalente (art. 16).']);
-  if (u.sensibles && u.base && u.base !== 'consentimiento') a.push(['info', 'Datos sensibles sin consentimiento: solo en los casos del art. 16. Si son de salud, los del art. 16 bis. Si son biométricos, solo los del inciso segundo del art. 16 bis, y siempre informando antes el sistema, la finalidad, el período y cómo ejercer derechos (art. 16 ter). Verifica que este calce en uno.']);
+  if (esBiometrico(u) && !u.sensibles) a.push(['ambar', '<b>Parece biometría y no está marcado como sensible.</b> Los datos biométricos son sensibles (art. 2 g).']);
+  if (esBiometrico(u) && u.base && u.base !== 'consentimiento')
+    a.push(['ambar', '<b>Datos biométricos sin consentimiento.</b> Solo caben los casos del inciso segundo del art. 16 bis (art. 16 ter); la causal laboral del art. 16 no alcanza a la biometría. Control de asistencia no calza en ninguno: lo normal es pedir consentimiento expreso y ofrecer una alternativa.']);
+  if (esBiometrico(u) && u.base === 'consentimiento')
+    a.push(['info', 'Biometría: antes de registrar el dato hay que informar el sistema, la finalidad, el plazo y cómo ejercer derechos (art. 16 ter). En «Consentimientos» puedes generar ese documento.']);
+  else if (u.sensibles && u.base && u.base !== 'consentimiento') a.push(['info','Datos sensibles sin consentimiento: solo en los casos del art. 16. Si son de salud, los del art. 16 bis. Si son biométricos, solo los del inciso segundo del art. 16 bis, y siempre informando antes el sistema, la finalidad, el período y cómo ejercer derechos (art. 16 ter). Verifica que este calce en uno.']);
   if (u.base === 'interes') {
     if (!u.baseDetalle) a.push(['ambar', '<b>Interés legítimo sin ponderación.</b> Hay que poder explicar qué interés es y por qué no pasa a llevar los derechos del titular; el titular puede exigir que se le informe (art. 13 d).']);
     a.push(['info', 'El titular puede oponerse a este uso en cualquier momento (art. 8 a).']);
@@ -1066,7 +1098,10 @@ function htmlConsentimientos() {
   }).join('')}</tbody></table>` : `<div class="vacio">${datos.consentimientos.length ? 'Ningún consentimiento con ese filtro.' : 'Aún no hay consentimientos registrados.'}</div>`;
   return `<div class="sec-cab">
       <div><h1>Consentimientos</h1><p>Solo para los usos cuya base es el consentimiento (${usosCons.length} de ${datos.usos.length}). Debe ser libre, informado, específico, previo e inequívoco; si hay datos sensibles, expreso (arts. 12 y 16).</p></div>
-      <button class="btn primario" data-accion="nuevo-cons"${usosCons.length ? '' : ' disabled title="Ningún uso de datos tiene como base el consentimiento"'}>+ Registrar consentimiento</button>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn" data-accion="doc-bio"${usosBio().length ? '' : ' disabled title="Ningún uso de datos biométricos tiene como base el consentimiento"'}>Documento biométrico</button>
+        <button class="btn primario" data-accion="nuevo-cons"${usosCons.length ? '' : ' disabled title="Ningún uso de datos tiene como base el consentimiento"'}>+ Registrar consentimiento</button>
+      </div>
     </div>
     ${huerfanos ? `<p class="alerta">${huerfanos} ${huerfanos === 1 ? 'consentimiento vigente está asociado' : 'consentimientos vigentes están asociados'} a usos cuya base ya no es el consentimiento. Revisa si sobran.</p>` : ''}
     <div class="filtros" style="margin-top:12px">
@@ -1096,6 +1131,72 @@ function abrirRevocar(c) {
   f.medio.innerHTML = opciones(MEDIOS_CONS, c.medio);
   $('dlgRevTxt').textContent = `${c.titular} · ${(buscarUso(c.usoId) || { nombre: 'uso eliminado' }).nombre}`;
   $('dlgRev').showModal();
+}
+
+/* ───────── Documento de consentimiento biométrico (arts. 12, 16 y 16 ter) ───────── */
+const usosBio = () => datos.usos.filter((u) => u.base === 'consentimiento' && esBiometrico(u));
+function rellenarBio(u) {
+  const f = $('formBio');
+  const t = textoUso(u);
+  f.sistema.innerHTML = opciones(SISTEMAS_BIO, Object.keys(PISTAS_BIO).find((k) => PISTAS_BIO[k].test(t)) || 'otro');
+  f.proveedor.value = u.encargados;
+  f.finalidad.value = u.finalidad;
+  f.periodo.value = u.conservacion;
+  $('errBio').textContent = '';
+}
+function abrirBio() {
+  const lista = usosBio();
+  if (!lista.length) return;
+  const f = $('formBio');
+  f.reset();
+  const sel = lista.find((u) => u.id === ui.usoCons) || lista[0];
+  f.usoId.innerHTML = lista.map((u) => `<option value="${esc(u.id)}"${u === sel ? ' selected' : ''}>${esc(u.nombre)}</option>`).join('');
+  rellenarBio(sel);
+  $('dlgBio').showModal();
+  f.descripcion.focus();
+}
+/** El documento que firma la persona. Va aparte del contrato y deja ambas opciones a la vista. */
+function documentoBio(u, v) {
+  const e = datos.empresa;
+  const sistema = SISTEMAS_BIO[v.sistema];
+  const conProveedor = v.proveedor ? `${v.proveedor}, que presta el servicio por encargo de ${e.nombre} y solo puede usar sus datos según nuestras instrucciones.` : `Nadie fuera de ${e.nombre}.`;
+  return `INFORMACIÓN Y CONSENTIMIENTO PARA EL USO DE DATOS BIOMÉTRICOS
+
+${e.nombre}${e.rut ? ' · RUT ' + e.rut : ''}
+Versión del ${fmtLargo(hoyISO())} · ${u.nombre}
+
+Le pedimos este consentimiento en un documento aparte de su contrato. Puede aceptar o no aceptar: su decisión no tendrá ninguna consecuencia para usted.
+
+1. Qué sistema usamos
+${sistema}${v.descripcion ? ': ' + v.descripcion.replace(/[.\s]+$/, '') : ''}. Sus datos biométricos son datos personales sensibles según la ley.
+
+2. Para qué
+${mayus(v.finalidad.replace(/[.\s]+$/, ''))}. No los usaremos para ningún otro fin.
+
+3. Por cuánto tiempo
+${mayus(v.periodo.replace(/[.\s]+$/, ''))}. Si usted retira su consentimiento, dejaremos de usarlos desde ese momento y los suprimiremos.
+
+4. Quién más los trata
+${conProveedor}
+
+5. Sus derechos y cómo ejercerlos
+Puede pedir acceso a sus datos, su rectificación, su supresión, su portabilidad u oponerse a su uso, y pedir el bloqueo temporal de sus datos mientras se resuelve una solicitud de rectificación, supresión u oposición. Escriba a ${e.correo}. Es gratuito. Le responderemos dentro de 30 días corridos, plazo que podemos prorrogar una sola vez por otros 30. Si no le respondemos a tiempo o le negamos lo que pide, puede reclamar ante la Agencia de Protección de Datos Personales.
+
+6. Es voluntario y puede retirarlo cuando quiera
+Si no acepta, usará ${v.alternativa.replace(/[.\s]+$/, '')}. Puede retirar su consentimiento en cualquier momento, sin dar explicaciones y sin costo, avisando a ${e.correo} o por un medio tan simple como el que usó para darlo. Desde entonces usará la alternativa.
+
+DECLARACIÓN
+
+Nombre: ______________________________   RUT: ________________
+
+Marque una opción:
+[  ] Acepto que ${e.nombre} use mis datos biométricos (${sistema.toLowerCase()}) para ${v.finalidad.replace(/[.\s]+$/, '').toLowerCase()}, en los términos de este documento.
+[  ] No acepto. Usaré ${v.alternativa.replace(/[.\s]+$/, '')}.
+
+Firma: ______________________________   Fecha: ________________
+
+Se entrega una copia a la persona. ${e.nombre} conserva el original como prueba del consentimiento.
+Arts. 12, 16 y 16 ter de ${LEY}.`;
 }
 
 /* ───────── Formulario para titulares ───────── */
@@ -1262,6 +1363,7 @@ document.addEventListener('click', async (e) => {
     }
     case 'nuevo-uso': abrirUso(null); break;
     case 'nuevo-cons': abrirCons(); break;
+    case 'doc-bio': abrirBio(); break;
     case 'acuse-hoy': if (s) cambiar(() => { s.checks.acuse = hoyISO(); anotar('Acuse de recibo enviado.', s.id); }); break;
     case 'carta-acuse': if (s) abrirCarta('Carta de acuse de recibo', cartaAcuse(s)); break;
     case 'carta-prorroga': if (s) abrirCarta('Carta de prórroga', cartaProrroga(s)); break;
@@ -1338,6 +1440,7 @@ document.addEventListener('change', (e) => {
   if (el.id === 'estCons') { ui.estCons = el.value; pintar(); return; }
   if (el.form && el.form.id === 'formPub') { ajustarFormPub(); return; }
   if (el.form && el.form.id === 'formUso' && el.name === 'base') { etiquetaDetalle(); return; }
+  if (el.form && el.form.id === 'formBio' && el.name === 'usoId') { const u = buscarUso(el.value); if (u) rellenarBio(u); return; }
   if (el.form && el.form.id === 'formSol' && el.name === 'tipo') { $('campoBloqueo').hidden = !CON_BLOQUEO.includes(el.value); return; }
   const s = solActual();
   if (!s) return;
@@ -1418,6 +1521,20 @@ $('formCons').addEventListener('submit', (e) => {
   $('dlgCons').close();
   guardar(); pintar();
   avisar(c.texto ? 'Consentimiento registrado.' : 'Registrado. Conviene anotar qué texto se le mostró: es parte de la prueba.');
+});
+$('formBio').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const f = e.target;
+  const u = buscarUso(f.usoId.value);
+  if (!u) return;
+  const v = { sistema: f.sistema.value in SISTEMAS_BIO ? f.sistema.value : 'otro', proveedor: txt(f.proveedor.value, 160), descripcion: txt(f.descripcion.value, 300), finalidad: txt(f.finalidad.value, 240), periodo: txt(f.periodo.value, 200), alternativa: txt(f.alternativa.value, 200) };
+  // Las cuatro informaciones del art. 16 ter son condición de licitud: sin ellas no se genera el documento.
+  const falta = [!v.finalidad && 'la finalidad (b)', !v.periodo && 'el plazo (c)', !datos.empresa.correo && 'el correo para ejercer derechos (d), en «Datos de la empresa»', !v.alternativa && 'la alternativa para quien no acepte'].filter(Boolean);
+  if (falta.length) { $('errBio').textContent = `Falta ${falta.join(', ')}.`; return; }
+  $('dlgBio').close();
+  cambiar(() => anotar(`Documento de consentimiento biométrico generado para «${u.nombre}» (versión del ${fmt(hoyISO())}).`));
+  abrirCarta('Documento de consentimiento biométrico', documentoBio(u, v));
+  avisar(`Al registrar cada consentimiento, anota como texto «Documento biométrico, versión del ${fmt(hoyISO())}».`);
 });
 $('formRev').addEventListener('submit', (e) => {
   e.preventDefault();
