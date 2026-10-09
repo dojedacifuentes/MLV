@@ -135,6 +135,28 @@
   .historial li:last-child { border-bottom: 0; }
   .historial time { color: var(--suave); margin-right: 8px; font-variant-numeric: tabular-nums; }
 
+  /* Tablero de casos */
+  .barra-t { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 10px 12px; margin-bottom: 14px; }
+  .barra-t label.campo { flex: 1 1 280px; }
+  .nuevo-caso { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)) auto; gap: 10px; align-items: end; margin-bottom: 16px; }
+  @media (max-width: 760px) { .nuevo-caso { grid-template-columns: 1fr; } }
+  .columnas { display: grid; grid-template-columns: repeat(var(--n, 4), minmax(175px, 1fr)); gap: 12px; align-items: start; overflow-x: auto; padding-bottom: 6px; }
+  @media (max-width: 760px) { .columnas { grid-template-columns: 1fr; } }
+  .colu { background: var(--hundido); border-radius: var(--radio); padding: 12px; min-width: 0; }
+  .colu.destino { outline: 2px dashed var(--acento); outline-offset: -2px; }
+  .colu h3 { font: 600 15px/1.3 var(--serif); margin: 2px 2px 4px; display: flex; justify-content: space-between; gap: 8px; }
+  .colu h3 span { font: 500 13px/1.6 var(--sans); color: var(--suave); }
+  .colu .plazo-c { font-size: 12px; color: var(--suave); margin: 0 2px 10px; }
+  .colu .vacia { font-size: 13px; color: var(--suave); padding: 4px 2px 8px; }
+  .caso { background: var(--papel); border: 1px solid var(--linea); border-radius: 8px; padding: 11px 12px; margin-bottom: 10px; cursor: grab; }
+  .caso.arrastrando { opacity: .45; }
+  .caso b { display: block; font-size: 14.5px; }
+  .caso .mini { display: block; font-size: 12.5px; color: var(--suave); margin-top: 3px; overflow-wrap: anywhere; }
+  .caso .pie-c { display: flex; gap: 6px; align-items: center; margin-top: 8px; }
+  .caso select { flex: 1; min-width: 0; width: auto; font-size: 12.5px; padding: 4px 6px; }
+  .caso .quitar { flex: none; background: none; border: 0; color: var(--suave); cursor: pointer; font-size: 16px; padding: 2px 6px; }
+  .caso .quitar:hover { color: var(--rojo); }
+
   /* Levantar un proceso */
   .entrevista { max-width: 720px; }
   .progreso { height: 6px; background: var(--linea2); border-radius: 3px; overflow: hidden; margin: 0 0 18px; }
@@ -192,6 +214,7 @@
   <div class="franja" id="franja-demo" hidden>Los procesos que vienen son <b>ejemplos</b> para mostrar la idea: los pasos, los plazos y los responsables los define MLV. <button class="btn chico" id="sin-ejemplos" style="margin-left:6px">Empezar sin ejemplos</button></div>
   <nav class="vistas" aria-label="Secciones">
     <a href="#/" data-v="mapa">Mapa de procesos</a>
+    <a href="#/tablero" data-v="tablero">Tablero de casos</a>
     <a href="#/levantar" data-v="levantar">Levantar un proceso</a>
     <a href="#/claude" data-v="claude">Llevarlo a Claude</a>
   </nav>
@@ -354,6 +377,24 @@ function cargar() {
   try { return JSON.parse(crudo); } catch { return null; }
 }
 let datos = cargar() || { version: 1, demo: true, reglas: REGLAS_BASE, procesos: ejemplos() };
+// Casos de ejemplo (ficticios). El tablero no lleva nombres de las partes: cada caso se identifica por su código.
+function casosEjemplo(p) {
+  const c = (codigo, cliente, responsable, dias, paso, nota) => ({ id: nuevoId(), codigo, cliente, responsable, ingreso: diasAtras(dias), paso, nota, hist: [{ f: diasAtras(dias), t: 'Caso abierto.' }] });
+  if (/karin/i.test(p.nombre)) return [
+    c('LK-2026-011', 'Clínica Dental Ejemplo SpA', 'Encargada de investigaciones', 1, 0, 'Denuncia recibida por correo del cliente.'),
+    c('LK-2026-009', 'Constructora Ficticia del Sur Ltda.', 'Encargada de investigaciones', 4, 1, 'El cliente debe confirmar las medidas.'),
+    c('LK-2026-007', 'Transportes Ficticio Ltda.', 'Abogado investigador', 12, 2, 'Faltan dos declaraciones.'),
+    c('LK-2026-005', 'Almacenes Demo SpA', 'Abogado investigador', 21, 3, 'Borrador del informe en revisión.'),
+    c('LK-2026-002', 'Fundación Educacional Colegio Ejemplo', 'Encargada de investigaciones', 48, 5, 'Informe entregado y remitido.'),
+  ];
+  if (/despido/i.test(p.nombre)) return [
+    c('DE-2026-031', 'Transportes Ficticio Ltda.', 'Abogado asociado', 0, 0, 'Esperando el contrato y las liquidaciones.'),
+    c('DE-2026-029', 'Almacenes Demo SpA', 'Abogado asociado', 2, 2, 'Carta en revisión del socio.'),
+    c('DE-2026-024', 'Constructora Ficticia del Sur Ltda.', 'Abogado asociado', 6, 4, 'Falta firmar el finiquito.'),
+  ];
+  return [];
+}
+datos.procesos.forEach((p) => { if (!Array.isArray(p.casos)) p.casos = datos.demo ? casosEjemplo(p) : []; });
 let tGuardar;
 function guardar() {
   try { localStorage.setItem(CLAVE, JSON.stringify(datos)); sinGuardar = false; } catch { sinGuardar = true; }
@@ -370,6 +411,7 @@ function ruta() {
   const r = location.hash.replace(/^#\/?/, '').split('/');
   if (r[0] === 'p' && r[1]) return { v: 'ficha', id: r[1] };
   if (r[0] === 'levantar') return { v: 'levantar' };
+  if (r[0] === 'tablero') return { v: 'tablero', id: r[1] || '' };
   if (r[0] === 'claude') return { v: 'claude' };
   return { v: 'mapa' };
 }
@@ -382,6 +424,7 @@ function pintar() {
   $('#franja-demo').hidden = !datos.demo;
   if (r.v === 'ficha') { const p = proceso(r.id); if (!p) { location.hash = '#/'; return; } pintarFicha(p); }
   else if (r.v === 'levantar') pintarLevantar();
+  else if (r.v === 'tablero') pintarTablero(r.id);
   else if (r.v === 'claude') pintarClaude();
   else pintarMapa();
   window.scrollTo(0, 0);
@@ -415,6 +458,7 @@ function pintarMapa() {
       <b>${esc(p.nombre || 'Proceso sin nombre')}</b>
       <span class="fila-t"><span class="chip ${e.c}">${e.t}</span><span class="mini" style="margin:0">${(p.pasos || []).length} pasos</span></span>
       <span class="mini">Dueño: ${p.dueno?.trim() ? esc(p.dueno) : '<span class="rojo">sin dueño</span>'}</span>
+      ${enCurso(p) ? `<span class="mini">${enCurso(p)} caso${enCurso(p) > 1 ? 's' : ''} en curso</span>` : ''}
       <span class="mini ${revisionVencida(p) ? 'rojo' : ''}">Revisión: ${prox ? (revisionVencida(p) ? 'vencida el ' : 'próxima el ') + fecha(prox) : 'pendiente'}</span>
     </a>`;
   };
@@ -461,6 +505,83 @@ function pintarMapa() {
   };
 }
 
+// ───────────────────────── tablero de casos ─────────────────────────
+const enCurso = (p) => (p.casos || []).filter((c) => c.paso < (p.pasos || []).length).length;
+const diasDesde = (iso) => Math.max(0, Math.round((new Date(hoyISO()) - new Date(iso)) / 86400000));
+let tableroId = '';
+function pintarTablero(id) {
+  const p = proceso(id) || proceso(tableroId) || [...datos.procesos].sort((a, b) => enCurso(b) - enCurso(a))[0];
+  if (!p) { $('#vista').innerHTML = '<p class="nota">Todavía no hay procesos. Levanta uno en «Mapa de procesos» y aquí podrás seguir sus casos.</p>'; return; }
+  tableroId = p.id;
+  p.casos = p.casos || [];
+  p.casos.forEach((c) => { c.paso = Math.min(Math.max(0, +c.paso || 0), (p.pasos || []).length); });  // por si se borraron pasos
+  const cols = [...(p.pasos || []).map((s, i) => ({ t: s.titulo?.trim() || `Paso ${i + 1}`, plazo: s.plazo?.trim() })), { t: 'Cerrado', plazo: '' }];
+  const opciones = (actual) => cols.map((c, j) => `<option value="${j}" ${j === actual ? 'selected' : ''}>${j < cols.length - 1 ? j + 1 + '. ' : ''}${esc(c.t)}</option>`).join('');
+  const tarjeta = (c) => `<article class="caso" draggable="true" data-caso="${c.id}">
+      <b>${esc(c.codigo || 'Sin código')}</b>
+      <span class="mini">${esc(c.cliente || '—')}</span>
+      <span class="mini">${esc(c.responsable || 'Sin responsable')} · ${diasDesde(c.ingreso)} día${diasDesde(c.ingreso) === 1 ? '' : 's'} desde el ingreso</span>
+      ${c.nota ? `<span class="mini">${esc(c.nota)}</span>` : ''}
+      <div class="pie-c"><select data-mover-caso="${c.id}" aria-label="Mover ${esc(c.codigo)}">${opciones(c.paso)}</select><button class="quitar" data-quitar-caso="${c.id}" title="Eliminar el caso" aria-label="Eliminar ${esc(c.codigo)}">×</button></div>
+    </article>`;
+  $('#vista').innerHTML = `
+    <div class="barra-t">
+      <label class="campo"><span>Proceso</span><select id="t-proceso">${datos.procesos.map((x) => `<option value="${x.id}" ${x.id === p.id ? 'selected' : ''}>${esc(x.nombre)}${enCurso(x) ? ` (${enCurso(x)})` : ''}</option>`).join('')}</select></label>
+      <a class="btn" href="#/p/${p.id}">Ver la ficha del proceso</a>
+    </div>
+    <p class="nota">Las columnas son los pasos del proceso. Arrastra una tarjeta para avanzar el caso (o usa su selector). El tablero no lleva nombres de las partes ni datos sensibles: cada caso se identifica por su código, y el detalle queda en el expediente.</p>
+    <form class="caja nuevo-caso" id="form-caso" autocomplete="off">
+      <label class="campo"><span>Código del caso</span><input name="codigo" required maxlength="40" placeholder="Ej.: LK-2026-012"></label>
+      <label class="campo"><span>Cliente</span><input name="cliente" maxlength="80"></label>
+      <label class="campo"><span>Responsable</span><input name="responsable" maxlength="60"></label>
+      <button class="btn primario">Agregar caso</button>
+    </form>
+    <div class="columnas" style="--n:${cols.length}">${cols.map((col, j) => {
+      const en = p.casos.filter((c) => c.paso === j);
+      return `<section class="colu" data-col="${j}"><h3>${j < cols.length - 1 ? j + 1 + '. ' : ''}${esc(col.t)}<span>${en.length}</span></h3>
+        ${col.plazo ? `<p class="plazo-c">${/^plazo/i.test(col.plazo) ? '' : 'Plazo: '}${esc(col.plazo)}</p>` : '<p class="plazo-c">&nbsp;</p>'}
+        ${en.map(tarjeta).join('') || '<div class="vacia">Sin casos.</div>'}</section>`;
+    }).join('')}</div>`;
+  $('#t-proceso').onchange = (e) => { location.hash = `#/tablero/${e.target.value}`; };
+  $('#form-caso').onsubmit = (e) => {
+    e.preventDefault();
+    const f = e.target;
+    const c = { id: nuevoId(), codigo: f.codigo.value.trim(), cliente: f.cliente.value.trim(), responsable: f.responsable.value.trim(), ingreso: hoyISO(), paso: 0, nota: '', hist: [{ f: hoyISO(), t: 'Caso abierto.' }] };
+    if (!c.codigo) return;
+    p.casos.push(c); guardar(); pintarTablero(p.id); avisar(`Caso ${c.codigo} agregado`);
+  };
+}
+function moverCaso(n, idCaso) {
+  const p = proceso(tableroId); const c = p?.casos.find((x) => x.id === idCaso);
+  if (!c || c.paso === n) return;
+  const nombre = (j) => j < p.pasos.length ? (p.pasos[j].titulo?.trim() || `Paso ${j + 1}`) : 'Cerrado';
+  c.hist = c.hist || []; c.hist.unshift({ f: hoyISO(), t: `${nombre(c.paso)} → ${nombre(n)}` });
+  c.paso = n; guardar(); pintarTablero(p.id); avisar(`${c.codigo}: ${nombre(n)}`);
+}
+let casoArrastrado = null;
+const limpiarDestino = () => document.querySelectorAll('.colu.destino').forEach((x) => x.classList.remove('destino'));
+document.addEventListener('dragstart', (e) => {
+  const t = e.target.closest?.('[data-caso]'); if (!t) return;
+  casoArrastrado = t.dataset.caso; e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', casoArrastrado); t.classList.add('arrastrando');
+});
+document.addEventListener('dragend', (e) => { e.target.closest?.('[data-caso]')?.classList.remove('arrastrando'); casoArrastrado = null; limpiarDestino(); });
+document.addEventListener('dragover', (e) => {
+  const col = casoArrastrado && e.target.closest?.('.colu[data-col]'); if (!col) return;
+  e.preventDefault(); e.dataTransfer.dropEffect = 'move';
+  if (!col.classList.contains('destino')) { limpiarDestino(); col.classList.add('destino'); }
+});
+document.addEventListener('drop', (e) => {
+  const col = casoArrastrado && e.target.closest?.('.colu[data-col]'); if (!col) return;
+  e.preventDefault(); const id = casoArrastrado; casoArrastrado = null; limpiarDestino(); moverCaso(+col.dataset.col, id);
+});
+document.addEventListener('change', (e) => { if (e.target.dataset.moverCaso) moverCaso(+e.target.value, e.target.dataset.moverCaso); });
+document.addEventListener('click', (e) => {
+  const b = e.target.closest?.('[data-quitar-caso]'); if (!b) return;
+  const p = proceso(tableroId); const c = p?.casos.find((x) => x.id === b.dataset.quitarCaso);
+  if (!c || !confirm(`¿Eliminar el caso ${c.codigo} del tablero?`)) return;
+  p.casos = p.casos.filter((x) => x !== c); guardar(); pintarTablero(p.id);
+});
+
 // ───────────────────────── ficha ─────────────────────────
 function campo(etiqueta, ruta, valor, tipo = 'input', extra = '') {
   const ctrl = tipo === 'textarea'
@@ -503,6 +624,7 @@ function pintarFicha(p) {
     <input class="titulo-ficha" data-c="nombre" value="${esc(p.nombre)}" aria-label="Nombre del proceso">
     <div class="ficha-acc">
       <button class="btn primario" data-acc="claude">Instrucciones para Claude</button>
+      <a class="btn" href="#/tablero/${p.id}">Tablero de casos${enCurso(p) ? ` (${enCurso(p)})` : ''}</a>
       <button class="btn" data-acc="imprimir">Imprimir ficha</button>
       <button class="btn" data-acc="duplicar">Duplicar</button>
       <button class="btn peligro" data-acc="borrar">Eliminar</button>
@@ -567,7 +689,7 @@ function pintarFicha(p) {
     else if (acc === 'revisado') { p.revision = p.revision || { cadaMeses: 6 }; p.revision.ultima = hoyISO(); anotar(p, 'Revisado: sigue calzando con cómo se trabaja.'); guardar(); pintarFicha(p); avisar('Revisión registrada'); }
     else if (acc === 'claude') abrirDialogo(`Instrucciones para Claude · ${p.nombre}`, 'Pégalas en las instrucciones de un proyecto de Claude del área y adjunta las plantillas que se mencionan.', textoClaude(p), `instrucciones-${slug(p.nombre)}.md`);
     else if (acc === 'imprimir') imprimir(p);
-    else if (acc === 'duplicar') { const c = JSON.parse(JSON.stringify(p)); c.id = nuevoId(); c.nombre += ' (copia)'; c.estado = 'borrador'; c.historial = []; anotar(c, `Copiado de «${p.nombre}».`); datos.procesos.push(c); guardar(); location.hash = `#/p/${c.id}`; }
+    else if (acc === 'duplicar') { const c = JSON.parse(JSON.stringify(p)); c.id = nuevoId(); c.nombre += ' (copia)'; c.estado = 'borrador'; c.historial = []; c.casos = []; anotar(c, `Copiado de «${p.nombre}».`); datos.procesos.push(c); guardar(); location.hash = `#/p/${c.id}`; }
     else if (acc === 'borrar') { if (confirm(`¿Eliminar «${p.nombre}»? No se puede deshacer (salvo con un respaldo).`)) { datos.procesos = datos.procesos.filter((x) => x !== p); guardar(); location.hash = '#/'; } }
   };
 }

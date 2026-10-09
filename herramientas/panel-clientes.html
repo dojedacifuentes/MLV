@@ -146,6 +146,10 @@
   .tarjeta .pie-t { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
   .tarjeta select { font-size: 13px; padding: 4px 6px; }
   .tarjeta .mini + .mini { margin-top: 2px; }
+  .kanban .tarjeta[draggable="true"] { cursor: grab; }
+  .kanban .tarjeta.arrastrando { opacity: .45; }
+  .col.destino { outline: 2px dashed var(--acento); outline-offset: -2px; }
+  .ayuda-kanban { font-size: 13px; color: var(--suave); margin: -4px 0 10px; }
 
   /* Ficha */
   .miga { margin: 20px 0 8px; font-size: 14px; }
@@ -696,9 +700,9 @@ function pintarLista() {
 }
 
 function htmlKanban(filas) {
-  return `<div class="kanban">${ETAPAS.map((nombre, i) => {
+  return `<p class="ayuda-kanban">Arrastra una tarjeta a otra columna para cambiar la etapa (o usa el selector de la tarjeta).</p><div class="kanban">${ETAPAS.map((nombre, i) => {
     const en = filas.filter((f) => f.c.etapa === i).sort((a, b) => SEM[a.sem.color].orden - SEM[b.sem.color].orden);
-    const tarjetas = en.map(({ c, av, sem, prox }) => `<article class="tarjeta">
+    const tarjetas = en.map(({ c, av, sem, prox }) => `<article class="tarjeta" draggable="true" data-arrastre="${esc(c.id)}">
         <a class="nombre" href="${enlaceFicha(c)}">${esc(c.razon)}</a>
         <span class="mini">${esc([c.rubro, c.tamano].filter(Boolean).join(' · '))}</span>
         ${barraHTML(av)}
@@ -708,7 +712,7 @@ function htmlKanban(filas) {
           <select data-mover="${esc(c.id)}" data-foco="mover-${esc(c.id)}" aria-label="Cambiar etapa de ${esc(c.razon)}">${ETAPAS.map((e, j) => `<option value="${j}"${j === c.etapa ? ' selected' : ''}>${j + 1}. ${e}</option>`).join('')}</select>
         </div>
       </article>`).join('');
-    return `<section class="col"><h3>${i + 1}. ${nombre}<span>${en.length}</span></h3>${tarjetas || '<div class="nada">Sin clientes en esta etapa.</div>'}</section>`;
+    return `<section class="col" data-etapa="${i}"><h3>${i + 1}. ${nombre}<span>${en.length}</span></h3>${tarjetas || '<div class="nada">Sin clientes en esta etapa.</div>'}</section>`;
   }).join('')}</div>`;
 }
 
@@ -1120,6 +1124,37 @@ document.addEventListener('click', async (e) => {
       if (c) cambiar(() => { c[b.dataset.lista] = c[b.dataset.lista].filter((x) => x.id !== b.dataset.item); });
       break;
   }
+});
+
+/* Arrastrar tarjetas entre columnas (con mouse; en el celular queda el selector de la tarjeta). */
+let arrastrado = null;
+const limpiarDestino = () => document.querySelectorAll('.col.destino').forEach((x) => x.classList.remove('destino'));
+document.addEventListener('dragstart', (e) => {
+  const t = e.target.closest?.('[data-arrastre]');
+  if (!t) return;
+  arrastrado = t.dataset.arrastre;
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', arrastrado);
+  t.classList.add('arrastrando');
+});
+document.addEventListener('dragend', (e) => {
+  e.target.closest?.('[data-arrastre]')?.classList.remove('arrastrando');
+  arrastrado = null; limpiarDestino();
+});
+document.addEventListener('dragover', (e) => {
+  const col = arrastrado && e.target.closest?.('.col[data-etapa]');
+  if (!col) return;
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  if (!col.classList.contains('destino')) { limpiarDestino(); col.classList.add('destino'); }
+});
+document.addEventListener('drop', (e) => {
+  const col = arrastrado && e.target.closest?.('.col[data-etapa]');
+  if (!col) return;
+  e.preventDefault();
+  const k = buscarCliente(arrastrado), n = +col.dataset.etapa;
+  arrastrado = null; limpiarDestino();
+  if (k && n !== k.etapa) { cambiar(() => cambiarEtapa(k, n)); avisar(`«${k.razon}» pasó a «${ETAPAS[k.etapa]}».`); }
 });
 
 document.addEventListener('change', (e) => {
