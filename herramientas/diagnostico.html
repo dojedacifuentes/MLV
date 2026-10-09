@@ -1,0 +1,940 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- La página no puede conectarse a nada: el navegador bloquea cualquier envío. Así se puede prometer que las respuestas no salen del computador. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; connect-src 'none'; form-action 'none'; base-uri 'none'">
+<meta name="robots" content="noindex">
+<title>Diagnóstico de herramientas · MLV Abogados</title>
+<style>
+  :root {
+    --fondo: #f6f5f1; --papel: #ffffff; --papel2: #fbfaf7; --hundido: #efede6;
+    --tinta: #1a2636; --tinta2: #3b4859; --suave: #5f6873; --linea: #dddbd2; --linea2: #ebe9e2; --campo: #8e8a82;
+    --acento: #0d5c68; --acento-osc: #094650; --acento-claro: #e3eef0; --acento-borde: #c3dbde;
+    --verde: #2b7549; --verde-f: #e4f0e8; --verde-b: #bcd8c6;
+    --ambar: #94600f; --ambar-f: #f9eed8; --ambar-b: #ead2a2;
+    --rojo: #a12f2a; --rojo-f: #f7e2e0; --rojo-b: #e6bdb9;
+    --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", serif;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --mono: ui-monospace, "Cascadia Mono", Consolas, "Courier New", monospace;
+    --radio: 10px;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; background: var(--fondo); color: var(--tinta); font: 15px/1.5 var(--sans); }
+  .app { max-width: 1280px; margin: 0 auto; padding: 0 28px 36px; }
+  a { color: var(--acento); }
+  h1, h2, h3 { font-family: var(--serif); font-weight: 600; color: var(--tinta); }
+  :focus-visible { outline: 2px solid var(--acento); outline-offset: 2px; }
+  [hidden] { display: none !important; }
+  .sr { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+
+  /* Cabecera */
+  .cabecera { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px 24px; padding: 26px 0 18px; }
+  .firma { font: 600 25px/1.1 var(--serif); letter-spacing: .01em; color: var(--tinta); text-decoration: none; }
+  .sub { color: var(--suave); font-size: 12.5px; letter-spacing: .1em; text-transform: uppercase; margin-top: 6px; }
+  .acciones-cab { display: flex; align-items: center; flex-wrap: wrap; gap: 10px 16px; }
+
+  /* Título y pestañas */
+  .sec-cab { display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 10px 20px; margin: 4px 0 0; }
+  .sec-cab h1 { font-size: 27px; line-height: 1.15; margin: 0; }
+  .sec-cab h1:focus { outline: none; }
+  .lead { margin: 10px 0 0; color: var(--tinta2); max-width: 820px; }
+  .chip { display: inline-flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 500; padding: 4px 11px; border-radius: 999px; border: 1px solid transparent; }
+  .chip.verde { background: var(--verde-f); color: var(--verde); border-color: var(--verde-b); }
+  .chip.verde i { width: 8px; height: 8px; border-radius: 50%; background: var(--verde); flex: none; }
+  .chip.ambar { background: var(--ambar-f); color: var(--ambar); border-color: var(--ambar-b); }
+  .chip.azul { background: var(--acento-claro); color: var(--acento); border-color: var(--acento-borde); }
+  .vistas { display: flex; flex-wrap: wrap; gap: 2px; border-bottom: 1px solid var(--linea); margin: 20px 0 22px; }
+  .vistas [role=tab] { font: inherit; font-size: 14.5px; font-weight: 500; padding: 10px 13px; color: var(--tinta2); background: none; border: 0; border-bottom: 2px solid transparent; margin-bottom: -1px; cursor: pointer; }
+  .vistas [role=tab]:hover { color: var(--acento); }
+  .vistas [role=tab][aria-selected="true"] { color: var(--tinta); border-color: var(--acento); }
+
+  /* Botones y campos */
+  .btn { font: inherit; font-size: 14px; font-weight: 500; line-height: 1.3; color: var(--tinta); background: var(--papel); border: 1px solid var(--linea); border-radius: 8px; padding: 8px 14px; cursor: pointer; text-decoration: none; display: inline-block; }
+  .btn:hover { border-color: var(--acento); color: var(--acento); }
+  .btn.primario { background: var(--acento); border-color: var(--acento); color: #fff; }
+  .btn.primario:hover { background: var(--acento-osc); color: #fff; }
+  .btn.chico { font-size: 13px; padding: 5px 10px; }
+  input, select, textarea { font: inherit; font-size: 14px; color: var(--tinta); background: var(--papel); border: 1px solid var(--campo); border-radius: 7px; padding: 7px 10px; min-width: 0; max-width: 100%; }
+  input:focus, select:focus, textarea:focus { border-color: var(--acento); outline: none; box-shadow: 0 0 0 3px var(--acento-claro); }
+  input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px solid var(--acento); outline-offset: 1px; }
+  input[type=checkbox], input[type=radio] { width: 17px; height: 17px; accent-color: var(--acento); margin: 0; flex: none; }
+  textarea { resize: vertical; width: 100%; min-height: 80px; font: 15px/1.55 var(--sans); padding: 10px 12px; }
+  label.marca { display: flex; align-items: flex-start; gap: 9px; font-size: 14px; color: var(--tinta2); cursor: pointer; line-height: 1.45; margin: 8px 0 0; }
+  label.marca input { margin-top: 2px; }
+
+  /* Cajas */
+  .caja { background: var(--papel); border: 1px solid var(--linea); border-radius: var(--radio); padding: 18px 20px; min-width: 0; }
+  .caja + .caja, .caja + .rejilla, .rejilla + .caja, .rejilla + .rejilla { margin-top: 16px; }
+  .caja h2 { font-size: 19px; margin: 0 0 6px; }
+  .caja h2 .paso-n { display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--acento); color: #fff; font: 600 13px/1 var(--sans); margin-right: 9px; vertical-align: 2px; }
+  .caja h3 { font-size: 16.5px; margin: 0 0 4px; line-height: 1.3; }
+  .nota { font-size: 13.5px; color: var(--suave); margin: 4px 0 10px; }
+  .fila-acc { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 12px; }
+  .msg { font-size: 13.5px; color: var(--tinta2); min-height: 1.4em; margin: 8px 0 0; }
+  .msg.warn { color: var(--ambar); font-weight: 500; }
+  .rejilla { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; align-items: start; }
+  @media (max-width: 900px) { .rejilla { grid-template-columns: 1fr; } }
+  .pie { margin-top: 40px; padding-top: 14px; border-top: 1px solid var(--linea); font-size: 13px; color: var(--suave); }
+  .pie p { margin: 4px 0; }
+
+  /* Fuente de los datos */
+  .fuente { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; background: var(--papel); border: 1px solid var(--linea); border-radius: var(--radio); padding: 12px 16px; }
+  .fuente p { margin: 0; flex: 1 1 300px; color: var(--tinta2); font-size: 14px; }
+  .fuente .fila-acc { margin: 0; }
+  .filtro { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 16px 0 0; }
+  .filtro label { font-weight: 600; font-size: 14px; }
+  .archivo-oculto { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+
+  /* Cifras */
+  .cifras { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-top: 16px; }
+  @media (max-width: 900px) { .cifras { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  .cifra { background: var(--papel); border: 1px solid var(--linea); border-radius: var(--radio); padding: 14px 16px; }
+  .cifra .n { font: 600 30px/1.1 var(--serif); color: var(--tinta); }
+  .cifra .n small { font: 500 15px/1 var(--sans); color: var(--suave); margin-left: 4px; }
+  .cifra .t { font-size: 13.5px; color: var(--tinta2); margin-top: 4px; }
+  .cifra.rojo { border-color: var(--rojo-b); background: var(--rojo-f); }
+  .cifra.rojo .n { color: var(--rojo); }
+
+  /* Alertas y prioridades */
+  .alertas { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 8px; }
+  .alertas li { border-left: 3px solid var(--c); background: var(--f); padding: 10px 12px; border-radius: 0 6px 6px 0; font-size: 14px; color: var(--tinta); }
+  .alertas li b { font-weight: 600; }
+  .alertas li .que { display: block; color: var(--tinta2); margin-top: 2px; }
+  .alertas li.rojo { --c: var(--rojo); --f: var(--rojo-f); }
+  .alertas li.ambar { --c: var(--ambar); --f: var(--ambar-f); }
+  .alertas li.azul { --c: var(--acento); --f: var(--acento-claro); }
+  .alertas li.verde { --c: var(--verde); --f: var(--verde-f); }
+  .prioridades { list-style: none; margin: 8px 0 0; padding: 0; counter-reset: p; }
+  .prioridades li { counter-increment: p; display: grid; grid-template-columns: 30px minmax(0, 1fr) auto; gap: 4px 12px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--linea2); font-size: 14.5px; }
+  .prioridades li:last-child { border-bottom: 0; }
+  .prioridades li::before { content: counter(p); display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--acento-claro); color: var(--acento); font-weight: 600; font-size: 13px; }
+  .prioridades .h { font-weight: 600; color: var(--tinta); white-space: nowrap; }
+  .prioridades .d { grid-column: 2 / 4; font-size: 13px; color: var(--suave); }
+
+  /* Barras */
+  .barras { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 7px; }
+  .barras li { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr) 72px; gap: 10px; align-items: center; font-size: 13.5px; }
+  .barras .et { color: var(--tinta); overflow-wrap: anywhere; line-height: 1.3; }
+  .barras .pista { height: 12px; background: var(--hundido); border-radius: 6px; overflow: hidden; }
+  .barras .pista i { display: block; height: 100%; background: var(--acento); border-radius: 6px; min-width: 2px; }
+  .barras li.rojo .pista i { background: var(--rojo); }
+  .barras li.ambar .pista i { background: #c18a2e; }
+  .barras li.cero .pista i { min-width: 0; }
+  .barras .num { text-align: right; color: var(--tinta2); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  @media (max-width: 560px) { .barras li { grid-template-columns: minmax(0, 1fr) 64px; } .barras .pista { grid-column: 1 / 3; grid-row: 2; } }
+  .textos { margin: 8px 0 0; padding-left: 20px; color: var(--tinta2); font-size: 14px; }
+  .textos li { margin: 6px 0; }
+  .vacio { color: var(--suave); font-size: 14px; margin: 8px 0 0; }
+
+  /* Preguntas */
+  .seccion-p { font: 600 12.5px/1.4 var(--sans); letter-spacing: .1em; text-transform: uppercase; color: var(--suave); margin: 22px 0 8px; }
+  .seccion-p:first-child { margin-top: 4px; }
+  .pregunta { border-top: 1px solid var(--linea2); padding: 12px 0; }
+  .pregunta h3 { font-size: 16px; }
+  .pregunta .tipo { display: inline-block; font: 500 12px/1.4 var(--sans); color: var(--acento); background: var(--acento-claro); border-radius: 999px; padding: 2px 9px; margin: 2px 0 6px; }
+  .pregunta ul { margin: 0; padding-left: 20px; color: var(--tinta2); font-size: 14px; columns: 2; column-gap: 28px; }
+  @media (max-width: 700px) { .pregunta ul { columns: 1; } }
+  .pregunta .nota { margin: 6px 0 0; }
+  .aviso-texto { white-space: pre-wrap; background: var(--papel2); border: 1px solid var(--linea); border-radius: 8px; padding: 12px 14px; font-size: 14px; color: var(--tinta2); margin: 8px 0 0; }
+  .pasos { margin: 8px 0 0; padding-left: 22px; color: var(--tinta2); }
+  .pasos li { margin: 8px 0; }
+  .pasos b { color: var(--tinta); font-weight: 600; }
+  fieldset.resp { border: 0; border-top: 1px solid var(--linea2); padding: 12px 0; margin: 0; min-width: 0; }
+  fieldset.resp legend { font: 600 15.5px/1.35 var(--serif); padding: 0; float: left; width: 100%; margin-bottom: 4px; }
+  fieldset.resp .ops { clear: both; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 20px; }
+  @media (max-width: 700px) { fieldset.resp .ops { grid-template-columns: 1fr; } }
+
+  /* Celular y táctil */
+  @media (pointer: coarse) {
+    .btn, .btn.chico, select, input:not([type=checkbox]):not([type=radio]) { min-height: 44px; }
+    .vistas [role=tab] { min-height: 44px; }
+    label.marca { min-height: 36px; align-items: center; }
+  }
+  @media (max-width: 760px) {
+    .app { padding: 0 16px 28px; }
+    input, select, textarea { font-size: 16px; }
+    .caja { padding: 16px; }
+  }
+  @media (max-width: 700px) {
+    .vistas { display: grid; grid-template-columns: 1fr 1fr 1fr; }
+    .vistas [role=tab] { min-height: 44px; text-align: center; padding: 8px 6px; font-size: 14px; }
+  }
+  @media print {
+    body { background: #fff; font-size: 12.5px; }
+    .app { max-width: none; padding: 0; }
+    .acciones-cab, .vistas, .fuente .fila-acc, .filtro, .pie, .no-imprimir { display: none !important; }
+    .caja, .cifra { break-inside: avoid; border-color: #ccc; }
+    .rejilla { grid-template-columns: 1fr 1fr; }
+    .barras .pista { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  }
+
+  /* Común a las herramientas del estudio: vuelta a la portada, botón de ayuda y guía de primer uso */
+  .ico { width: 1.15em; height: 1.15em; flex: none; vertical-align: -.2em; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .portada { display: inline-flex; align-items: center; gap: 5px; margin-bottom: 8px; font-size: 13px; color: var(--suave); text-decoration: none; }
+  .portada:hover { color: var(--acento); text-decoration: underline; text-underline-offset: 3px; }
+  .btn.ayuda { display: inline-flex; align-items: center; gap: 6px; }
+  .guia-capa { position: fixed; inset: 0; z-index: 40; background: rgba(26, 38, 54, .5); }
+  .guia-capa.con-foco { background: transparent; }
+  .guia-foco { position: fixed; z-index: 41; border-radius: 10px; box-shadow: 0 0 0 4px var(--acento), 0 0 0 9999px rgba(26, 38, 54, .5); pointer-events: none; transition: top .2s, left .2s, width .2s, height .2s; }
+  .guia-globo { position: fixed; z-index: 42; width: min(380px, calc(100vw - 24px)); background: var(--papel); color: var(--tinta); border-radius: 12px; padding: 18px 20px 16px; box-shadow: 0 18px 50px rgba(20, 30, 45, .3); font: 15px/1.5 var(--sans); }
+  .guia-globo:focus { outline: none; }
+  .guia-globo .guia-n { margin: 0 0 4px; font-size: 12.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--suave); }
+  .guia-globo h2 { margin: 0 0 6px; font: 600 19px/1.25 var(--serif); }
+  .guia-globo p.guia-txt { margin: 0; color: var(--tinta2); }
+  .guia-pie { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+  .guia-pie .guia-saltar { margin-right: auto; font: inherit; font-size: 14px; background: none; border: 0; padding: 10px 2px; color: var(--suave); cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
+  .guia-pie .guia-saltar:hover { color: var(--tinta); }
+  .guia-puntos { display: flex; gap: 5px; margin-top: 14px; }
+  .guia-puntos i { width: 7px; height: 7px; border-radius: 50%; background: var(--linea); }
+  .guia-puntos i.on { background: var(--acento); }
+  @media (max-width: 600px) { .guia-globo { left: 12px !important; right: 12px; bottom: 12px; top: auto !important; width: auto; } }
+  @media (prefers-reduced-motion: reduce) { .guia-foco { transition: none; } }
+  @media print { .guia-capa, .guia-foco, .guia-globo, .portada, .btn.ayuda { display: none !important; } }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="cabecera">
+    <div>
+      <a class="portada" href="../index.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg> Herramientas del estudio</a><br>
+      <span class="firma">MLV Abogados</span>
+      <div class="sub">Diagnóstico de herramientas · Herramientas del estudio</div>
+    </div>
+    <div class="acciones-cab">
+      <button class="btn ayuda" data-guia-abrir><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg> Cómo se usa</button>
+    </div>
+  </header>
+
+  <main>
+    <div class="sec-cab">
+      <h1 id="titulo" tabindex="-1">Diagnóstico de herramientas</h1>
+      <span class="chip verde"><i aria-hidden="true"></i>Funciona sin internet: nada sale de este computador</span>
+    </div>
+    <p class="lead">Cómo usa y cómo crea herramientas el estudio: qué programas e inteligencia artificial se usan, qué ha armado cada persona y dónde lo guarda, en qué tareas se va el tiempo y qué riesgos hay con los datos de los clientes. Las respuestas se recogen con Microsoft Forms, en la cuenta del estudio; aquí se carga el Excel que entrega Forms y sale el informe.</p>
+
+    <div class="vistas" role="tablist" aria-label="Partes del diagnóstico">
+      <button type="button" role="tab" id="tab-informe" aria-controls="panel-informe" aria-selected="true" tabindex="0">Informe</button>
+      <button type="button" role="tab" id="tab-preguntas" aria-controls="panel-preguntas" aria-selected="false" tabindex="-1">Las preguntas</button>
+      <button type="button" role="tab" id="tab-encuesta" aria-controls="panel-encuesta" aria-selected="false" tabindex="-1">Hacer la encuesta</button>
+    </div>
+
+    <!-- ───────── Informe ───────── -->
+    <section id="panel-informe" role="tabpanel" aria-labelledby="tab-informe">
+      <div class="fuente" id="fuente">
+        <p id="fuente-txt"></p>
+        <div class="fila-acc">
+          <label class="btn primario" for="archivo" id="cargar">Cargar respuestas (Excel o CSV)</label>
+          <input type="file" id="archivo" class="archivo-oculto" accept=".xlsx,.csv,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
+          <button type="button" class="btn" id="volver-ejemplo" hidden>Volver al ejemplo</button>
+          <button type="button" class="btn" id="imprimir">Imprimir informe</button>
+        </div>
+      </div>
+      <p class="msg" id="msg-archivo" role="status" aria-live="polite"></p>
+      <div class="filtro">
+        <label for="filtro-area">Ver</label>
+        <select id="filtro-area"></select>
+        <span class="nota" style="margin:0">Un área con menos de 3 respuestas no se muestra por separado, para que nadie quede identificado.</span>
+      </div>
+      <div id="informe"></div>
+    </section>
+
+    <!-- ───────── Las preguntas ───────── -->
+    <section id="panel-preguntas" role="tabpanel" aria-labelledby="tab-preguntas" hidden>
+      <div class="caja">
+        <h2>Aviso para quien responde</h2>
+        <p class="nota">Va al comienzo del formulario. Las respuestas sobre el trabajo de cada persona son datos personales de los trabajadores: hay que decirles para qué se piden, que es voluntario y quién las verá.</p>
+        <div class="aviso-texto" id="aviso"></div>
+      </div>
+      <div class="caja" id="lista-preguntas">
+        <h2>Las preguntas</h2>
+        <p class="nota">16 preguntas, unos 10 minutos. Copie los títulos tal como están: la página reconoce las columnas del Excel por el título de cada pregunta.</p>
+        <div class="fila-acc no-imprimir">
+          <button type="button" class="btn primario" id="copiar">Copiar todo para Forms</button>
+          <span class="msg" id="msg-copiar" role="status" aria-live="polite" style="margin:0"></span>
+        </div>
+        <div id="preguntas"></div>
+      </div>
+      <div class="caja no-imprimir" id="probar">
+        <h2>Probar la encuesta aquí</h2>
+        <p class="nota">Para ver cómo se siente responderla. Su respuesta se suma al informe que está en pantalla y se borra al cerrar la página: no se guarda ni se envía.</p>
+        <form id="form-prueba"></form>
+      </div>
+    </section>
+
+    <!-- ───────── Hacer la encuesta ───────── -->
+    <section id="panel-encuesta" role="tabpanel" aria-labelledby="tab-encuesta" hidden>
+      <div class="caja" id="pasos-forms">
+        <h2>Cómo hacer la encuesta con Microsoft Forms</h2>
+        <p class="nota">El estudio usa Microsoft 365, así que Forms ya viene incluido. Las respuestas quedan en la cuenta del estudio, no en esta página ni en internet abierto.</p>
+        <ol class="pasos">
+          <li><b>Crear el formulario.</b> Entre a forms.office.com con la cuenta del estudio y elija «Nuevo formulario». Ponga de título «Diagnóstico de herramientas · MLV Abogados» y pegue el aviso en la descripción.</li>
+          <li><b>Agregar las preguntas.</b> En la pestaña «Las preguntas» use «Copiar todo para Forms» y péguelo en un documento como guía. Cree cada pregunta en Forms con el tipo indicado: «Elección» (con «Varias respuestas» activado cuando dice «varias») o «Texto» con «Respuesta larga». Marque como obligatorias las que no dicen «opcional». Toma unos 15 minutos.</li>
+          <li><b>Hacerla anónima.</b> En «Configuración»: «Solo las personas de mi organización pueden responder», desactive «Registrar el nombre» y deje activado «Una respuesta por persona».</li>
+          <li><b>Enviarla.</b> Use «Recopilar respuestas» y mande el enlace por correo o Teams a las 18 personas, con una semana de plazo y un recordatorio a mitad de semana.</li>
+          <li><b>Descargar las respuestas.</b> En la pestaña «Respuestas» de Forms elija «Abrir en Excel» (o descargue el archivo). Guárdelo en el computador.</li>
+          <li><b>Ver el informe.</b> En la pestaña «Informe» de esta página use «Cargar respuestas» y elija ese archivo. Se lee en este computador; al cerrar la página no queda nada.</li>
+        </ol>
+      </div>
+      <div class="caja">
+        <h2>Cuidados</h2>
+        <ul class="pasos">
+          <li>El informe muestra cifras del grupo, nunca respuestas de una persona. Si el archivo trae nombres o correos, la página no los usa ni los muestra (y le avisa para que corrija la configuración de Forms).</li>
+          <li>Las respuestas abiertas se leen tal como se escribieron: revíselas antes de mostrar el informe a otras personas.</li>
+          <li>Cuando el diagnóstico esté listo, borre el Excel descargado y, si ya no se necesitan, las respuestas en Forms.</li>
+          <li>Es una encuesta de percepción: las horas son estimaciones de cada persona. Sirve para decidir por dónde empezar, no para medir el desempeño de nadie.</li>
+        </ul>
+      </div>
+      <div class="caja">
+        <h2>Después del diagnóstico</h2>
+        <p class="nota" style="margin-bottom:0">Las tareas que salen primero en «Por dónde empezar» se levantan como procesos en el <a href="sistema-de-trabajo.html">Sistema de trabajo</a>, con su dueño y su fecha de revisión. Si aparecen datos de clientes pegados en una IA sin tachar, el paso inmediato es acordar las reglas de uso de IA del estudio y usar <a href="tachar.html">Tachar antes de pegar</a>.</p>
+      </div>
+    </section>
+
+    <footer class="pie">
+      <p>Demo con respuestas ficticias. Cuando se carga un archivo, se procesa solo en este navegador: la página no puede enviar nada a internet.</p>
+    </footer>
+  </main>
+</div>
+
+<script>
+'use strict';
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const norm = (s) => String(s ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+const pct = (a, b) => (b ? Math.round((a / b) * 100) : 0);
+const MINIMO = 3;   // menos respuestas que esto en un área: no se muestra por separado
+
+/* ───────── Las preguntas ───────── */
+const NO_IA = 'No uso IA para el trabajo';
+const NO_ARMO = 'No armo herramientas';
+const AREAS = ['Laboral y tecnologías', 'Derecho público', 'Corporativo', 'Infraestructura, litigación y controversias', 'Recursos naturales, energía y medio ambiente', 'Administración y finanzas', 'Prefiero no decirlo'];
+const PREGUNTAS = [
+  { sec: 'Sobre usted', id: 'area', tipo: 'una', opcional: true, titulo: '¿En qué área trabaja?', ops: AREAS,
+    nota: 'Sirve para comparar áreas. Si un área tiene menos de 3 respuestas, el informe no la muestra por separado.' },
+  { id: 'cargo', tipo: 'una', opcional: true, titulo: '¿Cuál es su cargo?',
+    ops: ['Socio o socia', 'Abogado o abogada asociada', 'Abogado o abogada junior', 'Procurador, procuradora o paralegal', 'Administración o secretaría', 'Prefiero no decirlo'] },
+  { sec: 'Lo que usa', id: 'prog', tipo: 'varias', titulo: '¿Qué programas usa al menos una vez a la semana para el trabajo?',
+    ops: ['Word', 'Excel', 'Outlook', 'Teams', 'OneDrive o SharePoint', 'Oficina Judicial Virtual', 'Portal de la Dirección del Trabajo', 'Bases jurídicas (vLex, Microjuris, Thomson Reuters u otra)', 'Programa de gestión de causas o de horas', 'Firma electrónica'] },
+  { id: 'ia', tipo: 'varias', titulo: '¿Qué herramientas de inteligencia artificial usa para el trabajo?',
+    ops: ['ChatGPT', 'Copilot de Microsoft', 'Claude', 'Gemini', 'Una IA jurídica especializada', NO_IA] },
+  { id: 'frec', tipo: 'una', orden: true, titulo: '¿Con qué frecuencia usa IA para el trabajo?',
+    ops: ['Nunca', 'Algunas veces al mes', 'Cada semana', 'Todos los días'] },
+  { id: 'para', tipo: 'varias', titulo: '¿Para qué usa la IA?',
+    ops: ['Redactar o corregir escritos', 'Resumir documentos o expedientes', 'Buscar normativa o jurisprudencia', 'Revisar o preparar contratos', 'Escribir correos', 'Traducir', NO_IA] },
+  { sec: 'Los datos', id: 'cuenta', tipo: 'una', titulo: 'La cuenta de IA que usa para el trabajo es…',
+    ops: ['Del estudio', 'Personal y pagada', 'Personal y gratuita', NO_IA], tonos: { 'Personal y gratuita': 'rojo', 'Personal y pagada': 'ambar' } },
+  { id: 'datos', tipo: 'una', titulo: '¿Ha pegado en una IA textos con datos de clientes o de otras personas (nombres, RUT, salud, remuneraciones)?',
+    ops: ['Nunca', 'Sí, después de tachar esos datos', 'Sí, sin tachar los datos', 'No estoy seguro o segura', NO_IA], tonos: { 'Sí, sin tachar los datos': 'rojo', 'No estoy seguro o segura': 'ambar' } },
+  { id: 'regla', tipo: 'una', titulo: '¿El estudio le ha dado instrucciones sobre cómo usar la IA?',
+    ops: ['Sí, por escrito', 'Sí, de palabra', 'No', 'No lo sé'], tonos: { 'No': 'ambar', 'No lo sé': 'ambar' } },
+  { sec: 'Lo que crea', id: 'crea', tipo: 'varias', titulo: '¿Qué ha armado usted para su trabajo?',
+    ops: ['Plantillas de escritos o contratos', 'Planillas de Excel (plazos, cálculos, seguimiento)', 'Listas de control o pasos a seguir', 'Instrucciones guardadas para la IA (prompts)', 'Macros o automatizaciones', 'Una recopilación propia de jurisprudencia o modelos', 'Nada de esto'] },
+  { id: 'donde', tipo: 'una', titulo: '¿Dónde guarda principalmente lo que arma?',
+    ops: ['En la carpeta compartida del estudio (OneDrive o SharePoint)', 'En mi computador', 'En mi correo', 'En una cuenta personal (Google Drive, Dropbox u otra)', NO_ARMO],
+    tonos: { 'En mi computador': 'ambar', 'En mi correo': 'ambar', 'En una cuenta personal (Google Drive, Dropbox u otra)': 'rojo' } },
+  { id: 'comparte', tipo: 'una', titulo: '¿Otras personas del estudio usan lo que usted arma?',
+    ops: ['Sí, varias personas', 'Solo mi equipo', 'Solo yo', NO_ARMO] },
+  { sec: 'El tiempo', id: 'tareas', tipo: 'varias', titulo: '¿Qué tareas repetitivas le quitan más tiempo? (marque hasta tres)',
+    ops: ['Redactar escritos de mero trámite', 'Calcular finiquitos, indemnizaciones o liquidaciones', 'Revisar contratos', 'Controlar plazos judiciales o administrativos', 'Preparar informes o reportes para clientes', 'Buscar documentos o la versión vigente de un archivo', 'Registrar horas', 'Actas e informes de investigaciones (Ley Karin)', 'Responder consultas repetidas de clientes', 'Seguir expedientes y permisos'] },
+  { id: 'horas', tipo: 'una', orden: true, titulo: '¿Cuántas horas a la semana le dedica, en total, a esas tareas repetitivas?',
+    ops: ['Menos de 2', 'Entre 2 y 5', 'Entre 5 y 10', 'Más de 10'] },
+  { sec: 'Lo que necesita', id: 'quiere', tipo: 'texto', opcional: true, titulo: '¿Qué herramienta le ahorraría más tiempo o le daría más tranquilidad?' },
+  { id: 'mas', tipo: 'texto', opcional: true, titulo: '¿Algo más que quiera contar?', nota: 'Pida que no escriban nombres de clientes ni de colegas.' },
+];
+const P = Object.fromEntries(PREGUNTAS.map((q) => [q.id, q]));
+const HORAS_MEDIAS = { 'Menos de 2': 1, 'Entre 2 y 5': 3.5, 'Entre 5 y 10': 7.5, 'Más de 10': 12 };
+
+const AVISO = `Esta encuesta es para conocer cómo usamos y creamos herramientas de trabajo en el estudio (programas, plantillas, planillas e inteligencia artificial), en qué tareas se nos va el tiempo y dónde hay riesgos con la información de los clientes. Con el resultado se decidirá qué herramientas ordenar o crear primero.
+
+Es voluntaria y anónima: el formulario no registra su nombre ni su correo. El área y el cargo son opcionales. El informe muestra solo cifras del grupo, y un área con menos de 3 respuestas no se muestra por separado. Las respuestas no se usarán para evaluar a nadie.
+
+Las verá el equipo a cargo del diagnóstico y se borrarán cuando termine. Por favor, no escriba nombres de clientes ni de colegas en las respuestas abiertas. Toma unos 10 minutos.`;
+
+const tipoTexto = (q) => (q.tipo === 'texto' ? 'Texto · respuesta larga' : q.tipo === 'varias' ? 'Elección · varias respuestas' : 'Elección · una respuesta') + (q.opcional ? ' · opcional' : '');
+
+function textoParaForms() {
+  const lineas = ['Diagnóstico de herramientas · MLV Abogados', '', 'Descripción (aviso):', AVISO, ''];
+  let n = 0;
+  for (const q of PREGUNTAS) {
+    if (q.sec) lineas.push('', `— ${q.sec} —`);
+    lineas.push('', `${++n}. ${q.titulo}`, `   Tipo: ${tipoTexto(q)}`);
+    for (const o of q.ops || []) lineas.push(`   - ${o}`);
+  }
+  return lineas.join('\n');
+}
+
+function pintarPreguntas() {
+  $('aviso').textContent = AVISO;
+  let n = 0, html = '';
+  for (const q of PREGUNTAS) {
+    if (q.sec) html += `<p class="seccion-p">${esc(q.sec)}</p>`;
+    html += `<div class="pregunta"><h3>${++n}. ${esc(q.titulo)}</h3><span class="tipo">${esc(tipoTexto(q))}</span>`;
+    if (q.ops) html += `<ul>${q.ops.map((o) => `<li>${esc(o)}</li>`).join('')}</ul>`;
+    if (q.nota) html += `<p class="nota">${esc(q.nota)}</p>`;
+    html += '</div>';
+  }
+  $('preguntas').innerHTML = html;
+
+  // Formulario de prueba
+  let f = '';
+  n = 0;
+  for (const q of PREGUNTAS) {
+    const nom = `p-${q.id}`;
+    f += `<fieldset class="resp"><legend>${++n}. ${esc(q.titulo)}${q.opcional ? ' <span class="nota">(opcional)</span>' : ''}</legend>`;
+    if (q.tipo === 'texto') f += `<textarea name="${nom}" aria-label="${esc(q.titulo)}"></textarea>`;
+    else f += `<div class="ops">${q.ops.map((o) => `<label class="marca"><input type="${q.tipo === 'varias' ? 'checkbox' : 'radio'}" name="${nom}" value="${esc(o)}"> ${esc(o)}</label>`).join('')}</div>`;
+    f += '</fieldset>';
+  }
+  f += `<div class="fila-acc"><button type="submit" class="btn primario">Sumar mi respuesta al informe</button><span class="msg" id="msg-prueba" role="status" aria-live="polite" style="margin:0"></span></div>`;
+  $('form-prueba').innerHTML = f;
+}
+
+$('copiar').addEventListener('click', async () => {
+  const t = textoParaForms();
+  try { await navigator.clipboard.writeText(t); $('msg-copiar').textContent = 'Copiado. Péguelo en un documento y úselo de guía para crear el formulario.'; }
+  catch {
+    const ta = document.createElement('textarea');
+    ta.value = t; document.body.append(ta); ta.select();
+    const ok = document.execCommand('copy'); ta.remove();
+    $('msg-copiar').textContent = ok ? 'Copiado.' : 'No se pudo copiar automáticamente: seleccione las preguntas con el mouse y cópielas.';
+  }
+});
+
+$('form-prueba').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const fd = new FormData(e.target), fila = {};
+  const faltan = [];
+  for (const q of PREGUNTAS) {
+    const v = fd.getAll(`p-${q.id}`).map((x) => String(x).trim()).filter(Boolean);
+    fila[q.id] = q.tipo === 'varias' ? v : (v[0] || '');
+    if (!q.opcional && !v.length) faltan.push(q.titulo);
+  }
+  if (faltan.length) { $('msg-prueba').textContent = `Faltan ${faltan.length} preguntas obligatorias (la primera: «${faltan[0]}»).`; $('msg-prueba').className = 'msg warn'; return; }
+  estado.filas = [...estado.filas, fila];
+  estado.pruebas += 1;
+  e.target.reset();
+  $('msg-prueba').textContent = '';
+  show('informe');
+  pintarInforme();
+  $('msg-archivo').className = 'msg';
+  $('msg-archivo').textContent = `Se sumó su respuesta de prueba: ahora son ${estado.filas.length}. No se guardó en ninguna parte.`;
+});
+
+/* ───────── Respuestas de ejemplo (ficticias, siempre las mismas) ───────── */
+function respuestasEjemplo() {
+  let s = 20261010;
+  const azar = () => { s |= 0; s = (s + 0x6D2B79F5) | 0; let t = Math.imul(s ^ (s >>> 15), 1 | s); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+  const una = (pesos) => { const tot = Object.values(pesos).reduce((a, b) => a + b, 0); let r = azar() * tot; for (const [k, w] of Object.entries(pesos)) { if ((r -= w) < 0) return k; } return Object.keys(pesos)[0]; };
+  const varias = (probs) => Object.entries(probs).filter(([, p]) => azar() < p).map(([k]) => k);
+  const tres = (pesos) => { const p = { ...pesos }, sal = []; while (sal.length < 3 && Object.keys(p).length) { const k = una(p); sal.push(k); delete p[k]; } return sal; };
+  const T = P.tareas.ops;
+  const tareasPorArea = {
+    'Laboral y tecnologías': { [T[1]]: 6, [T[7]]: 5, [T[3]]: 4, [T[0]]: 4, [T[8]]: 3, [T[6]]: 2 },
+    'Infraestructura, litigación y controversias': { [T[3]]: 6, [T[0]]: 5, [T[5]]: 4, [T[4]]: 3, [T[6]]: 2 },
+    'Corporativo': { [T[2]]: 6, [T[5]]: 4, [T[4]]: 3, [T[6]]: 3 },
+    'Derecho público': { [T[9]]: 6, [T[3]]: 4, [T[4]]: 2 },
+    'Administración y finanzas': { [T[6]]: 6, [T[4]]: 4, [T[5]]: 4 },
+  };
+  const ideas = {
+    'Laboral y tecnologías': ['Una calculadora de finiquitos e indemnizaciones revisada por el área, para no rehacer la planilla en cada caso.', 'Plantillas comunes para las actas e informes de las investigaciones Ley Karin.', 'Saber qué IA podemos usar y con qué datos, por escrito.'],
+    'Infraestructura, litigación y controversias': ['Alertas de plazos judiciales que no dependan de la agenda personal de cada uno.', 'Un buscador de nuestros propios escritos anteriores.', 'Un lugar único con las plantillas vigentes: hoy cada uno tiene su versión.'],
+    'Corporativo': ['Un banco de cláusulas aprobadas por el área.', 'Un lugar único con las plantillas vigentes: hoy cada uno tiene su versión.'],
+    'Derecho público': ['Seguimiento de expedientes y permisos con avisos de vencimiento.'],
+    'Administración y finanzas': ['Registrar horas desde el correo, sin abrir otra planilla.'],
+  };
+  const reparto = [['Laboral y tecnologías', 6], ['Infraestructura, litigación y controversias', 5], ['Corporativo', 3], ['Derecho público', 2], ['Administración y finanzas', 2]];
+  const filas = [];
+  for (const [area, cuantos] of reparto) {
+    for (let k = 0; k < cuantos; k++) {
+      const admin = area === 'Administración y finanzas';
+      const f = { area };
+      f.cargo = admin ? 'Administración o secretaría' : una({ 'Socio o socia': 1, 'Abogado o abogada asociada': 3, 'Abogado o abogada junior': 3, 'Procurador, procuradora o paralegal': 1.5 });
+      f.prog = ['Word', 'Outlook', ...varias({ Excel: 0.85, Teams: 0.7, 'OneDrive o SharePoint': 0.5, 'Firma electrónica': 0.35, 'Programa de gestión de causas o de horas': 0.45 }),
+        ...(admin ? [] : varias({ 'Oficina Judicial Virtual': area.startsWith('Infra') || area.startsWith('Laboral') ? 0.9 : 0.2, 'Portal de la Dirección del Trabajo': area.startsWith('Laboral') ? 0.8 : 0, 'Bases jurídicas (vLex, Microjuris, Thomson Reuters u otra)': 0.7 }))];
+      f.frec = una({ Nunca: admin ? 2 : 1.2, 'Algunas veces al mes': 2, 'Cada semana': 3, 'Todos los días': 2.5 });
+      if (f.frec === 'Nunca') { f.ia = [NO_IA]; f.para = [NO_IA]; f.cuenta = NO_IA; f.datos = NO_IA; }
+      else {
+        f.ia = varias({ ChatGPT: 0.85, 'Copilot de Microsoft': 0.35, Claude: 0.25, Gemini: 0.15, 'Una IA jurídica especializada': 0.08 });
+        if (!f.ia.length) f.ia = ['ChatGPT'];
+        f.para = varias({ 'Redactar o corregir escritos': 0.7, 'Resumir documentos o expedientes': 0.6, 'Buscar normativa o jurisprudencia': 0.45, 'Revisar o preparar contratos': area === 'Corporativo' ? 0.8 : 0.25, 'Escribir correos': 0.5, Traducir: 0.3 });
+        if (!f.para.length) f.para = ['Redactar o corregir escritos'];
+        f.cuenta = f.ia.includes('Copilot de Microsoft') ? 'Del estudio' : una({ 'Personal y pagada': 3, 'Personal y gratuita': 4.5 });
+        f.datos = una({ Nunca: 4, 'Sí, después de tachar esos datos': 3, 'Sí, sin tachar los datos': 2, 'No estoy seguro o segura': 1.5 });
+      }
+      f.regla = una({ 'Sí, por escrito': 0.5, 'Sí, de palabra': 4, No: 6, 'No lo sé': 3 });
+      f.crea = varias({ 'Plantillas de escritos o contratos': admin ? 0.3 : 0.8, 'Planillas de Excel (plazos, cálculos, seguimiento)': 0.6, 'Listas de control o pasos a seguir': 0.35, 'Instrucciones guardadas para la IA (prompts)': f.frec === 'Nunca' ? 0 : 0.35, 'Macros o automatizaciones': 0.08, 'Una recopilación propia de jurisprudencia o modelos': admin ? 0 : 0.35 });
+      if (!f.crea.length) f.crea = ['Nada de esto'];
+      const nada = f.crea[0] === 'Nada de esto';
+      f.donde = nada ? NO_ARMO : una({ 'En la carpeta compartida del estudio (OneDrive o SharePoint)': 5, 'En mi computador': 7, 'En mi correo': 1.5, 'En una cuenta personal (Google Drive, Dropbox u otra)': 1.5 });
+      f.comparte = nada ? NO_ARMO : una({ 'Sí, varias personas': 4, 'Solo mi equipo': 5, 'Solo yo': 5 });
+      f.tareas = tres(tareasPorArea[area]);
+      f.horas = una({ 'Menos de 2': 2, 'Entre 2 y 5': 6, 'Entre 5 y 10': 6, 'Más de 10': 2 });
+      f.quiere = azar() < 0.7 ? (ideas[area].shift() || '') : '';   // cada idea una sola vez
+      f.mas = '';
+      filas.push(f);
+    }
+  }
+  filas[3].mas = 'Me sirve mucho la IA, pero no sé si lo que hago está permitido.';
+  filas[9].mas = 'Cada vez que alguien se va, perdemos sus planillas.';
+  return filas;
+}
+
+/* ───────── Leer el archivo de Forms (Excel .xlsx o CSV) ───────── */
+async function leerZip(buf) {
+  const v = new DataView(buf), u8 = new Uint8Array(buf);
+  let fin = -1;
+  for (let i = buf.byteLength - 22; i >= Math.max(0, buf.byteLength - 65557); i--) { if (v.getUint32(i, true) === 0x06054b50) { fin = i; break; } }
+  if (fin < 0) throw new Error('no es un Excel (.xlsx) válido');
+  const total = v.getUint16(fin + 10, true);
+  let p = v.getUint32(fin + 16, true);
+  const dec = new TextDecoder();
+  const entradas = {};
+  for (let k = 0; k < total; k++) {
+    if (v.getUint32(p, true) !== 0x02014b50) break;
+    const metodo = v.getUint16(p + 10, true), tam = v.getUint32(p + 20, true);
+    const ln = v.getUint16(p + 28, true), le = v.getUint16(p + 30, true), lc = v.getUint16(p + 32, true);
+    const local = v.getUint32(p + 42, true);
+    const nombre = dec.decode(u8.subarray(p + 46, p + 46 + ln));
+    entradas[nombre] = { metodo, tam, local };
+    p += 46 + ln + le + lc;
+  }
+  return async (nombre) => {
+    const e = entradas[nombre];
+    if (!e) return null;
+    const ini = e.local + 30 + v.getUint16(e.local + 26, true) + v.getUint16(e.local + 28, true);
+    const datos = u8.subarray(ini, ini + e.tam);
+    if (e.metodo === 0) return dec.decode(datos);
+    if (e.metodo !== 8) throw new Error('el Excel usa una compresión que esta página no lee');
+    if (typeof DecompressionStream === 'undefined') throw new Error('este navegador no puede abrir Excel; use Chrome o Edge actualizados, o guarde el archivo como CSV');
+    const flujo = new Blob([datos]).stream().pipeThrough(new DecompressionStream('deflate-raw'));
+    return dec.decode(await new Response(flujo).arrayBuffer());
+  };
+}
+
+async function leerXlsx(buf) {
+  const abrir = await leerZip(buf);
+  const xml = (t) => new DOMParser().parseFromString(t, 'application/xml');
+  const todos = (nodo, tag) => [...nodo.getElementsByTagNameNS('*', tag)];
+  // Primera hoja del libro
+  let ruta = 'xl/worksheets/sheet1.xml';
+  const libro = await abrir('xl/workbook.xml'), rels = await abrir('xl/_rels/workbook.xml.rels');
+  if (libro && rels) {
+    const hoja = todos(xml(libro), 'sheet')[0];
+    const rid = hoja && (hoja.getAttribute('r:id') || [...hoja.attributes].find((a) => a.localName === 'id')?.value);
+    const rel = todos(xml(rels), 'Relationship').find((r) => r.getAttribute('Id') === rid);
+    if (rel) { const t = rel.getAttribute('Target'); ruta = t.startsWith('/') ? t.slice(1) : 'xl/' + t.replace(/^\.\//, ''); }
+  }
+  const textoHoja = await abrir(ruta);
+  if (!textoHoja) throw new Error('el Excel no tiene hojas');
+  const ss = await abrir('xl/sharedStrings.xml');
+  const compartidos = ss ? todos(xml(ss), 'si').map((si) => todos(si, 't').filter((t) => t.parentNode.localName !== 'rPh').map((t) => t.textContent).join('')) : [];
+  const col = (ref) => { let n = 0; for (const ch of ref.replace(/[0-9]/g, '')) n = n * 26 + (ch.charCodeAt(0) - 64); return n - 1; };
+  const tabla = [];
+  for (const fila of todos(xml(textoHoja), 'row')) {
+    const r = [];
+    for (const c of todos(fila, 'c')) {
+      const t = c.getAttribute('t'), vNodo = todos(c, 'v')[0];
+      let valor = '';
+      if (t === 's') valor = compartidos[+vNodo?.textContent] ?? '';
+      else if (t === 'inlineStr') valor = todos(c, 't').map((x) => x.textContent).join('');
+      else valor = vNodo?.textContent ?? '';
+      r[col(c.getAttribute('r') || 'A1')] = valor;
+    }
+    tabla.push(Array.from(r, (x) => x ?? ''));
+  }
+  return tabla;
+}
+
+function leerCsv(texto) {
+  texto = texto.replace(/^﻿/, '');
+  const primera = texto.split(/\r?\n/)[0];
+  const sep = (primera.match(/;/g) || []).length > (primera.match(/,/g) || []).length ? ';' : ',';
+  const tabla = [];
+  let fila = [], campo = '', comillas = false;
+  for (let i = 0; i < texto.length; i++) {
+    const ch = texto[i];
+    if (comillas) {
+      if (ch === '"') { if (texto[i + 1] === '"') { campo += '"'; i++; } else comillas = false; }
+      else campo += ch;
+    } else if (ch === '"') comillas = true;
+    else if (ch === sep) { fila.push(campo); campo = ''; }
+    else if (ch === '\n' || ch === '\r') { if (ch === '\r' && texto[i + 1] === '\n') i++; fila.push(campo); tabla.push(fila); fila = []; campo = ''; }
+    else campo += ch;
+  }
+  if (campo || fila.length) { fila.push(campo); tabla.push(fila); }
+  return tabla;
+}
+
+// Lleva la tabla de Forms a una fila por persona con las claves de las preguntas.
+function interpretar(tabla) {
+  const cab = (tabla[0] || []).map((h) => String(h));
+  const nCab = cab.map(norm);
+  const columna = {};
+  for (const q of PREGUNTAS) {
+    const t = norm(q.titulo);
+    let i = nCab.findIndex((h) => h === t);
+    if (i < 0) i = nCab.findIndex((h) => h && (h.startsWith(t.slice(0, 40)) || t.startsWith(h.slice(0, 40))) && h.length > 12);
+    if (i >= 0) columna[q.id] = i;
+  }
+  const encontradas = Object.keys(columna).length;
+  if (encontradas < 5) throw new Error(`se reconocieron solo ${encontradas} de ${PREGUNTAS.length} preguntas. Revise que los títulos en Forms sean los mismos de la pestaña «Las preguntas»`);
+  const avisos = [];
+  const faltan = PREGUNTAS.filter((q) => !(q.id in columna)).map((q) => q.titulo);
+  if (faltan.length) avisos.push(`No se encontró la columna de ${faltan.length === 1 ? 'la pregunta' : faltan.length + ' preguntas, por ejemplo'} «${faltan[0]}».`);
+  const iNombre = nCab.findIndex((h) => h === 'nombre' || h === 'name'), iCorreo = nCab.findIndex((h) => h.includes('correo') || h === 'email');
+  const traeIdentidad = tabla.slice(1).some((r) => (iNombre >= 0 && String(r[iNombre] || '').trim() && !/an[oó]n[iy]m/i.test(r[iNombre])) || (iCorreo >= 0 && String(r[iCorreo] || '').trim() && !/an[oó]n[iy]m/i.test(r[iCorreo])));
+  if (traeIdentidad) avisos.push('El archivo trae nombres o correos. La página no los usa ni los muestra, pero la encuesta debería ser anónima: en Forms desactive «Registrar el nombre».');
+  let otras = 0;
+  const casar = (q, valor) => {
+    const n = norm(valor);
+    const op = q.ops.find((o) => norm(o) === n) || q.ops.find((o) => n.length > 3 && (norm(o).startsWith(n) || n.startsWith(norm(o))));
+    if (!op) otras++;
+    return op || 'Otra respuesta';
+  };
+  const filas = [];
+  for (const r of tabla.slice(1)) {
+    const f = {};
+    let algo = false;
+    for (const q of PREGUNTAS) {
+      const bruto = q.id in columna ? String(r[columna[q.id]] ?? '').trim() : '';
+      if (bruto) algo = true;
+      if (q.tipo === 'texto') f[q.id] = bruto;
+      else if (q.tipo === 'varias') f[q.id] = [...new Set(bruto.split(';').map((x) => x.trim()).filter(Boolean).map((x) => casar(q, x)))];
+      else f[q.id] = bruto ? casar(q, bruto) : '';
+    }
+    if (algo) filas.push(f);
+  }
+  if (otras) avisos.push(`${otras} respuestas no calzan con las opciones (por ejemplo, las escritas en «Otro»): se cuentan como «Otra respuesta».`);
+  return { filas, avisos };
+}
+
+/* ───────── Estado e informe ───────── */
+const EJEMPLO = respuestasEjemplo();
+const estado = { fuente: 'ejemplo', archivo: '', filas: EJEMPLO, avisos: [], pruebas: 0 };
+
+function pintarFuente() {
+  const n = estado.filas.length;
+  $('fuente-txt').innerHTML = estado.fuente === 'ejemplo'
+    ? `<span class="chip ambar">Ejemplo</span> Respuestas ficticias de 18 personas${estado.pruebas ? ` más ${estado.pruebas} de prueba` : ''}, para ver cómo queda el informe. Cargue el Excel de Forms para ver el del estudio.`
+    : `<span class="chip azul">Respuestas cargadas</span> ${n} ${n === 1 ? 'respuesta' : 'respuestas'} de «${esc(estado.archivo)}»${estado.pruebas ? ` (incluye ${estado.pruebas} de prueba)` : ''}. Solo en esta pantalla: al cerrar la página no queda nada.`;
+  $('volver-ejemplo').hidden = estado.fuente === 'ejemplo' && !estado.pruebas;
+}
+
+function pintarFiltro() {
+  const sel = $('filtro-area'), antes = sel.value;
+  const cuenta = {};
+  for (const f of estado.filas) if (f.area && f.area !== 'Prefiero no decirlo') cuenta[f.area] = (cuenta[f.area] || 0) + 1;
+  sel.innerHTML = `<option value="">Todo el estudio (${estado.filas.length})</option>` + Object.entries(cuenta).map(([a, n]) =>
+    `<option value="${esc(a)}"${n < MINIMO ? ' disabled' : ''}>${esc(a)} (${n}${n < MINIMO ? ' · no se muestra' : ''})</option>`).join('');
+  sel.value = [...sel.options].some((o) => o.value === antes && !o.disabled) ? antes : '';
+}
+
+function barras(q, filas) {
+  const responden = filas.filter((f) => (q.tipo === 'varias' ? f[q.id]?.length : f[q.id]));
+  const n = responden.length;
+  if (!n) return '<p class="vacio">Sin respuestas.</p>';
+  const cuenta = new Map(q.ops.map((o) => [o, 0]));
+  for (const f of responden) for (const v of q.tipo === 'varias' ? f[q.id] : [f[q.id]]) cuenta.set(v, (cuenta.get(v) || 0) + 1);
+  let items = [...cuenta.entries()].filter(([o, c]) => c > 0 || o !== 'Otra respuesta');
+  if (!q.orden) items.sort((a, b) => b[1] - a[1]);
+  return `<ul class="barras">${items.map(([o, c]) => {
+    const p = pct(c, n), tono = q.tonos?.[o] || '';
+    return `<li class="${tono}${c ? '' : ' cero'}"><span class="et">${esc(o)}</span><span class="pista" aria-hidden="true"><i style="width:${p}%"></i></span><span class="num">${c} · ${p} %</span></li>`;
+  }).join('')}</ul><p class="nota" style="margin:8px 0 0">${n} ${n === 1 ? 'persona respondió' : 'personas respondieron'}${q.tipo === 'varias' ? ' · cada una podía marcar varias' : ''}.</p>`;
+}
+
+function calcular(filas) {
+  const n = filas.length;
+  const cuenta = (fn) => filas.filter(fn).length;
+  const usaIA = cuenta((f) => ['Cada semana', 'Todos los días'].includes(f.frec));
+  const sinTachar = cuenta((f) => f.datos === 'Sí, sin tachar los datos');
+  const noSabe = cuenta((f) => f.datos === 'No estoy seguro o segura');
+  const personal = cuenta((f) => ['Personal y pagada', 'Personal y gratuita'].includes(f.cuenta));
+  const gratuita = cuenta((f) => f.cuenta === 'Personal y gratuita');
+  const sinRegla = cuenta((f) => ['No', 'No lo sé'].includes(f.regla));
+  const fuera = ['En mi computador', 'En mi correo', 'En una cuenta personal (Google Drive, Dropbox u otra)'];
+  const creadores = cuenta((f) => f.donde && f.donde !== NO_ARMO);
+  const guardaFuera = cuenta((f) => fuera.includes(f.donde));
+  const compartidoFuera = cuenta((f) => fuera.includes(f.donde) && ['Sí, varias personas', 'Solo mi equipo'].includes(f.comparte));
+  const cuentaPersonalDocs = cuenta((f) => f.donde === 'En una cuenta personal (Google Drive, Dropbox u otra)');
+  const prompts = cuenta((f) => f.crea?.includes('Instrucciones guardadas para la IA (prompts)'));
+  // Horas: cada persona reparte sus horas entre las tareas que marcó (estimación gruesa).
+  const horasTarea = new Map(P.tareas.ops.map((o) => [o, { h: 0, n: 0 }]));
+  let horasTotal = 0;
+  for (const f of filas) {
+    const h = HORAS_MEDIAS[f.horas] || 0;
+    horasTotal += h;
+    const ts = (f.tareas || []).filter((t) => horasTarea.has(t));
+    for (const t of ts) { const x = horasTarea.get(t); x.h += h / ts.length; x.n += 1; }
+  }
+  const prioridades = [...horasTarea.entries()].filter(([, x]) => x.n).sort((a, b) => b[1].h - a[1].h || b[1].n - a[1].n).slice(0, 5);
+  return { n, usaIA, sinTachar, noSabe, personal, gratuita, sinRegla, creadores, guardaFuera, compartidoFuera, cuentaPersonalDocs, prompts, horasTotal, prioridades };
+}
+
+const personas = (k) => `${k} ${k === 1 ? 'persona' : 'personas'}`;
+const redondo = (h) => (h >= 10 ? Math.round(h) : Math.round(h * 2) / 2).toLocaleString('es-CL');
+
+function alertas(c) {
+  const a = [];
+  if (c.sinTachar) a.push(['rojo', `${personas(c.sinTachar)} ${c.sinTachar === 1 ? 'pegó' : 'pegaron'} en una IA textos con datos de clientes o de otras personas sin tacharlos.`,
+    'Si fue en una cuenta personal, el estudio no controla qué se guarda ni para qué lo usa el proveedor. Es secreto profesional y son datos personales: conviene acordar reglas de uso de IA y usar «Tachar antes de pegar».']);
+  if (c.gratuita) a.push(['rojo', `${personas(c.gratuita)} ${c.gratuita === 1 ? 'usa' : 'usan'} una cuenta de IA personal y gratuita para el trabajo.`,
+    'En las versiones gratuitas el proveedor puede usar lo que se le pega para mejorar sus modelos, según cómo esté configurada la cuenta. Una cuenta del estudio permite fijar esas condiciones.']);
+  else if (c.personal) a.push(['ambar', `${personas(c.personal)} ${c.personal === 1 ? 'usa' : 'usan'} una cuenta de IA personal para el trabajo.`, 'El estudio no controla la configuración ni el historial de esas cuentas.']);
+  if (c.noSabe) a.push(['ambar', `${personas(c.noSabe)} no ${c.noSabe === 1 ? 'está segura de si pegó' : 'están seguras de si pegaron'} datos de personas en una IA.`, 'Señal de que falta claridad sobre qué cuenta como dato personal.']);
+  if (c.sinRegla) a.push(['ambar', `${personas(c.sinRegla)} ${c.sinRegla === 1 ? 'dice que no ha recibido instrucciones del estudio sobre IA, o no lo sabe' : 'dicen que no han recibido instrucciones del estudio sobre IA, o no lo saben'}.`, 'Unas reglas breves y por escrito resuelven la mayoría de las dudas.']);
+  if (c.cuentaPersonalDocs) a.push(['rojo', `${personas(c.cuentaPersonalDocs)} ${c.cuentaPersonalDocs === 1 ? 'guarda' : 'guardan'} herramientas del trabajo en una cuenta personal (Google Drive, Dropbox u otra).`, 'Pueden contener documentos de clientes fuera de los sistemas del estudio.']);
+  if (c.compartidoFuera) a.push(['ambar', `${personas(c.compartidoFuera)} ${c.compartidoFuera === 1 ? 'tiene' : 'tienen'} herramientas que usan otras personas, pero guardadas en su computador, correo o cuenta personal.`, 'Si esa persona se va o su equipo falla, el resto pierde la herramienta. Conviene moverlas a la carpeta compartida con un dueño.']);
+  else if (c.guardaFuera) a.push(['ambar', `${personas(c.guardaFuera)} ${c.guardaFuera === 1 ? 'guarda' : 'guardan'} lo que arma en su computador, correo o cuenta personal.`, 'Lo que no está en la carpeta compartida se pierde con la persona.']);
+  if (c.prompts) a.push(['azul', `${personas(c.prompts)} ya ${c.prompts === 1 ? 'tiene' : 'tienen'} instrucciones guardadas para la IA.`, 'Oportunidad: juntarlas, revisarlas y compartir las mejores en el Sistema de trabajo.']);
+  if (!a.length) a.push(['verde', 'No aparecen riesgos con las respuestas de este grupo.', 'Igual conviene repetir el diagnóstico una vez al año.']);
+  return a;
+}
+
+function pintarInforme() {
+  pintarFuente();
+  pintarFiltro();
+  const area = $('filtro-area').value;
+  const filas = area ? estado.filas.filter((f) => f.area === area) : estado.filas;
+  const caja = $('informe');
+  if (estado.avisos.length) $('msg-archivo').innerHTML = estado.avisos.map(esc).join('<br>'), $('msg-archivo').className = 'msg warn';
+  if (filas.length < MINIMO) { caja.innerHTML = `<div class="caja" style="margin-top:16px"><p class="vacio">Hay ${filas.length} ${filas.length === 1 ? 'respuesta' : 'respuestas'}. El informe se muestra desde ${MINIMO}, para que no se pueda saber qué contestó cada persona.</p></div>`; return; }
+  const c = calcular(filas);
+  const quien = area ? `en ${area}` : 'en el estudio';
+  let h = `<div class="cifras" id="cifras">
+    <div class="cifra"><div class="n">${c.n}</div><div class="t">${c.n === 1 ? 'respuesta' : 'respuestas'} ${esc(quien)}</div></div>
+    <div class="cifra"><div class="n">${pct(c.usaIA, c.n)}<small>%</small></div><div class="t">usa IA para el trabajo cada semana o a diario (${c.usaIA})</div></div>
+    <div class="cifra${c.sinTachar ? ' rojo' : ''}"><div class="n">${c.sinTachar}</div><div class="t">${c.sinTachar === 1 ? 'pegó' : 'pegaron'} datos de personas en una IA sin tacharlos</div></div>
+    <div class="cifra"><div class="n">≈ ${redondo(c.horasTotal)}<small>h</small></div><div class="t">a la semana en tareas repetitivas, sumando a todos (estimación de cada persona)</div></div>
+  </div>`;
+  h += `<div class="rejilla" style="margin-top:16px">
+    <div class="caja" id="alertas"><h2>Lo que hay que atender</h2><p class="nota">Riesgos y oportunidades que salen de las respuestas.</p>
+      <ul class="alertas">${alertas(c).map(([t, b, q]) => `<li class="${t}"><b>${esc(b)}</b><span class="que">${esc(q)}</span></li>`).join('')}</ul></div>
+    <div class="caja" id="prioridades"><h2>Por dónde empezar</h2><p class="nota">Las tareas repetitivas que más horas se llevan. Cada persona reparte sus horas entre las tareas que marcó; es una estimación para ordenar, no una medición.</p>
+      <ol class="prioridades">${c.prioridades.map(([t, x]) => `<li><span>${esc(t)}</span><span class="h">≈ ${redondo(x.h)} h/sem</span><span class="d">La ${x.n === 1 ? 'marcó 1 persona' : `marcaron ${x.n} personas`}</span></li>`).join('') || '<li><span>Sin datos de tareas.</span></li>'}</ol>
+      <p class="nota no-imprimir" style="margin:10px 0 0">Siguiente paso: levantar la primera como proceso en el <a href="sistema-de-trabajo.html#/levantar">Sistema de trabajo</a>.</p></div>
+  </div>`;
+  const grupos = [
+    ['Lo que usa', ['prog', 'ia', 'frec', 'para']],
+    ['Los datos', ['cuenta', 'datos', 'regla']],
+    ['Lo que crea', ['crea', 'donde', 'comparte']],
+    ['El tiempo', ['tareas', 'horas']],
+  ];
+  if (!area) grupos.unshift(['Quién respondió', ['area', 'cargo']]);
+  for (const [tit, ids] of grupos) {
+    h += `<p class="seccion-p" style="margin-top:26px">${esc(tit)}</p><div class="rejilla">${ids.map((id) => `<div class="caja"><h3>${esc(P[id].titulo)}</h3>${barras(P[id], filas)}</div>`).join('')}</div>`;
+  }
+  const textos = (id) => filas.map((f) => f[id]).filter((t) => t && t.trim());
+  const lista = (id) => { const t = textos(id); return t.length ? `<ul class="textos">${t.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>` : '<p class="vacio">Nadie escribió en esta pregunta.</p>'; };
+  h += `<p class="seccion-p" style="margin-top:26px">Lo que necesita</p><div class="rejilla">
+    <div class="caja"><h3>${esc(P.quiere.titulo)}</h3>${lista('quiere')}</div>
+    <div class="caja"><h3>${esc(P.mas.titulo)}</h3>${lista('mas')}</div></div>`;
+  caja.innerHTML = h;
+}
+
+$('filtro-area').addEventListener('change', pintarInforme);
+$('imprimir').addEventListener('click', () => window.print());
+$('volver-ejemplo').addEventListener('click', () => {
+  Object.assign(estado, { fuente: 'ejemplo', archivo: '', filas: EJEMPLO, avisos: [], pruebas: 0 });
+  $('archivo').value = '';
+  $('msg-archivo').textContent = '';
+  pintarInforme();
+});
+$('archivo').addEventListener('change', async (e) => {
+  const archivo = e.target.files[0];
+  if (!archivo) return;
+  const msg = $('msg-archivo');
+  msg.className = 'msg'; msg.textContent = 'Leyendo el archivo…';
+  try {
+    const buf = await archivo.arrayBuffer();
+    const esZip = new Uint8Array(buf, 0, Math.min(2, buf.byteLength)).join() === '80,75';
+    const tabla = esZip ? await leerXlsx(buf) : leerCsv(new TextDecoder().decode(buf));
+    const { filas, avisos } = interpretar(tabla);
+    if (!filas.length) throw new Error('el archivo no tiene respuestas');
+    Object.assign(estado, { fuente: 'archivo', archivo: archivo.name, filas, avisos, pruebas: 0 });
+    $('filtro-area').value = '';
+    msg.textContent = avisos.length ? '' : `Listo: ${filas.length} ${filas.length === 1 ? 'respuesta' : 'respuestas'}.`;
+    pintarInforme();
+  } catch (err) {
+    msg.className = 'msg warn';
+    msg.textContent = `No se pudo leer el archivo: ${err.message}.`;
+  }
+});
+
+/* ───────── Pestañas ───────── */
+const TABS = ['informe', 'preguntas', 'encuesta'];
+function show(nombre) {
+  for (const t of TABS) {
+    const activo = t === nombre;
+    $(`tab-${t}`).setAttribute('aria-selected', activo);
+    $(`tab-${t}`).tabIndex = activo ? 0 : -1;
+    $(`panel-${t}`).hidden = !activo;
+  }
+}
+document.querySelector('.vistas').addEventListener('click', (e) => {
+  const b = e.target.closest('[role=tab]');
+  if (b) show(b.id.replace('tab-', ''));
+});
+document.querySelector('.vistas').addEventListener('keydown', (e) => {
+  if (!['ArrowRight', 'ArrowLeft', 'Home', 'End'].includes(e.key)) return;
+  const i = TABS.findIndex((t) => $(`tab-${t}`).getAttribute('aria-selected') === 'true');
+  const j = e.key === 'Home' ? 0 : e.key === 'End' ? TABS.length - 1 : (i + (e.key === 'ArrowRight' ? 1 : -1) + TABS.length) % TABS.length;
+  e.preventDefault(); show(TABS[j]); $(`tab-${TABS[j]}`).focus();
+});
+
+/* ───────── Guía de primer uso (la misma en todas las herramientas del estudio) ─────────
+   Cada paso: { titulo, texto, el: selector que se destaca (opcional), ir: ruta '#/…' o función que prepara la pantalla (opcional) }.
+   Se abre sola la primera vez y después con el botón «Cómo se usa». No guarda nada más que «ya la vi». */
+const Guia = (() => {
+  let pasos = [], i = 0, capa, foco, globo, antes = null, rutaInicial = '';
+  const vista = (clave) => { try { return localStorage.getItem(clave) === '1'; } catch { return true; } };
+  const enfocables = () => [...globo.querySelectorAll('button')];
+
+  function construir() {
+    capa = document.createElement('div');
+    capa.className = 'guia-capa';
+    foco = document.createElement('div');
+    foco.className = 'guia-foco';
+    globo = document.createElement('div');
+    globo.className = 'guia-globo';
+    globo.tabIndex = -1;
+    globo.setAttribute('role', 'dialog');
+    globo.setAttribute('aria-modal', 'true');
+    globo.setAttribute('aria-labelledby', 'guiaTit');
+    globo.setAttribute('aria-describedby', 'guiaTxt');
+    globo.innerHTML = `<p class="guia-n" id="guiaN"></p><h2 id="guiaTit"></h2><p class="guia-txt" id="guiaTxt"></p>
+      <div class="guia-puntos" aria-hidden="true"></div>
+      <div class="guia-pie"><button type="button" class="guia-saltar" data-tour-cerrar>Saltar la guía</button>
+        <button type="button" class="btn" data-guia="atras">Anterior</button><button type="button" class="btn primario" data-guia="sig">Siguiente</button></div>`;
+    globo.addEventListener('click', (e) => {
+      const b = e.target.closest('button');
+      if (!b) return;
+      if (b.hasAttribute('data-tour-cerrar')) cerrar();
+      else if (b.dataset.guia === 'atras') ir(i - 1);
+      else if (b.dataset.guia === 'sig') ir(i + 1);
+    });
+    document.body.append(capa, foco, globo);
+  }
+
+  function teclas(e) {
+    if (e.key === 'Escape') { e.preventDefault(); cerrar(); return; }
+    if (e.key === 'ArrowRight' && !e.altKey) { e.preventDefault(); ir(i + 1); return; }
+    if (e.key === 'ArrowLeft' && !e.altKey) { e.preventDefault(); ir(i - 1); return; }
+    if (e.key === 'Tab') {   // el foco no sale del globo mientras la guía está abierta
+      const b = enfocables(), primero = b[0], ultimo = b[b.length - 1];
+      if (e.shiftKey && document.activeElement === primero) { e.preventDefault(); ultimo.focus(); }
+      else if (!e.shiftKey && document.activeElement === ultimo) { e.preventDefault(); primero.focus(); }
+      else if (!globo.contains(document.activeElement)) { e.preventDefault(); primero.focus(); }
+    }
+  }
+
+  function ubicar() {
+    if (!globo || globo.hidden) return;
+    const p = pasos[i];
+    const el = p.el && document.querySelector(p.el);
+    const r = el && el.getBoundingClientRect();
+    const visible = r && r.width > 0 && r.height > 0;
+    capa.classList.toggle('con-foco', !!visible);
+    foco.hidden = !visible;
+    const W = window.innerWidth, H = window.innerHeight, m = 8;
+    const gw = globo.offsetWidth, gh = globo.offsetHeight;
+    if (!visible) {   // sin elemento: el globo va al centro
+      globo.style.left = Math.max(12, (W - gw) / 2) + 'px';
+      globo.style.top = Math.max(12, (H - gh) / 2) + 'px';
+      return;
+    }
+    Object.assign(foco.style, { left: r.left - m + 'px', top: r.top - m + 'px', width: r.width + 2 * m + 'px', height: r.height + 2 * m + 'px' });
+    let top = r.bottom + m + 12;
+    if (top + gh > H - 12) top = r.top - m - 12 - gh;   // no cabe abajo: arriba
+    if (top < 12) top = Math.min(H - gh - 12, Math.max(12, r.top + 12));   // tampoco arriba: encima del elemento
+    const left = Math.min(W - gw - 12, Math.max(12, r.left));
+    globo.style.left = left + 'px';
+    globo.style.top = top + 'px';
+  }
+
+  function ir(n) {
+    if (n < 0) return;
+    if (n >= pasos.length) { cerrar(); return; }
+    i = n;
+    const p = pasos[i];
+    if (typeof p.ir === 'function') p.ir();
+    else if (p.ir && location.hash !== p.ir) location.hash = p.ir;
+    globo.querySelector('#guiaN').textContent = `Paso ${i + 1} de ${pasos.length}`;
+    globo.querySelector('#guiaTit').textContent = p.titulo;
+    globo.querySelector('#guiaTxt').textContent = p.texto;
+    globo.querySelector('.guia-puntos').innerHTML = pasos.map((_, k) => `<i${k === i ? ' class="on"' : ''}></i>`).join('');
+    globo.querySelector('[data-guia="atras"]').hidden = i === 0;
+    globo.querySelector('[data-guia="sig"]').textContent = i === pasos.length - 1 ? 'Terminar' : 'Siguiente';
+    // Se espera a que la pantalla se pinte (cambio de ruta) antes de buscar el elemento.
+    setTimeout(() => {
+      const el = p.el && document.querySelector(p.el);
+      if (el) {
+        const chico = window.innerWidth <= 600;
+        el.scrollIntoView({ block: chico ? 'start' : 'center', behavior: 'instant' });
+        if (chico) window.scrollBy(0, -16);
+      }
+      ubicar();
+      globo.querySelector('[data-guia="sig"]').focus();
+    }, 60);
+  }
+
+  function abrir(lista, clave) {
+    if (!lista || !lista.length) return;
+    pasos = lista;
+    antes = document.activeElement;
+    rutaInicial = location.hash;
+    try { localStorage.setItem(clave, '1'); } catch { /* sin almacenamiento: igual se muestra */ }
+    if (!globo) construir();
+    capa.hidden = foco.hidden = globo.hidden = false;
+    document.addEventListener('keydown', teclas, true);
+    window.addEventListener('resize', ubicar);
+    window.addEventListener('scroll', ubicar, { passive: true });
+    ir(0);
+  }
+
+  function cerrar() {
+    if (!globo || globo.hidden) return;
+    capa.hidden = foco.hidden = globo.hidden = true;
+    document.removeEventListener('keydown', teclas, true);
+    window.removeEventListener('resize', ubicar);
+    window.removeEventListener('scroll', ubicar);
+    if (location.hash !== rutaInicial) location.hash = rutaInicial || '#/';
+    // Si se abrió sola, el foco vuelve al botón «Cómo se usa», que es donde se reabre.
+    const volver = antes && antes !== document.body && document.contains(antes) ? antes : document.querySelector('[data-guia-abrir]');
+    if (volver) volver.focus();
+  }
+
+  return { abrir, cerrar, vista };
+})();
+
+/* Los pasos de la guía de esta herramienta. */
+const CLAVE_GUIA = 'mlv-diagnostico-guia-v1';
+const GUIA = [
+  { ir: () => show('informe'), titulo: 'Para qué sirve',
+    texto: 'Muestra cómo usa y cómo crea herramientas el estudio: programas, IA, plantillas y planillas propias, dónde se guardan, en qué se va el tiempo y qué riesgos hay con los datos de los clientes. Lo que ve ahora son respuestas ficticias de ejemplo.' },
+  { ir: () => show('informe'), el: '#cifras', titulo: 'El informe de un vistazo',
+    texto: 'Cuántas personas respondieron, cuántas usan IA cada semana, cuántas pegaron datos de personas sin tachar y cuántas horas se van en tareas repetitivas.' },
+  { ir: () => show('informe'), el: '#alertas', titulo: 'Lo que hay que atender',
+    texto: 'Los riesgos (en rojo y ámbar) y las oportunidades (en azul) que salen de las respuestas, con lo que conviene hacer en cada caso.' },
+  { ir: () => show('informe'), el: '#prioridades', titulo: 'Por dónde empezar',
+    texto: 'Las tareas repetitivas que más horas se llevan. La primera es buena candidata para levantarla como proceso en el Sistema de trabajo.' },
+  { ir: () => show('preguntas'), el: '#lista-preguntas', titulo: 'Las preguntas',
+    texto: 'Son 16, unos 10 minutos. Con «Copiar todo para Forms» se llevan al formulario. Más abajo puede responderla usted mismo para probar.' },
+  { ir: () => show('encuesta'), el: '#pasos-forms', titulo: 'Hacer la encuesta',
+    texto: 'Los pasos para crearla en Microsoft Forms con la cuenta del estudio, dejarla anónima, enviarla y descargar las respuestas.' },
+  { ir: () => show('informe'), el: '#cargar', titulo: 'Ver el informe del estudio',
+    texto: 'Cuando tenga el Excel de Forms, cárguelo aquí. Se lee en este computador y no se sube a ningún lado. Esta guía se vuelve a abrir con «Cómo se usa».' },
+];
+
+/* ───────── Arranque ───────── */
+pintarPreguntas();
+show('informe');
+pintarInforme();
+document.addEventListener('click', (e) => { if (e.target.closest('[data-guia-abrir]')) Guia.abrir(GUIA, CLAVE_GUIA); });
+if (!Guia.vista(CLAVE_GUIA)) setTimeout(() => Guia.abrir(GUIA, CLAVE_GUIA), 500);
+</script>
+</body>
+</html>
