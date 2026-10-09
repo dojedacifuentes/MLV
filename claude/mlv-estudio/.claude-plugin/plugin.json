@@ -1,0 +1,9 @@
+{
+  "name": "mlv-estudio",
+  "version": "0.1.0",
+  "description": "Recetas del estudio MLV para trabajar con Claude: cada trabajo que se repite, hecho siempre igual, con lo que revisa el abogado marcado. Borrador v0.1 para revisión del estudio.",
+  "author": {
+    "name": "MLV Abogados · demo de trabajo"
+  },
+  "keywords": ["chile", "laboral", "ley-karin", "ley-21719", "datos-personales", "estudio-juridico"]
+}

@@ -1,0 +1,1162 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Herramienta local: guarda solo en este navegador y no se conecta a nada. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; connect-src 'none'; form-action 'none'; base-uri 'none'">
+<meta name="robots" content="noindex">
+<title>Bitácora de IA · MLV Abogados</title>
+<style>
+  :root {
+    --fondo: #f6f5f1; --papel: #ffffff; --papel2: #fbfaf7; --hundido: #efede6;
+    --tinta: #1a2636; --tinta2: #3b4859; --suave: #5f6873; --linea: #dddbd2; --linea2: #ebe9e2; --campo: #8e8a82;
+    --acento: #0d5c68; --acento-osc: #094650; --acento-claro: #e3eef0; --acento-borde: #c3dbde;
+    --verde: #2b7549; --verde-f: #e4f0e8; --verde-b: #bcd8c6;
+    --ambar: #94600f; --ambar-f: #f9eed8; --ambar-b: #ead2a2;
+    --rojo: #a12f2a; --rojo-f: #f7e2e0; --rojo-b: #e6bdb9;
+    --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", serif;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --mono: ui-monospace, "Cascadia Mono", Consolas, "Courier New", monospace;
+    --radio: 10px;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; background: var(--fondo); color: var(--tinta); font: 15px/1.5 var(--sans); }
+  .app { max-width: 1280px; margin: 0 auto; padding: 0 28px 36px; }
+  a { color: var(--acento); }
+  h1, h2, h3 { font-family: var(--serif); font-weight: 600; color: var(--tinta); }
+  :focus-visible { outline: 2px solid var(--acento); outline-offset: 2px; }
+  [hidden] { display: none !important; }
+  .sr { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+
+  /* Cabecera */
+  .cabecera { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px 24px; padding: 26px 0 18px; }
+  .firma { font: 600 25px/1.1 var(--serif); letter-spacing: .01em; color: var(--tinta); text-decoration: none; }
+  .sub { color: var(--suave); font-size: 12.5px; letter-spacing: .1em; text-transform: uppercase; margin-top: 6px; }
+  .acciones-cab { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; }
+
+  /* Título y pestañas */
+  .sec-cab { display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 10px 20px; margin: 4px 0 0; }
+  .sec-cab h1 { font-size: 27px; line-height: 1.15; margin: 0; }
+  .sec-cab h1:focus { outline: none; }
+  .lead { margin: 10px 0 0; color: var(--tinta2); max-width: 840px; }
+  .chip { display: inline-flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 500; padding: 4px 11px; border-radius: 999px; border: 1px solid transparent; }
+  .chip i { width: 8px; height: 8px; border-radius: 50%; background: currentColor; flex: none; }
+  .chip.verde { background: var(--verde-f); color: var(--verde); border-color: var(--verde-b); }
+  .chip.ambar { background: var(--ambar-f); color: var(--ambar); border-color: var(--ambar-b); }
+  .chip.rojo { background: var(--rojo-f); color: var(--rojo); border-color: var(--rojo-b); }
+  .chip.azul { background: var(--acento-claro); color: var(--acento); border-color: var(--acento-borde); }
+  .chip.gris { background: var(--hundido); color: var(--suave); border-color: var(--linea); }
+  .chip.chico { font-size: 12px; padding: 2px 9px; white-space: nowrap; }
+  .vistas { display: flex; flex-wrap: wrap; gap: 2px; border-bottom: 1px solid var(--linea); margin: 20px 0 22px; }
+  .vistas [role=tab] { font: inherit; font-size: 14.5px; font-weight: 500; padding: 10px 13px; color: var(--tinta2); background: none; border: 0; border-bottom: 2px solid transparent; margin-bottom: -1px; cursor: pointer; }
+  .vistas [role=tab]:hover { color: var(--acento); }
+  .vistas [role=tab][aria-selected="true"] { color: var(--tinta); border-color: var(--acento); }
+
+  /* Aviso de ejemplo */
+  .aviso-demo { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; background: var(--ambar-f); border: 1px solid var(--ambar-b); border-radius: var(--radio); padding: 10px 14px; margin: 16px 0 0; font-size: 14px; color: var(--tinta); }
+  .aviso-demo p { margin: 0; flex: 1 1 320px; }
+
+  /* Botones y campos */
+  .btn { font: inherit; font-size: 14px; font-weight: 500; line-height: 1.3; color: var(--tinta); background: var(--papel); border: 1px solid var(--linea); border-radius: 8px; padding: 8px 14px; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+  .btn:hover { border-color: var(--acento); color: var(--acento); }
+  .btn.primario { background: var(--acento); border-color: var(--acento); color: #fff; }
+  .btn.primario:hover { background: var(--acento-osc); color: #fff; }
+  .btn.chico { font-size: 13px; padding: 5px 10px; }
+  .btn.peligro:hover { border-color: var(--rojo); color: var(--rojo); }
+  input, select, textarea { font: inherit; font-size: 14px; color: var(--tinta); background: var(--papel); border: 1px solid var(--campo); border-radius: 7px; padding: 7px 10px; min-width: 0; max-width: 100%; }
+  input:focus, select:focus, textarea:focus { border-color: var(--acento); outline: none; box-shadow: 0 0 0 3px var(--acento-claro); }
+  input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px solid var(--acento); outline-offset: 1px; }
+  input[type=checkbox] { width: 17px; height: 17px; accent-color: var(--acento); margin: 0; flex: none; }
+  textarea { resize: vertical; width: 100%; min-height: 90px; font: 15px/1.55 var(--sans); padding: 10px 12px; }
+  .archivo-oculto { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+
+  /* Cajas */
+  .caja { background: var(--papel); border: 1px solid var(--linea); border-radius: var(--radio); padding: 18px 20px; min-width: 0; }
+  .caja + .caja, .caja + .rejilla, .rejilla + .caja, .rejilla + .rejilla, .cifras + .rejilla, .cifras + .caja { margin-top: 16px; }
+  .caja h2 { font-size: 19px; margin: 0 0 6px; }
+  .caja h3 { font-size: 16.5px; margin: 0 0 4px; line-height: 1.3; }
+  .nota { font-size: 13.5px; color: var(--suave); margin: 4px 0 10px; }
+  .fila-acc { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 12px; }
+  .msg { font-size: 13.5px; color: var(--tinta2); min-height: 1.4em; margin: 8px 0 0; }
+  .msg.warn { color: var(--rojo); font-weight: 500; }
+  .msg.ok { color: var(--verde); font-weight: 500; }
+  .rejilla { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; align-items: start; }
+  .rejilla.tres { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  @media (max-width: 1000px) { .rejilla.tres { grid-template-columns: 1fr; } }
+  @media (max-width: 900px) { .rejilla { grid-template-columns: 1fr; } }
+  .filtro { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 0 0 16px; }
+  .filtro label { font-weight: 600; font-size: 14px; }
+  .pie { margin-top: 40px; padding-top: 14px; border-top: 1px solid var(--linea); font-size: 13px; color: var(--suave); }
+  .pie p { margin: 4px 0; }
+
+  /* Cifras */
+  .cifras { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+  @media (max-width: 900px) { .cifras { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  .cifra { background: var(--papel); border: 1px solid var(--linea); border-radius: var(--radio); padding: 14px 16px; }
+  .cifra .n { font: 600 30px/1.1 var(--serif); color: var(--tinta); }
+  .cifra .n small { font: 500 15px/1 var(--sans); color: var(--suave); margin-left: 4px; }
+  .cifra .t { font-size: 13.5px; color: var(--tinta2); margin-top: 4px; }
+  .cifra .d { font-size: 12.5px; color: var(--suave); margin-top: 2px; }
+  .cifra.rojo { border-color: var(--rojo-b); background: var(--rojo-f); }
+  .cifra.rojo .n { color: var(--rojo); }
+
+  /* Alertas */
+  .alertas { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 8px; }
+  .alertas li { border-left: 3px solid var(--c); background: var(--f); padding: 10px 12px; border-radius: 0 6px 6px 0; font-size: 14px; color: var(--tinta); }
+  .alertas li b { font-weight: 600; }
+  .alertas li .que { display: block; color: var(--tinta2); margin-top: 2px; }
+  .alertas li.rojo { --c: var(--rojo); --f: var(--rojo-f); }
+  .alertas li.ambar { --c: var(--ambar); --f: var(--ambar-f); }
+  .alertas li.azul { --c: var(--acento); --f: var(--acento-claro); }
+  .alertas li.verde { --c: var(--verde); --f: var(--verde-f); }
+
+  /* Barras */
+  .barras { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 7px; }
+  .barras li { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) 76px; gap: 10px; align-items: center; font-size: 13.5px; }
+  .barras .et { color: var(--tinta); overflow-wrap: anywhere; line-height: 1.3; }
+  .barras .pista { height: 12px; background: var(--hundido); border-radius: 6px; overflow: hidden; }
+  .barras .pista i { display: block; height: 100%; background: var(--acento); border-radius: 6px; min-width: 2px; }
+  .barras li.rojo .pista i { background: var(--rojo); }
+  .barras li.ambar .pista i { background: #c18a2e; }
+  .barras .num { text-align: right; color: var(--tinta2); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  @media (max-width: 560px) { .barras li { grid-template-columns: minmax(0, 1fr) 70px; } .barras .pista { grid-column: 1 / 3; grid-row: 2; } }
+  .vacio { color: var(--suave); font-size: 14px; margin: 8px 0 0; }
+
+  /* Formulario */
+  .campos { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px 14px; }
+  .campos .ancho2 { grid-column: span 2; }
+  .campos .ancho4 { grid-column: 1 / -1; }
+  @media (max-width: 900px) { .campos { grid-template-columns: repeat(2, minmax(0, 1fr)); } .campos .ancho2 { grid-column: 1 / -1; } }
+  @media (max-width: 520px) { .campos { grid-template-columns: 1fr; } }
+  .campo { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+  .campo > label, .campo > .et { font-weight: 600; font-size: 13.5px; }
+  .campo .ayuda { font-size: 12.5px; color: var(--suave); }
+  fieldset.marcas { border: 0; padding: 0; margin: 0; min-width: 0; }
+  fieldset.marcas legend { font-weight: 600; font-size: 13.5px; padding: 0; margin-bottom: 4px; }
+  .marcas-op { display: flex; flex-wrap: wrap; gap: 6px 16px; }
+  label.marca { display: inline-flex; align-items: center; gap: 7px; font-size: 14px; color: var(--tinta2); cursor: pointer; }
+
+  /* Tablas */
+  .tabla-env { position: relative; overflow-x: auto; border: 1px solid var(--linea); border-radius: var(--radio); background: var(--papel); }
+  table { border-collapse: collapse; width: 100%; font-size: 14px; }
+  th, td { text-align: left; vertical-align: top; padding: 9px 12px; border-bottom: 1px solid var(--linea2); }
+  th { font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--suave); font-weight: 600; background: var(--papel2); white-space: nowrap; }
+  tr:last-child td { border-bottom: 0; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  td.cod { font: 600 13px/1.4 var(--mono); color: var(--acento); white-space: nowrap; }
+  .tabla-env table { min-width: 760px; }
+
+  /* Citas */
+  .estado-citas { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 14px 0 0; padding: 12px 14px; border-radius: 8px; border: 1px solid var(--c, var(--linea)); background: var(--f, var(--papel2)); font-weight: 500; }
+  .estado-citas.rojo { --c: var(--rojo-b); --f: var(--rojo-f); color: var(--rojo); }
+  .estado-citas.verde { --c: var(--verde-b); --f: var(--verde-f); color: var(--verde); }
+  .cita-txt { font-family: var(--serif); font-size: 15px; color: var(--tinta); }
+  .riesgo { display: inline-block; font: 600 11.5px/1 var(--sans); letter-spacing: .03em; padding: 4px 8px; border-radius: 999px; white-space: nowrap; }
+  .riesgo.alta { background: var(--rojo-f); color: var(--rojo); }
+  .riesgo.media { background: var(--ambar-f); color: var(--ambar); }
+  .riesgo.baja { background: var(--hundido); color: var(--suave); }
+  td select, td input { width: 100%; font-size: 13.5px; padding: 5px 8px; }
+
+  /* Informe */
+  .informe h2 { font-size: 23px; margin: 0 0 4px; }
+  .informe h3 { font-size: 17px; margin: 22px 0 8px; }
+  .informe ul.lista { margin: 6px 0 0; padding-left: 20px; color: var(--tinta2); }
+  .informe ul.lista li { margin: 6px 0; }
+  .delta { font-size: 12.5px; font-weight: 600; }
+  .delta.mejor { color: var(--verde); } .delta.peor { color: var(--rojo); }
+
+  /* Celular y táctil */
+  @media (pointer: coarse) {
+    .btn, .btn.chico, select, input:not([type=checkbox]) { min-height: 44px; }
+    .vistas [role=tab] { min-height: 44px; }
+    label.marca { min-height: 36px; }
+  }
+  @media (max-width: 760px) {
+    .app { padding: 0 16px 28px; }
+    input, select, textarea { font-size: 16px; }
+    .caja { padding: 16px; }
+  }
+  @media (max-width: 700px) {
+    .vistas { display: grid; grid-template-columns: 1fr 1fr 1fr; }
+    .vistas [role=tab] { min-height: 44px; text-align: center; padding: 8px 6px; font-size: 14px; }
+  }
+  @media print {
+    body { background: #fff; font-size: 12.5px; }
+    .app { max-width: none; padding: 0; }
+    .acciones-cab, .vistas, .filtro, .pie, .no-imprimir, .aviso-demo { display: none !important; }
+    .caja, .cifra { break-inside: avoid; border-color: #ccc; }
+    .barras .pista { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  }
+
+  /* Común a las herramientas del estudio: vuelta a la portada, botón de ayuda y guía de primer uso */
+  .ico { width: 1.15em; height: 1.15em; flex: none; vertical-align: -.2em; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .portada { display: inline-flex; align-items: center; gap: 5px; margin-bottom: 8px; font-size: 13px; color: var(--suave); text-decoration: none; }
+  .portada:hover { color: var(--acento); text-decoration: underline; text-underline-offset: 3px; }
+  .btn.ayuda { display: inline-flex; align-items: center; gap: 6px; }
+  .guia-capa { position: fixed; inset: 0; z-index: 40; background: rgba(26, 38, 54, .5); }
+  .guia-capa.con-foco { background: transparent; }
+  .guia-foco { position: fixed; z-index: 41; border-radius: 10px; box-shadow: 0 0 0 4px var(--acento), 0 0 0 9999px rgba(26, 38, 54, .5); pointer-events: none; transition: top .2s, left .2s, width .2s, height .2s; }
+  .guia-globo { position: fixed; z-index: 42; width: min(380px, calc(100vw - 24px)); background: var(--papel); color: var(--tinta); border-radius: 12px; padding: 18px 20px 16px; box-shadow: 0 18px 50px rgba(20, 30, 45, .3); font: 15px/1.5 var(--sans); }
+  .guia-globo:focus { outline: none; }
+  .guia-globo .guia-n { margin: 0 0 4px; font-size: 12.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--suave); }
+  .guia-globo h2 { margin: 0 0 6px; font: 600 19px/1.25 var(--serif); }
+  .guia-globo p.guia-txt { margin: 0; color: var(--tinta2); }
+  .guia-pie { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+  .guia-pie .guia-saltar { margin-right: auto; font: inherit; font-size: 14px; background: none; border: 0; padding: 10px 2px; color: var(--suave); cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
+  .guia-pie .guia-saltar:hover { color: var(--tinta); }
+  .guia-puntos { display: flex; gap: 5px; margin-top: 14px; }
+  .guia-puntos i { width: 7px; height: 7px; border-radius: 50%; background: var(--linea); }
+  .guia-puntos i.on { background: var(--acento); }
+  @media (max-width: 600px) { .guia-globo { left: 12px !important; right: 12px; bottom: 12px; top: auto !important; width: auto; } }
+  @media (prefers-reduced-motion: reduce) { .guia-foco { transition: none; } }
+  @media print { .guia-capa, .guia-foco, .guia-globo, .portada, .btn.ayuda { display: none !important; } }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="cabecera">
+    <div>
+      <a class="portada" href="../index.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg> Herramientas del estudio</a><br>
+      <span class="firma">MLV Abogados</span>
+      <div class="sub">Bitácora de IA · Herramientas del estudio</div>
+    </div>
+    <div class="acciones-cab">
+      <button type="button" class="btn" id="exportar">Descargar respaldo</button>
+      <label class="btn" for="importar">Cargar respaldo</label>
+      <input type="file" id="importar" class="archivo-oculto" accept=".json,application/json">
+      <button type="button" class="btn ayuda" data-guia-abrir><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg> Cómo se usa</button>
+    </div>
+  </header>
+
+  <main>
+    <div class="sec-cab">
+      <h1 id="titulo" tabindex="-1">Bitácora de IA y control de calidad</h1>
+      <span class="chip verde"><i aria-hidden="true"></i>Guarda solo en este navegador: nada sale del computador</span>
+    </div>
+    <p class="lead">Cómo sabe el estudio si Claude le ahorra tiempo de verdad y dónde se equivoca. Cada abogado anota sus usos en un minuto; las citas se verifican antes de entregar; los errores llegan al encargado, que corrige la receta para todos; y una vez al mes sale el informe para la dirección.</p>
+    <p class="msg warn" id="msg-alm" role="status" hidden>Este navegador no permite guardar: lo que anote se perderá al cerrar la página. Descargue un respaldo antes de salir.</p>
+
+    <div class="aviso-demo" id="aviso-demo" hidden>
+      <p><b>Está viendo datos de ejemplo</b> (ficticios): tres meses de uso de un estudio con seis abogados.</p>
+      <button type="button" class="btn chico" id="en-blanco">Empezar en blanco</button>
+    </div>
+
+    <div class="vistas" role="tablist" aria-label="Partes de la bitácora">
+      <button type="button" role="tab" id="tab-indicadores" aria-controls="panel-indicadores" aria-selected="true" tabindex="0">Indicadores</button>
+      <button type="button" role="tab" id="tab-registrar" aria-controls="panel-registrar" aria-selected="false" tabindex="-1">Registrar un uso</button>
+      <button type="button" role="tab" id="tab-citas" aria-controls="panel-citas" aria-selected="false" tabindex="-1">Verificar citas</button>
+      <button type="button" role="tab" id="tab-recetas" aria-controls="panel-recetas" aria-selected="false" tabindex="-1">Recetas</button>
+      <button type="button" role="tab" id="tab-informe" aria-controls="panel-informe" aria-selected="false" tabindex="-1">Informe mensual</button>
+    </div>
+
+    <div class="filtro" id="barra-periodo">
+      <label for="periodo">Periodo</label>
+      <select id="periodo">
+        <option value="30">Últimos 30 días</option>
+        <option value="90" selected>Últimos 90 días</option>
+        <option value="0">Todo</option>
+      </select>
+    </div>
+
+    <!-- ───────── Indicadores ───────── -->
+    <section id="panel-indicadores" role="tabpanel" aria-labelledby="tab-indicadores">
+      <div class="cifras" id="cifras"></div>
+      <div class="rejilla">
+        <div class="caja" id="caja-alertas">
+          <h2>Lo que hay que atender</h2>
+          <ul class="alertas" id="alertas"></ul>
+        </div>
+        <div class="caja">
+          <h2>Horas ahorradas por área</h2>
+          <p class="nota">Minutos estimados sin IA menos minutos reales con IA, incluida la revisión del abogado.</p>
+          <ul class="barras" id="barras-area"></ul>
+        </div>
+      </div>
+      <div class="rejilla">
+        <div class="caja">
+          <h2>Errores por tipo</h2>
+          <p class="nota">Los que detectó el abogado antes de entregar. Un error anotado es una receta que se puede corregir.</p>
+          <ul class="barras" id="barras-errores"></ul>
+        </div>
+        <div class="caja">
+          <h2>Usos por receta</h2>
+          <p class="nota">«Sin receta» alto quiere decir que hay trabajos que se repiten y todavía no tienen receta.</p>
+          <ul class="barras" id="barras-recetas"></ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ───────── Registrar ───────── -->
+    <section id="panel-registrar" role="tabpanel" aria-labelledby="tab-registrar" hidden>
+      <div class="rejilla">
+        <form class="caja" id="form-registro" novalidate>
+          <h2>Registrar un uso</h2>
+          <p class="nota">Un minuto al terminar un trabajo hecho con Claude. <b>Sin nombres de clientes ni de personas</b>: el trabajo se describe en general.</p>
+          <div class="campos">
+            <div class="campo"><label for="r-fecha">Fecha</label><input type="date" id="r-fecha" required></div>
+            <div class="campo"><label for="r-abog">Abogado</label><input id="r-abog" maxlength="4" placeholder="Iniciales" autocomplete="off" required><span class="ayuda">Solo iniciales</span></div>
+            <div class="campo"><label for="r-area">Área</label><select id="r-area" required></select></div>
+            <div class="campo"><label for="r-receta">Receta</label><select id="r-receta" required></select></div>
+            <div class="campo ancho4"><label for="r-trabajo">Trabajo</label><input id="r-trabajo" maxlength="120" placeholder="Por ejemplo: carta de despido por necesidades de la empresa" required></div>
+            <div class="campo"><label for="r-sin">Minutos sin IA</label><input type="number" id="r-sin" min="0" max="6000" step="5" inputmode="numeric" required><span class="ayuda">Cuánto habría tomado</span></div>
+            <div class="campo"><label for="r-con">Minutos con IA</label><input type="number" id="r-con" min="0" max="6000" step="5" inputmode="numeric" required><span class="ayuda">Incluida la revisión</span></div>
+            <div class="campo"><label for="r-reesc">Cuánto se reescribió</label><select id="r-reesc" required></select></div>
+            <div class="campo"><label for="r-cliente">¿Se informó al cliente?</label><select id="r-cliente"></select></div>
+            <fieldset class="marcas ancho4"><legend>Errores que detectó</legend><div class="marcas-op" id="r-errores"></div></fieldset>
+            <div class="campo ancho4"><label for="r-detalle">Qué pasó (si hubo error)</label><textarea id="r-detalle" maxlength="400" placeholder="Qué dijo Claude y qué era lo correcto, en una o dos líneas"></textarea></div>
+          </div>
+          <div class="fila-acc">
+            <button type="submit" class="btn primario">Guardar en la bitácora</button>
+            <button type="reset" class="btn">Limpiar</button>
+          </div>
+          <p class="msg" id="msg-registro" role="status" aria-live="polite"></p>
+        </form>
+        <div class="caja" id="caja-pegar">
+          <h2>Pegar lo que preparó Claude</h2>
+          <p class="nota">La receta <code>registro-bitacora</code> del estudio entrega un bloque «Fecha: … Abogado: … Receta: …». Péguelo aquí y se rellena el formulario para revisarlo antes de guardar.</p>
+          <label class="sr" for="pegar">Bloque de la bitácora</label>
+          <textarea id="pegar" rows="9" placeholder="Fecha: 09-10-2026&#10;Abogado (iniciales): AB&#10;Área: Laboral&#10;Receta: carta-despido&#10;…"></textarea>
+          <div class="fila-acc"><button type="button" class="btn" id="rellenar">Rellenar el formulario</button></div>
+          <p class="msg" id="msg-pegar" role="status" aria-live="polite"></p>
+        </div>
+      </div>
+      <div class="caja">
+        <h2>Últimos registros</h2>
+        <div class="tabla-env" tabindex="0" role="region" aria-label="Últimos registros (se desplaza hacia el lado en pantallas chicas)">
+          <table>
+            <thead><tr><th scope="col">Fecha</th><th scope="col">Abog.</th><th scope="col">Área</th><th scope="col">Receta</th><th scope="col">Trabajo</th><th scope="col" class="num">Sin IA</th><th scope="col" class="num">Con IA</th><th scope="col">Reescrito</th><th scope="col">Errores</th><th scope="col"><span class="sr">Acciones</span></th></tr></thead>
+            <tbody id="tabla-registros"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ───────── Verificar citas ───────── -->
+    <section id="panel-citas" role="tabpanel" aria-labelledby="tab-citas" hidden>
+      <div class="caja" id="zona-citas">
+        <h2>Verificar las citas de un escrito</h2>
+        <p class="nota">Pegue el escrito (tachado si tiene datos de personas). La página busca leyes, artículos, decretos, dictámenes, roles, fallos, doctrina y plazos, y arma la lista. <b>Un abogado verifica cada una en la fuente oficial</b>; que otra IA la revise no cuenta. El texto no se guarda: solo la lista de citas.</p>
+        <label class="sr" for="texto-citas">Texto del escrito</label>
+        <textarea id="texto-citas" rows="8"></textarea>
+        <div class="fila-acc">
+          <button type="button" class="btn primario" id="buscar-citas">Buscar citas</button>
+          <button type="button" class="btn" id="agregar-cita">Agregar una cita a mano</button>
+          <button type="button" class="btn" id="nueva-verif">Empezar otra verificación</button>
+        </div>
+        <p class="msg" id="msg-citas" role="status" aria-live="polite"></p>
+      </div>
+      <div class="caja" id="caja-lista-citas">
+        <h2>Lista de citas</h2>
+        <div class="campos" style="margin-bottom:12px">
+          <div class="campo ancho2"><label for="v-titulo">Escrito</label><input id="v-titulo" maxlength="100" placeholder="Por ejemplo: contestación de demanda laboral (sin nombres)"></div>
+          <div class="campo"><label for="v-abog">Verifica</label><input id="v-abog" maxlength="4" placeholder="Iniciales" autocomplete="off"></div>
+        </div>
+        <div class="tabla-env" tabindex="0" role="region" aria-label="Citas encontradas (se desplaza hacia el lado en pantallas chicas)">
+          <table>
+            <thead><tr><th scope="col">#</th><th scope="col">Cita</th><th scope="col">Tipo</th><th scope="col">Riesgo</th><th scope="col">Dónde verificar</th><th scope="col" style="min-width:140px">Estado</th><th scope="col" style="min-width:160px">Nota</th><th scope="col"><span class="sr">Quitar</span></th></tr></thead>
+            <tbody id="tabla-citas"></tbody>
+          </table>
+        </div>
+        <div class="estado-citas" id="estado-citas" role="status"></div>
+        <div class="fila-acc">
+          <button type="button" class="btn primario" id="guardar-verif">Guardar constancia</button>
+          <span class="msg" id="msg-verif" role="status" aria-live="polite" style="margin:0"></span>
+        </div>
+      </div>
+      <div class="caja">
+        <h2>Constancias guardadas</h2>
+        <p class="nota">Quién verificó qué y cuándo. Un escrito con citas «Pendiente» no debe salir del estudio.</p>
+        <div class="tabla-env" tabindex="0" role="region" aria-label="Constancias (se desplaza hacia el lado en pantallas chicas)">
+          <table>
+            <thead><tr><th scope="col">Fecha</th><th scope="col">Escrito</th><th scope="col">Verifica</th><th scope="col" class="num">Citas</th><th scope="col">Estado</th><th scope="col"><span class="sr">Acciones</span></th></tr></thead>
+            <tbody id="tabla-verifs"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ───────── Recetas ───────── -->
+    <section id="panel-recetas" role="tabpanel" aria-labelledby="tab-recetas" hidden>
+      <div class="caja" id="caja-recetas">
+        <h2>Cómo rinde cada receta</h2>
+        <p class="nota">Una receta con dos o más errores graves en el periodo, o con una cita inexistente, pasa a «Corregir». La corrige el encargado de IA (receta <code>nueva-receta</code>) y vuelve a «en prueba» hasta que la apruebe su dueño.</p>
+        <div class="tabla-env" tabindex="0" role="region" aria-label="Recetas (se desplaza hacia el lado en pantallas chicas)">
+          <table>
+            <thead><tr><th scope="col">Receta</th><th scope="col">Área</th><th scope="col" class="num">Usos</th><th scope="col" class="num">Horas ahorradas</th><th scope="col" class="num">Útiles sin reescribir</th><th scope="col" class="num">Errores graves</th><th scope="col">Estado</th></tr></thead>
+            <tbody id="tabla-recetas"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="rejilla">
+        <div class="caja">
+          <h2>Para corregir</h2>
+          <p class="nota">La lista de trabajo del encargado: cada error con lo que pasó.</p>
+          <div id="para-corregir"></div>
+        </div>
+        <div class="caja">
+          <h2>Candidatas a receta nueva</h2>
+          <p class="nota">Trabajos hechos «sin receta» que se repiten. Se levantan primero como proceso en el <a href="sistema-de-trabajo.html">Sistema de trabajo</a>.</p>
+          <div id="candidatas"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ───────── Informe mensual ───────── -->
+    <section id="panel-informe" role="tabpanel" aria-labelledby="tab-informe" hidden>
+      <div class="filtro no-imprimir">
+        <label for="mes">Mes</label>
+        <select id="mes"></select>
+        <button type="button" class="btn" id="imprimir">Imprimir o guardar en PDF</button>
+      </div>
+      <div class="caja informe" id="informe-mes"></div>
+    </section>
+
+    <footer class="pie">
+      <p>Demo con datos ficticios. Lo que se anota queda solo en este navegador; para pasarlo a otro computador, use «Descargar respaldo». No anote nombres de clientes, de las partes ni de testigos.</p>
+      <p>Las recetas están en el repositorio del estudio (carpeta <code>claude/</code>). Íconos: Lucide (licencia ISC).</p>
+    </footer>
+  </main>
+</div>
+
+<script>
+'use strict';
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const norm = (s) => String(s ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
+const pct = (a, b) => (b ? Math.round((a / b) * 100) : 0);
+const nuevoId = () => Math.random().toString(36).slice(2, 9);
+const horas = (min) => (Math.round(min / 6) / 10).toLocaleString('es-CL');
+function isoLocal(d) { d = new Date(d); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); return d.toISOString().slice(0, 10); }
+const hoyISO = () => isoLocal(new Date());
+function diasAtras(n) { const d = new Date(); d.setDate(d.getDate() - n); return isoLocal(d); }
+function fecha(iso) { if (!iso) return '—'; const [a, m, d] = iso.split('-'); return `${d}-${m}-${a}`; }
+const MESES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+const nombreMes = (ym) => { const [a, m] = ym.split('-'); return `${MESES[+m - 1]} de ${a}`; };
+const RUT = /\b\d{1,2}\.?\d{3}\.?\d{3}-[\dkK]\b/;
+const URL_REPO = 'https://github.com/dojedacifuentes/MLV/blob/main/claude/mlv-estudio/skills/';
+
+/* ───────── Catálogos ───────── */
+const AREAS = ['Laboral', 'Ley Karin', 'Datos personales', 'Corporativo', 'Derecho público', 'Litigación', 'Gestión del estudio'];
+const SIN = 'sin receta';
+const RECETAS = [
+  { id: 'verificar-citas', area: 'Todas', d: 'Lista cada cita con su riesgo y dónde verificarla.' },
+  { id: 'revisar-datos-antes', area: 'Todas', d: 'Detiene el trabajo si hay datos de personas sin tachar.' },
+  { id: 'minuta-laboral', area: 'Laboral', d: 'Borrador de la minuta laboral mensual.' },
+  { id: 'carta-despido', area: 'Laboral', d: 'Carta de término y lista de control para el abogado.' },
+  { id: 'investigacion-ley-karin', area: 'Ley Karin', d: 'Plan, pauta, matriz de hechos e informe, sin concluir.' },
+  { id: 'solicitud-titular', area: 'Datos personales', d: 'Solicitudes de titulares con los plazos del art. 11.' },
+  { id: 'informe-cliente', area: 'Todas', d: 'Informe de una página para el cliente.' },
+  { id: SIN, area: '—', d: 'Trabajos hechos sin receta.' },
+];
+const REESC = { nada: 'Nada', poco: 'Poco', mucho: 'Mucho', descartado: 'Se descartó' };
+const ERRORES = {
+  inexistente: { t: 'Cita inexistente', grave: true },
+  atribuida: { t: 'Cita mal atribuida', grave: true },
+  norma: { t: 'Norma o plazo errado', grave: true },
+  dato: { t: 'Dato personal sin tachar', grave: true },
+  omision: { t: 'Omisión relevante' },
+  estilo: { t: 'Estilo o tono' },
+};
+const CLIENTE = { na: 'No aplica', si: 'Sí', no: 'No' };
+const ESTADOS_CITA = { pendiente: 'Pendiente', verificada: 'Verificada', corregida: 'Corregida', eliminada: 'Eliminada del escrito' };
+
+/* ───────── Datos de ejemplo (ficticios) ─────────
+   [días atrás, abogado, área, receta, trabajo, min sin IA, min con IA, reescritura, errores, detalle, cliente] */
+const EJEMPLO = [
+  [2, 'AB', 'Laboral', 'carta-despido', 'Carta por necesidades de la empresa', 90, 35, 'poco', ['norma'], 'Indicó un plazo de aviso distinto al de la ficha del proceso. Se corrigió con la ficha.', 'na'],
+  [3, 'CD', 'Ley Karin', 'investigacion-ley-karin', 'Pauta de entrevistas para testigos', 120, 45, 'poco', [], '', 'si'],
+  [4, 'EF', 'Laboral', 'minuta-laboral', 'Minuta laboral de septiembre', 480, 210, 'poco', [], '', 'na'],
+  [5, 'GH', 'Corporativo', SIN, 'Resumen de pacto de accionistas', 150, 60, 'mucho', ['atribuida'], 'Atribuyó a la ley de sociedades anónimas una regla que está en el estatuto. Se detectó al verificar.', 'no'],
+  [6, 'AB', 'Datos personales', 'solicitud-titular', 'Respuesta a solicitud de acceso', 75, 25, 'nada', [], '', 'na'],
+  [8, 'JK', 'Litigación', SIN, 'Borrador de recurso con jurisprudencia', 240, 150, 'mucho', ['inexistente'], 'Propuso un fallo de la Corte Suprema con un rol que no existe. Se eliminó antes de presentar.', 'no'],
+  [9, 'CD', 'Laboral', 'carta-despido', 'Carta por incumplimiento grave', 90, 40, 'poco', ['norma'], 'Citó la causal con el número de artículo equivocado.', 'na'],
+  [10, 'LM', 'Derecho público', 'informe-cliente', 'Informe de estado para gerencia', 60, 20, 'nada', [], '', 'si'],
+  [11, 'EF', 'Laboral', 'verificar-citas', 'Verificación de contestación de demanda', 60, 30, 'nada', [], '', 'na'],
+  [12, 'GH', 'Datos personales', SIN, 'Revisión de cláusula con proveedor', 90, 50, 'poco', ['dato'], 'Se pegó el contrato con nombre y RUT del representante sin tachar (cuenta del estudio). Se avisó al dueño del protocolo.', 'no'],
+  [14, 'AB', 'Ley Karin', 'investigacion-ley-karin', 'Matriz de hechos de una investigación', 180, 70, 'poco', [], '', 'si'],
+  [15, 'JK', 'Laboral', 'informe-cliente', 'Informe de riesgos laborales para RR. HH.', 90, 30, 'poco', ['estilo'], 'Demasiado técnico para RR. HH.; se simplificó.', 'si'],
+  [17, 'CD', 'Datos personales', 'solicitud-titular', 'Acuse y respuesta de supresión', 80, 30, 'poco', [], '', 'na'],
+  [19, 'LM', 'Corporativo', SIN, 'Traducción de contrato de servicios', 120, 40, 'poco', [], '', 'no'],
+  [21, 'EF', 'Laboral', 'carta-despido', 'Revisión de carta redactada por el cliente', 60, 25, 'nada', [], '', 'na'],
+  [23, 'AB', 'Laboral', 'minuta-laboral', 'Minuta especial sobre jornada', 240, 110, 'poco', ['omision'], 'No incluyó la fecha de entrada en vigor, que venía en la fuente.', 'na'],
+  [26, 'GH', 'Litigación', 'verificar-citas', 'Verificación de demanda', 45, 25, 'nada', [], '', 'na'],
+  [28, 'JK', 'Ley Karin', 'investigacion-ley-karin', 'Estructura del informe final', 150, 70, 'poco', [], '', 'si'],
+  [33, 'CD', 'Laboral', 'carta-despido', 'Carta por necesidades de la empresa', 90, 45, 'mucho', ['norma'], 'Plazo de comunicación distinto al de la ficha del proceso.', 'na'],
+  [36, 'EF', 'Laboral', 'minuta-laboral', 'Minuta laboral de agosto', 480, 260, 'mucho', ['inexistente'], 'Incluyó un dictamen que no venía en las fuentes y no existe con ese número.', 'na'],
+  [40, 'AB', 'Datos personales', 'solicitud-titular', 'Respuesta a solicitud de rectificación', 75, 35, 'poco', [], '', 'na'],
+  [44, 'LM', 'Derecho público', SIN, 'Resumen de bases de licitación', 180, 90, 'poco', [], '', 'no'],
+  [50, 'GH', 'Corporativo', 'informe-cliente', 'Informe al directorio', 120, 50, 'poco', [], '', 'si'],
+  [55, 'JK', 'Litigación', SIN, 'Cronología de un expediente', 200, 80, 'poco', [], '', 'no'],
+  [61, 'CD', 'Ley Karin', 'investigacion-ley-karin', 'Plan de investigación', 120, 60, 'mucho', ['estilo'], 'Preguntas sugestivas en la pauta; se reescribieron.', 'si'],
+  [67, 'EF', 'Laboral', 'minuta-laboral', 'Minuta laboral de julio', 480, 300, 'mucho', ['atribuida'], 'Atribuyó una modificación a la ley equivocada.', 'na'],
+  [74, 'AB', 'Laboral', 'carta-despido', 'Carta por vencimiento del plazo', 60, 35, 'poco', [], '', 'na'],
+  [82, 'LM', 'Datos personales', 'solicitud-titular', 'Respuesta a solicitud de acceso', 75, 40, 'poco', [], '', 'na'],
+  [88, 'GH', 'Corporativo', SIN, 'Revisión de contrato de arriendo', 90, 70, 'descartado', ['omision'], 'Omitió una cláusula de término anticipado; se hizo a mano.', 'no'],
+];
+const TEXTO_EJEMPLO = `Texto de ejemplo para probar la herramienta: el fallo, el dictamen y la doctrina que aparecen son inventados.
+
+Conforme al art. 11 inciso 2 de la Ley N° 19.628, en el texto que le dio la Ley N° 21.719, el responsable debe pronunciarse dentro de los 30 días corridos siguientes al ingreso de la solicitud. A su vez, el art. 162 del Código del Trabajo exige comunicar el término del contrato por escrito.
+
+La Corte Suprema, en sentencia Rol N° 12.345-2025, habría resuelto que la omisión de los hechos en la carta hace improcedente la causal. En el mismo sentido se pronunció el Dictamen N° 1.234/56 de la Dirección del Trabajo, y lo sostiene Pérez (2021), p. 45.`;
+
+function demo() {
+  return {
+    version: 1, demo: true,
+    registros: EJEMPLO.map(([d, abog, area, receta, trabajo, minSin, minCon, reesc, errores, detalle, cliente]) =>
+      ({ id: nuevoId(), fecha: diasAtras(d), abog, area, receta, trabajo, minSin, minCon, reesc, errores, detalle, cliente })),
+    verificaciones: [
+      { id: nuevoId(), fecha: diasAtras(11), titulo: 'Contestación de demanda laboral', abog: 'EF', citas: [
+        { t: 'art. 162 del Código del Trabajo', tipo: 'Artículo', riesgo: 'media', estado: 'verificada', nota: 'BCN, texto vigente' },
+        { t: 'Rol N° 1.111-2024', tipo: 'Rol o RIT', riesgo: 'alta', estado: 'corregida', nota: 'El año correcto era otro' },
+        { t: 'Ley N° 21.643', tipo: 'Ley', riesgo: 'baja', estado: 'verificada', nota: '' },
+      ] },
+      { id: nuevoId(), fecha: diasAtras(1), titulo: 'Recurso de protección (borrador)', abog: 'JK', citas: [
+        { t: 'art. 20 de la Constitución', tipo: 'Artículo', riesgo: 'media', estado: 'verificada', nota: '' },
+        { t: 'Corte Suprema, Rol N° 2.222-2025', tipo: 'Fallo', riesgo: 'alta', estado: 'pendiente', nota: '' },
+        { t: 'Rol N° 3.333-2024', tipo: 'Rol o RIT', riesgo: 'alta', estado: 'eliminada', nota: 'No existe: lo propuso la IA' },
+      ] },
+    ],
+  };
+}
+
+/* ───────── Guardar ───────── */
+const CLAVE = 'mlv-bitacora-ia-v1';
+let sinGuardar = false;
+function cargar() {
+  let crudo;
+  try { crudo = localStorage.getItem(CLAVE); } catch { sinGuardar = true; return null; }
+  if (!crudo) return null;
+  try {
+    const d = JSON.parse(crudo);
+    if (!d || !Array.isArray(d.registros)) return null;
+    d.verificaciones = Array.isArray(d.verificaciones) ? d.verificaciones : [];
+    return d;
+  } catch { return null; }
+}
+function guardar() {
+  try { localStorage.setItem(CLAVE, JSON.stringify(datos)); sinGuardar = false; } catch { sinGuardar = true; }
+  $('msg-alm').hidden = !sinGuardar;
+}
+let datos = cargar() || demo();
+
+/* ───────── Cálculos ───────── */
+const enPeriodo = (r, dias) => !dias || r.fecha >= diasAtras(dias);
+const ahorro = (r) => Math.max(0, (+r.minSin || 0) - (+r.minCon || 0));
+const util = (r) => r.reesc === 'nada' || r.reesc === 'poco';
+const graves = (r) => r.errores.filter((e) => ERRORES[e]?.grave);
+const nombreReceta = (id) => (id === SIN ? 'Sin receta' : id);
+
+function resumen(rs) {
+  const min = rs.reduce((s, r) => s + ahorro(r), 0);
+  const minSin = rs.reduce((s, r) => s + (+r.minSin || 0), 0);
+  return {
+    usos: rs.length, min, minSin,
+    utiles: pct(rs.filter(util).length, rs.length),
+    graves: rs.reduce((s, r) => s + graves(r).length, 0),
+    inexistentes: rs.filter((r) => r.errores.includes('inexistente')).length,
+    incidentes: rs.filter((r) => r.errores.includes('dato')),
+  };
+}
+
+function estadoReceta(id, rs) {
+  const propios = rs.filter((r) => r.receta === id);
+  if (id === SIN) return propios.length ? { t: 'Ver candidatas', c: 'azul' } : { t: 'Sin uso', c: 'gris' };
+  if (!propios.length) return { t: 'Sin uso', c: 'gris' };
+  const g = propios.reduce((s, r) => s + graves(r).length, 0);
+  if (propios.some((r) => r.errores.includes('inexistente'))) return { t: 'Corregir ya', c: 'rojo' };
+  if (g >= 2) return { t: 'Corregir', c: 'ambar' };
+  return { t: 'Al día', c: 'verde' };
+}
+
+function pendientesVerif(v) { return v.citas.filter((c) => c.estado === 'pendiente').length; }
+
+function alertas(rs) {
+  const out = [];
+  const R = resumen(rs);
+  for (const r of R.incidentes) {
+    out.push({ c: 'rojo', b: `Dato personal sin tachar (${fecha(r.fecha)}, ${r.area})`, q: 'Confirmar que se avisó al dueño del protocolo el mismo día y dejar constancia de si es un incidente que deba evaluarse.' });
+  }
+  if (R.inexistentes) {
+    const sinR = rs.filter((r) => r.errores.includes('inexistente') && r.receta === SIN).length;
+    out.push({ c: 'rojo', b: `${R.inexistentes === 1 ? 'Una cita inexistente detectada' : `${R.inexistentes} citas inexistentes detectadas`}`,
+      q: `${sinR ? `${sinR === R.inexistentes ? 'Todas' : sinR} en trabajos sin receta. ` : ''}La verificación las atajó antes de salir: es el control que más importa. Revisar que nadie entregue sin la lista de «Verificar citas».` });
+  }
+  for (const x of RECETAS) {
+    if (x.id === SIN) continue;
+    const e = estadoReceta(x.id, rs);
+    if (e.c === 'rojo' || e.c === 'ambar') {
+      const n = rs.filter((r) => r.receta === x.id).reduce((s, r) => s + graves(r).length, 0);
+      out.push({ c: 'ambar', b: `La receta ${x.id} necesita corrección`, q: `${n} ${n === 1 ? 'error grave' : 'errores graves'} en el periodo. Ver «Para corregir» en la pestaña Recetas.` });
+    }
+  }
+  const pend = datos.verificaciones.filter((v) => pendientesVerif(v) > 0);
+  if (pend.length) out.push({ c: 'ambar', b: `${pend.length === 1 ? 'Un escrito tiene' : `${pend.length} escritos tienen`} citas sin verificar`, q: pend.map((v) => `«${v.titulo}» (${pendientesVerif(v)} pendiente${pendientesVerif(v) === 1 ? '' : 's'})`).join(' · ') + '. No deben salir del estudio así.' });
+  const sinR = rs.filter((r) => r.receta === SIN).length;
+  if (rs.length && pct(sinR, rs.length) >= 25) out.push({ c: 'azul', b: `El ${pct(sinR, rs.length)} % de los usos fue sin receta`, q: 'Los trabajos que se repiten son candidatos a receta nueva (pestaña Recetas).' });
+  const conCliente = rs.filter((r) => r.cliente !== 'na');
+  const noInf = conCliente.filter((r) => r.cliente === 'no').length;
+  if (noInf) out.push({ c: 'azul', b: `En ${noInf} de ${conCliente.length} trabajos para clientes no se informó el uso de IA`, q: 'Definir la regla: cuándo y cómo se informa al cliente (lo decide MLV; ver el Protocolo de uso de IA).' });
+  if (!out.length) out.push({ c: 'verde', b: 'Sin alertas en el periodo', q: 'Siga anotando: los indicadores se vuelven confiables con el uso.' });
+  return out;
+}
+
+function barras(items, fmt, tono) {
+  const max = Math.max(1, ...items.map((x) => x.v));
+  if (!items.some((x) => x.v > 0)) return '<li class="vacio">Sin datos en el periodo.</li>';
+  return items.map((x) => `<li class="${tono ? tono(x) : ''}"><span class="et">${esc(x.et)}</span><span class="pista"><i style="width:${(x.v / max) * 100}%"></i></span><span class="num">${fmt(x.v)}</span></li>`).join('');
+}
+
+/* ───────── Indicadores ───────── */
+function pintarIndicadores() {
+  const dias = +$('periodo').value;
+  const rs = datos.registros.filter((r) => enPeriodo(r, dias));
+  const R = resumen(rs);
+  $('cifras').innerHTML = `
+    <div class="cifra"><div class="n">${R.usos}</div><div class="t">usos registrados</div><div class="d">${new Set(rs.map((r) => r.abog)).size} personas</div></div>
+    <div class="cifra"><div class="n">${horas(R.min)}<small>h</small></div><div class="t">ahorradas (medidas)</div><div class="d">${R.minSin ? `${pct(R.min, R.minSin)} % del tiempo estimado sin IA` : '—'}</div></div>
+    <div class="cifra"><div class="n">${R.utiles}<small>%</small></div><div class="t">borradores útiles</div><div class="d">se usaron sin reescribir o con poco</div></div>
+    <div class="cifra${R.graves ? ' rojo' : ''}"><div class="n">${R.graves}</div><div class="t">errores graves detectados</div><div class="d">${R.inexistentes} citas inexistentes · ${R.incidentes.length} datos sin tachar</div></div>`;
+  $('alertas').innerHTML = alertas(rs).map((a) => `<li class="${a.c}"><b>${esc(a.b)}</b><span class="que">${esc(a.q)}</span></li>`).join('');
+  $('barras-area').innerHTML = barras(AREAS.map((a) => ({ et: a, v: rs.filter((r) => r.area === a).reduce((s, r) => s + ahorro(r), 0) })).sort((x, y) => y.v - x.v), (v) => `${horas(v)} h`);
+  $('barras-errores').innerHTML = barras(Object.entries(ERRORES).map(([k, e]) => ({ et: e.t, v: rs.filter((r) => r.errores.includes(k)).length, grave: e.grave })), (v) => String(v), (x) => (x.grave ? 'rojo' : 'ambar'));
+  $('barras-recetas').innerHTML = barras(RECETAS.map((x) => ({ et: nombreReceta(x.id), v: rs.filter((r) => r.receta === x.id).length, sin: x.id === SIN })).sort((x, y) => y.v - x.v), (v) => `${v} uso${v === 1 ? '' : 's'}`, (x) => (x.sin ? 'ambar' : ''));
+}
+
+/* ───────── Registrar ───────── */
+function opciones(sel, pares) { sel.innerHTML = pares.map(([v, t]) => `<option value="${esc(v)}">${esc(t)}</option>`).join(''); }
+function prepararFormulario() {
+  opciones($('r-area'), AREAS.map((a) => [a, a]));
+  opciones($('r-receta'), RECETAS.map((x) => [x.id, nombreReceta(x.id)]));
+  opciones($('r-reesc'), Object.entries(REESC));
+  opciones($('r-cliente'), Object.entries(CLIENTE));
+  $('r-errores').innerHTML = Object.entries(ERRORES).map(([k, e]) => `<label class="marca"><input type="checkbox" value="${k}"> ${esc(e.t)}</label>`).join('');
+  $('r-fecha').value = hoyISO();
+}
+
+$('form-registro').addEventListener('reset', () => setTimeout(() => { $('r-fecha').value = hoyISO(); $('msg-registro').textContent = ''; }, 0));
+$('form-registro').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const msg = $('msg-registro');
+  const r = {
+    id: nuevoId(), fecha: $('r-fecha').value, abog: $('r-abog').value.trim().toUpperCase(), area: $('r-area').value,
+    receta: $('r-receta').value, trabajo: $('r-trabajo').value.trim(), minSin: Math.round(+$('r-sin').value || 0),
+    minCon: Math.round(+$('r-con').value || 0), reesc: $('r-reesc').value, cliente: $('r-cliente').value,
+    errores: [...$('r-errores').querySelectorAll('input:checked')].map((x) => x.value), detalle: $('r-detalle').value.trim(),
+  };
+  const falta = [];
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(r.fecha)) falta.push('la fecha');
+  if (!/^[A-ZÁÉÍÓÚÑ]{2,4}$/.test(r.abog)) falta.push('las iniciales (2 a 4 letras)');
+  if (!r.trabajo) falta.push('el trabajo');
+  if (!$('r-sin').value || !$('r-con').value) falta.push('los minutos');
+  if (falta.length) { msg.className = 'msg warn'; msg.textContent = `Falta ${falta.join(', ')}.`; return; }
+  if (RUT.test(r.trabajo) || RUT.test(r.detalle)) { msg.className = 'msg warn'; msg.textContent = 'Hay un RUT en el texto: la bitácora no lleva datos de personas. Descríbalo en general.'; return; }
+  if (r.errores.length && !r.detalle) { msg.className = 'msg warn'; msg.textContent = 'Cuente en una línea qué pasó: es lo que el encargado usa para corregir la receta.'; $('r-detalle').focus(); return; }
+  datos.registros.push(r);
+  datos.registros.sort((a, b) => b.fecha.localeCompare(a.fecha));
+  guardar();
+  $('form-registro').reset();
+  msg.className = 'msg ok';
+  msg.textContent = r.errores.includes('dato') ? 'Guardado. Hubo un dato sin tachar: avise hoy al dueño del protocolo.' : 'Guardado en la bitácora.';
+  pintarTodo();
+});
+
+function pintarRegistros() {
+  const rs = [...datos.registros].sort((a, b) => b.fecha.localeCompare(a.fecha)).slice(0, 40);
+  $('tabla-registros').innerHTML = rs.length ? rs.map((r) => `<tr>
+    <td style="white-space:nowrap">${fecha(r.fecha)}</td><td>${esc(r.abog)}</td><td>${esc(r.area)}</td><td class="cod">${esc(nombreReceta(r.receta))}</td>
+    <td>${esc(r.trabajo)}${r.detalle ? `<div class="nota" style="margin:2px 0 0">${esc(r.detalle)}</div>` : ''}</td>
+    <td class="num">${r.minSin}</td><td class="num">${r.minCon}</td><td>${esc(REESC[r.reesc] || r.reesc)}</td>
+    <td>${r.errores.length ? r.errores.map((e) => `<span class="chip chico ${ERRORES[e]?.grave ? 'rojo' : 'ambar'}">${esc(ERRORES[e]?.t || e)}</span>`).join(' ') : '<span class="nota">—</span>'}</td>
+    <td><button type="button" class="btn chico peligro" data-borrar="${r.id}" aria-label="Borrar el registro del ${fecha(r.fecha)}: ${esc(r.trabajo)}">Borrar</button></td></tr>`).join('')
+    : '<tr><td colspan="10" class="vacio">Todavía no hay registros.</td></tr>';
+}
+$('tabla-registros').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-borrar]');
+  if (!b || !confirm('¿Borrar este registro de la bitácora?')) return;
+  datos.registros = datos.registros.filter((r) => r.id !== b.dataset.borrar);
+  guardar(); pintarTodo();
+  $('msg-registro').className = 'msg'; $('msg-registro').textContent = 'Registro borrado.';
+  $('r-fecha').focus();
+});
+
+/* Pegar el bloque que entrega la receta registro-bitacora */
+function buscarOpcion(lista, valor) {
+  const v = norm(valor).replace(/[^a-z0-9 -]/g, '');
+  if (!v) return null;
+  return lista.find(([k, t]) => norm(k) === v || norm(t) === v) || lista.find(([k, t]) => v.includes(norm(t)) || norm(t).includes(v) || v.includes(norm(k)));
+}
+$('rellenar').addEventListener('click', () => {
+  const msg = $('msg-pegar');
+  const campos = {};
+  for (const linea of $('pegar').value.split('\n')) {
+    const m = linea.match(/^\s*[-*]?\s*([^:]{3,60}):\s*(.*)$/);
+    if (m) campos[norm(m[1]).replace(/\(.*\)/, '').trim()] = m[2].trim();
+  }
+  const get = (...claves) => { for (const k of Object.keys(campos)) if (claves.some((c) => k.startsWith(c))) return campos[k]; return ''; };
+  let n = 0;
+  const f = get('fecha').match(/(\d{1,2})[-/](\d{1,2})[-/](\d{4})/);
+  if (f) { $('r-fecha').value = `${f[3]}-${f[2].padStart(2, '0')}-${f[1].padStart(2, '0')}`; n++; }
+  const ab = get('abogado').replace(/[^A-Za-zÁÉÍÓÚÑáéíóúñ]/g, '').toUpperCase();
+  if (ab) { $('r-abog').value = ab.slice(0, 4); n++; }
+  const ar = buscarOpcion(AREAS.map((a) => [a, a]), get('area')); if (ar) { $('r-area').value = ar[0]; n++; }
+  const re = buscarOpcion(RECETAS.map((x) => [x.id, nombreReceta(x.id)]), get('receta')); if (re) { $('r-receta').value = re[0]; n++; }
+  const tr = get('trabajo'); if (tr) { $('r-trabajo').value = tr.slice(0, 120); n++; }
+  const s = get('minutos sin').match(/\d+/); if (s) { $('r-sin').value = s[0]; n++; }
+  const c = get('minutos con').match(/\d+/); if (c) { $('r-con').value = c[0]; n++; }
+  const rz = buscarOpcion(Object.entries(REESC), get('cuanto se reescribio', 'reescrit')); if (rz) { $('r-reesc').value = rz[0]; n++; }
+  const cl = buscarOpcion([['si', 'Sí'], ['no', 'No'], ['na', 'No aplica']], get('se informo')); if (cl) { $('r-cliente').value = cl[0]; n++; }
+  const er = norm(get('errores'));
+  for (const box of $('r-errores').querySelectorAll('input')) box.checked = !!er && er.includes(norm(ERRORES[box.value].t));
+  const de = get('que paso'); if (de) { $('r-detalle').value = de.slice(0, 400); n++; }
+  msg.className = n ? 'msg ok' : 'msg warn';
+  msg.textContent = n ? `Se rellenaron ${n} campos. Revíselos y use «Guardar en la bitácora».` : 'No se reconoció el bloque. Debe tener líneas como «Fecha: 09-10-2026».';
+  if (n) $('r-fecha').focus();
+});
+
+/* ───────── Verificar citas ───────── */
+const MAY = '[A-ZÁÉÍÓÚÑ]', MIN = '[a-záéíóúñ]';
+const NUM = '(?:N[°º]\\.?\\s*)?';
+const PATRONES = [
+  { tipo: 'Fallo', riesgo: 'alta', re: new RegExp(`\\b(?:Excma\\.\\s+)?(?:Corte Suprema|Corte de Apelaciones de ${MAY}${MIN}+(?:\\s+${MAY}${MIN}+)?|Tribunal Constitucional|Juzgado de Letras del Trabajo de ${MAY}${MIN}+)[^.;\\n]{0,80}?\\b(?:[Rr]ol|RIT)\\s+${NUM}[A-Z]?-?[\\d.]+-\\d{2,4}`, 'g') },
+  { tipo: 'Rol o RIT', riesgo: 'alta', re: new RegExp(`\\b(?:[Rr]ol|RIT|RUC)\\s+${NUM}[A-Z]?-?[\\d.]+-\\d{2,4}\\b`, 'g') },
+  { tipo: 'Fallo', riesgo: 'alta', re: new RegExp(`\\b(?:Corte Suprema|Corte de Apelaciones de ${MAY}${MIN}+|Tribunal Constitucional)\\b`, 'g') },
+  { tipo: 'Dictamen u oficio', riesgo: 'alta', re: new RegExp(`\\b(?:[Dd]ictamen|Ord(?:inario)?\\.?|Oficio|Resoluci[óo]n(?:\\s+Exenta)?)\\s+${NUM}[\\d.]+(?:\\/\\d+)?(?:\\s+de\\s+(?:la\\s+)?(?:Direcci[óo]n del Trabajo|Contralor[íi]a[^,.;]{0,30}|Agencia[^,.;]{0,40}))?`, 'g') },
+  { tipo: 'Doctrina', riesgo: 'alta', re: new RegExp(`\\b${MAY}${MIN}+(?:\\s+${MAY}${MIN}+)?\\s*\\((?:19|20)\\d{2}\\)(?:,?\\s*p(?:p|ág)?\\.\\s*\\d+(?:-\\d+)?)?`, 'g') },
+  { tipo: 'Artículo', riesgo: 'media', re: new RegExp(`\\b(?:[Aa]rt(?:[íi]culo)?s?\\.?)\\s+\\d+[°º]?(?:\\s*(?:bis|ter|qu[áa]ter|quinquies|sexies))?(?:(?:\\s*,\\s*|\\s+)(?:inc(?:iso)?\\.?\\s*(?:\\d+|\\w+)|letra\\s+[a-zñ]\\)?|N[°º]\\s*\\d+))*(?:\\s+(?:del|de\\s+la)\\s+(?:Ley\\s+${NUM}[\\d.]+|C[óo]digo(?:\\s+(?:(?:del?|de\\s+la)\\s+)?${MAY}${MIN}+){1,3}|Constituci[óo]n(?:\\s+Pol[íi]tica)?))?`, 'g') },
+  { tipo: 'Decreto o DFL', riesgo: 'media', re: new RegExp(`\\b(?:D\\.\\s?F\\.\\s?L\\.|DFL|Decreto(?:\\s+Supremo|\\s+con\\s+Fuerza\\s+de\\s+Ley)?|D\\.S\\.)\\s+${NUM}[\\d.]+(?:\\s*(?:\\/|,?\\s*de)\\s*\\d{4})?`, 'g') },
+  { tipo: 'Plazo', riesgo: 'media', re: /\b\d{1,3}\s+d[íi]as\s+(?:h[áa]biles|corridos)\b/g },
+  { tipo: 'Ley', riesgo: 'baja', re: new RegExp(`\\b[Ll]ey\\s+${NUM}\\d{1,2}\\.?\\d{3}\\b`, 'g') },
+  { tipo: 'Proyecto (boletín)', riesgo: 'baja', re: new RegExp(`\\b[Bb]olet[íi]n\\s+${NUM}\\d{1,2}\\.?\\d{3}-\\d{2}\\b`, 'g') },
+];
+const DONDE = {
+  'Fallo': 'Buscador de jurisprudencia del Poder Judicial',
+  'Rol o RIT': 'Buscador de jurisprudencia del Poder Judicial',
+  'Dictamen u oficio': 'Sitio del organismo que lo emitió',
+  'Doctrina': 'La obra original (biblioteca)',
+  'Artículo': 'BCN Ley Chile, texto vigente a la fecha',
+  'Decreto o DFL': 'BCN Ley Chile',
+  'Plazo': 'La norma que lo fija, en BCN Ley Chile',
+  'Ley': 'BCN Ley Chile',
+  'Proyecto (boletín)': 'Senado o Cámara, tramitación del boletín',
+  'Otra': 'La fuente original',
+};
+const RIESGO_T = { alta: 'Alta', media: 'Media', baja: 'Baja' };
+
+function extraerCitas(texto) {
+  const hall = [];
+  for (const p of PATRONES) {
+    p.re.lastIndex = 0;
+    let m;
+    while ((m = p.re.exec(texto))) {
+      const t = m[0].replace(/\s+/g, ' ').replace(/[\s,]+$/, '');
+      hall.push({ ini: m.index, fin: m.index + m[0].length, t, tipo: p.tipo, riesgo: p.riesgo });
+      if (m[0].length === 0) p.re.lastIndex++;
+    }
+  }
+  hall.sort((a, b) => a.ini - b.ini || (b.fin - b.ini) - (a.fin - a.ini));
+  const quedan = [];
+  for (const h of hall) if (!quedan.some((q) => h.ini >= q.ini && h.fin <= q.fin)) quedan.push(h);
+  return quedan.map((h) => ({ t: h.t, tipo: h.tipo, riesgo: h.riesgo, estado: 'pendiente', nota: '' }));
+}
+
+let verif = { id: null, citas: [] };
+function pintarCitas() {
+  const tb = $('tabla-citas');
+  tb.innerHTML = verif.citas.length ? verif.citas.map((c, i) => `<tr>
+    <td class="num">${i + 1}</td>
+    <td>${c.manual ? `<label class="sr" for="ct-${i}">Cita ${i + 1}</label><input id="ct-${i}" data-i="${i}" data-campo="t" value="${esc(c.t)}" placeholder="Escriba la cita">` : `<span class="cita-txt">${esc(c.t)}</span>`}</td>
+    <td>${esc(c.tipo)}</td>
+    <td><span class="riesgo ${c.riesgo}">${RIESGO_T[c.riesgo]}</span></td>
+    <td class="nota" style="margin:0">${esc(DONDE[c.tipo] || DONDE.Otra)}</td>
+    <td><label class="sr" for="ce-${i}">Estado de la cita ${i + 1}</label><select id="ce-${i}" data-i="${i}" data-campo="estado">${Object.entries(ESTADOS_CITA).map(([k, t]) => `<option value="${k}"${c.estado === k ? ' selected' : ''}>${t}</option>`).join('')}</select></td>
+    <td><label class="sr" for="cn-${i}">Nota de la cita ${i + 1}</label><input id="cn-${i}" data-i="${i}" data-campo="nota" value="${esc(c.nota)}" maxlength="120" placeholder="Fuente revisada"></td>
+    <td><button type="button" class="btn chico" data-quitar="${i}" aria-label="Quitar la cita ${i + 1}: no es una cita">No es cita</button></td></tr>`).join('')
+    : '<tr><td colspan="8" class="vacio">Pegue un escrito y use «Buscar citas».</td></tr>';
+  pintarEstadoCitas();
+}
+function pintarEstadoCitas() {
+  const n = verif.citas.length, p = verif.citas.filter((c) => c.estado === 'pendiente').length;
+  const altas = verif.citas.filter((c) => c.estado === 'pendiente' && c.riesgo === 'alta').length;
+  const el = $('estado-citas');
+  el.className = 'estado-citas' + (!n ? '' : p ? ' rojo' : ' verde');
+  el.textContent = !n ? 'Sin citas todavía.' : p
+    ? `No entregar: quedan ${p} de ${n} citas pendientes${altas ? `, ${altas} de riesgo alto` : ''}.`
+    : `Lista para entregar: las ${n} citas fueron revisadas por un abogado.`;
+}
+$('tabla-citas').addEventListener('change', (e) => {
+  const x = e.target.closest('[data-campo]'); if (!x) return;
+  verif.citas[+x.dataset.i][x.dataset.campo] = x.value;
+  if (x.dataset.campo === 'estado') pintarEstadoCitas();
+});
+$('tabla-citas').addEventListener('input', (e) => {
+  const x = e.target.closest('input[data-campo]'); if (x) verif.citas[+x.dataset.i][x.dataset.campo] = x.value;
+});
+$('tabla-citas').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-quitar]'); if (!b) return;
+  verif.citas.splice(+b.dataset.quitar, 1); pintarCitas();
+  $('msg-citas').className = 'msg'; $('msg-citas').textContent = 'Cita quitada de la lista.';
+  $('buscar-citas').focus();
+});
+$('buscar-citas').addEventListener('click', () => {
+  const msg = $('msg-citas');
+  const texto = $('texto-citas').value;
+  if (!texto.trim()) { msg.className = 'msg warn'; msg.textContent = 'Pegue primero el texto del escrito.'; return; }
+  if (RUT.test(texto)) { msg.className = 'msg warn'; msg.textContent = 'El texto trae un RUT: páselo primero por el tachador. (La página no guarda el texto, pero el protocolo pide tacharlo.)'; }
+  const nuevas = extraerCitas(texto);
+  const ya = new Set(verif.citas.map((c) => norm(c.t)));
+  const sumadas = nuevas.filter((c) => !ya.has(norm(c.t)));
+  verif.citas.push(...sumadas);
+  pintarCitas();
+  if (!RUT.test(texto)) {
+    msg.className = sumadas.length ? 'msg ok' : 'msg';
+    const altas = sumadas.filter((c) => c.riesgo === 'alta').length;
+    msg.textContent = sumadas.length ? `Se encontraron ${sumadas.length} citas${altas ? `, ${altas} de riesgo alto (fallos, roles, dictámenes o doctrina)` : ''}. Revise también si falta alguna y agréguela a mano.` : 'No se encontraron citas nuevas. Si hay alguna que la página no reconoció, agréguela a mano.';
+  }
+});
+$('agregar-cita').addEventListener('click', () => {
+  verif.citas.push({ t: '', tipo: 'Otra', riesgo: 'alta', estado: 'pendiente', nota: '', manual: true });
+  pintarCitas();
+  $(`ct-${verif.citas.length - 1}`).focus();
+});
+$('nueva-verif').addEventListener('click', () => {
+  verif = { id: null, citas: [] };
+  $('texto-citas').value = ''; $('v-titulo').value = ''; $('v-abog').value = '';
+  $('msg-citas').textContent = ''; $('msg-verif').textContent = '';
+  pintarCitas(); $('texto-citas').focus();
+});
+$('guardar-verif').addEventListener('click', () => {
+  const msg = $('msg-verif');
+  const titulo = $('v-titulo').value.trim(), abog = $('v-abog').value.trim().toUpperCase();
+  verif.citas = verif.citas.filter((c) => c.t.trim());
+  if (!verif.citas.length) { msg.className = 'msg warn'; msg.textContent = 'No hay citas en la lista.'; return; }
+  if (!titulo || !/^[A-ZÁÉÍÓÚÑ]{2,4}$/.test(abog)) { msg.className = 'msg warn'; msg.textContent = 'Indique el escrito (sin nombres) y las iniciales de quien verifica.'; return; }
+  if (RUT.test(titulo)) { msg.className = 'msg warn'; msg.textContent = 'El nombre del escrito no puede llevar un RUT.'; return; }
+  const v = { id: verif.id || nuevoId(), fecha: hoyISO(), titulo, abog, citas: verif.citas.map(({ t, tipo, riesgo, estado, nota }) => ({ t, tipo, riesgo, estado, nota })) };
+  const i = datos.verificaciones.findIndex((x) => x.id === v.id);
+  if (i >= 0) datos.verificaciones[i] = v; else datos.verificaciones.unshift(v);
+  verif.id = v.id;
+  guardar(); pintarCitas(); pintarVerifs(); pintarIndicadores(); pintarInforme();
+  const p = pendientesVerif(v);
+  msg.className = p ? 'msg warn' : 'msg ok';
+  msg.textContent = p ? `Constancia guardada con ${p} citas pendientes: el escrito todavía no puede salir.` : 'Constancia guardada: lista para entregar.';
+});
+function pintarVerifs() {
+  const vs = datos.verificaciones;
+  $('tabla-verifs').innerHTML = vs.length ? vs.map((v) => {
+    const p = pendientesVerif(v);
+    return `<tr><td style="white-space:nowrap">${fecha(v.fecha)}</td><td>${esc(v.titulo)}</td><td>${esc(v.abog)}</td><td class="num">${v.citas.length}</td>
+      <td>${p ? `<span class="chip chico rojo">${p} pendiente${p === 1 ? '' : 's'}</span>` : '<span class="chip chico verde">Lista para entregar</span>'}</td>
+      <td style="white-space:nowrap"><button type="button" class="btn chico" data-abrir="${v.id}">Abrir</button> <button type="button" class="btn chico peligro" data-borrar-v="${v.id}" aria-label="Borrar la constancia ${esc(v.titulo)}">Borrar</button></td></tr>`;
+  }).join('') : '<tr><td colspan="6" class="vacio">Todavía no hay constancias.</td></tr>';
+}
+$('tabla-verifs').addEventListener('click', (e) => {
+  const a = e.target.closest('[data-abrir]'), b = e.target.closest('[data-borrar-v]');
+  if (a) {
+    const v = datos.verificaciones.find((x) => x.id === a.dataset.abrir); if (!v) return;
+    verif = { id: v.id, citas: v.citas.map((c) => ({ ...c })) };
+    $('v-titulo').value = v.titulo; $('v-abog').value = v.abog; $('texto-citas').value = '';
+    $('msg-verif').textContent = ''; $('msg-citas').className = 'msg'; $('msg-citas').textContent = `Abierta la constancia «${v.titulo}». Cambie los estados y vuelva a guardarla.`;
+    pintarCitas(); $('caja-lista-citas').scrollIntoView({ block: 'start' }); $('v-titulo').focus();
+  }
+  if (b && confirm('¿Borrar esta constancia?')) {
+    datos.verificaciones = datos.verificaciones.filter((x) => x.id !== b.dataset.borrarV);
+    if (verif.id === b.dataset.borrarV) verif.id = null;
+    guardar(); pintarVerifs(); pintarIndicadores(); pintarInforme();
+    $('nueva-verif').focus();
+  }
+});
+
+/* ───────── Recetas ───────── */
+function pintarRecetas() {
+  const dias = +$('periodo').value;
+  const rs = datos.registros.filter((r) => enPeriodo(r, dias));
+  $('tabla-recetas').innerHTML = RECETAS.map((x) => {
+    const p = rs.filter((r) => r.receta === x.id);
+    const e = estadoReceta(x.id, rs);
+    const nombre = x.id === SIN ? '<b>Sin receta</b>' : `<a class="cod" href="${URL_REPO}${x.id}/SKILL.md" target="_blank" rel="noopener">${esc(x.id)}</a>`;
+    return `<tr><td>${nombre}<div class="nota" style="margin:2px 0 0">${esc(x.d)}</div></td><td>${esc(x.area)}</td><td class="num">${p.length}</td>
+      <td class="num">${horas(p.reduce((s, r) => s + ahorro(r), 0))}</td><td class="num">${p.length ? pct(p.filter(util).length, p.length) + ' %' : '—'}</td>
+      <td class="num">${p.reduce((s, r) => s + graves(r).length, 0)}</td><td><span class="chip chico ${e.c}">${esc(e.t)}</span></td></tr>`;
+  }).join('');
+  const errs = rs.filter((r) => r.errores.length).sort((a, b) => b.fecha.localeCompare(a.fecha));
+  const grupos = RECETAS.map((x) => ({ x, l: errs.filter((r) => r.receta === x.id) })).filter((g) => g.l.length);
+  $('para-corregir').innerHTML = grupos.length ? grupos.map((g) => `<h3 class="cod" style="margin-top:12px">${esc(nombreReceta(g.x.id))}</h3><ul class="alertas">${g.l.map((r) =>
+    `<li class="${graves(r).length ? 'rojo' : 'ambar'}"><b>${r.errores.map((e) => esc(ERRORES[e]?.t || e)).join(' · ')}</b> <span class="nota">${fecha(r.fecha)} · ${esc(r.abog)}</span><span class="que">${esc(r.detalle || r.trabajo)}</span></li>`).join('')}</ul>`).join('')
+    : '<p class="vacio">Sin errores en el periodo.</p>';
+  const sinR = rs.filter((r) => r.receta === SIN);
+  const porArea = AREAS.map((a) => ({ a, l: sinR.filter((r) => r.area === a) })).filter((g) => g.l.length).sort((x, y) => y.l.length - x.l.length);
+  $('candidatas').innerHTML = porArea.length ? `<ul class="barras">${porArea.map((g) => `<li><span class="et"><b>${esc(g.a)}</b><br><span class="nota">${g.l.map((r) => esc(r.trabajo)).join(' · ')}</span></span><span class="pista"><i style="width:${(g.l.length / porArea[0].l.length) * 100}%"></i></span><span class="num">${g.l.length} uso${g.l.length === 1 ? '' : 's'}</span></li>`).join('')}</ul>`
+    : '<p class="vacio">Todos los usos del periodo tuvieron receta.</p>';
+}
+
+/* ───────── Informe mensual ───────── */
+const mesDe = (iso) => iso.slice(0, 7);
+function mesAnterior(ym) { const [a, m] = ym.split('-').map(Number); return m === 1 ? `${a - 1}-12` : `${a}-${String(m - 1).padStart(2, '0')}`; }
+function pintarMeses() {
+  const meses = [...new Set([mesDe(hoyISO()), ...datos.registros.map((r) => mesDe(r.fecha))])].sort().reverse();
+  const actual = $('mes').value;
+  $('mes').innerHTML = meses.map((m) => `<option value="${m}">${nombreMes(m)}</option>`).join('');
+  if (meses.includes(actual)) $('mes').value = actual;
+}
+function delta(a, b, mejorSiSube, fmt = (x) => x) {
+  if (b === null || a === b) return '';
+  const sube = a > b;
+  return ` <span class="delta ${sube === mejorSiSube ? 'mejor' : 'peor'}">${sube ? '▲' : '▼'} ${fmt(Math.abs(a - b))} vs. mes anterior</span>`;
+}
+function pintarInforme() {
+  const ym = $('mes').value || mesDe(hoyISO());
+  const rs = datos.registros.filter((r) => mesDe(r.fecha) === ym);
+  const prev = datos.registros.filter((r) => mesDe(r.fecha) === mesAnterior(ym));
+  const R = resumen(rs), P = prev.length ? resumen(prev) : null;
+  const errs = rs.filter((r) => r.errores.length);
+  const corregir = RECETAS.filter((x) => x.id !== SIN && ['rojo', 'ambar'].includes(estadoReceta(x.id, rs).c));
+  const verifs = datos.verificaciones.filter((v) => mesDe(v.fecha) === ym);
+  const sinR = rs.filter((r) => r.receta === SIN);
+  const decidir = [];
+  if (corregir.length) decidir.push(`Aprobar la corrección de ${corregir.map((x) => x.id).join(', ')} (la propone el encargado).`);
+  if (R.incidentes.length) decidir.push(`Revisar ${R.incidentes.length === 1 ? 'el dato personal sin tachar' : `los ${R.incidentes.length} datos personales sin tachar`} y decidir si se refuerza la capacitación.`);
+  if (sinR.length >= 2) decidir.push(`Elegir una receta nueva entre los trabajos sin receta (${[...new Set(sinR.map((r) => r.area))].join(', ')}).`);
+  if (rs.some((r) => r.cliente === 'no')) decidir.push('Definir cuándo se informa al cliente el uso de IA.');
+  decidir.push('Fijar la fecha de la próxima revisión del protocolo.');
+  $('informe-mes').innerHTML = `
+    <p class="sub" style="margin:0 0 4px">MLV Abogados · Comité de IA</p>
+    <h2>Informe de uso de IA · ${nombreMes(ym)}</h2>
+    <p class="nota">Generado el ${fecha(hoyISO())} con la bitácora del estudio. Las horas sin IA son estimaciones de cada abogado; las horas con IA, reales.</p>
+    ${rs.length ? `
+    <div class="cifras" style="margin-top:14px">
+      <div class="cifra"><div class="n">${R.usos}</div><div class="t">usos registrados${P ? delta(R.usos, P.usos, true) : ''}</div></div>
+      <div class="cifra"><div class="n">${horas(R.min)}<small>h</small></div><div class="t">ahorradas${P ? delta(R.min, P.min, true, (x) => horas(x) + ' h') : ''}</div></div>
+      <div class="cifra"><div class="n">${R.utiles}<small>%</small></div><div class="t">borradores útiles${P ? delta(R.utiles, P.utiles, true, (x) => x + ' pts') : ''}</div></div>
+      <div class="cifra${R.graves ? ' rojo' : ''}"><div class="n">${R.graves}</div><div class="t">errores graves${P ? delta(R.graves, P.graves, false) : ''}</div></div>
+    </div>
+    <h3>Errores del mes</h3>
+    ${errs.length ? `<ul class="lista">${errs.map((r) => `<li><b>${fecha(r.fecha)} · ${esc(nombreReceta(r.receta))}</b> — ${r.errores.map((e) => esc(ERRORES[e]?.t || e)).join(', ')}. ${esc(r.detalle)}</li>`).join('')}</ul>` : '<p class="vacio">Sin errores registrados.</p>'}
+    <h3>Recetas a corregir</h3>
+    ${corregir.length ? `<ul class="lista">${corregir.map((x) => `<li><span class="cod">${esc(x.id)}</span>: ${estadoReceta(x.id, rs).t.toLowerCase()}.</li>`).join('')}</ul>` : '<p class="vacio">Ninguna.</p>'}
+    <h3>Verificación de citas</h3>
+    ${verifs.length ? `<ul class="lista">${verifs.map((v) => `<li>${fecha(v.fecha)} · ${esc(v.titulo)} (${esc(v.abog)}): ${v.citas.length} citas, ${pendientesVerif(v) ? `<b>${pendientesVerif(v)} pendientes</b>` : 'todas revisadas'}.</li>`).join('')}</ul>` : '<p class="vacio">No se guardaron constancias este mes.</p>'}
+    <h3>Para decidir en el comité</h3>
+    <ul class="lista">${decidir.map((d) => `<li>${esc(d)}</li>`).join('')}</ul>`
+    : '<p class="vacio">No hay registros en este mes.</p>'}`;
+}
+$('imprimir').addEventListener('click', () => window.print());
+
+/* ───────── Respaldo ───────── */
+$('exportar').addEventListener('click', () => {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([JSON.stringify({ ...datos, exportado: new Date().toISOString() }, null, 2)], { type: 'application/json' }));
+  a.download = `respaldo-bitacora-ia-${hoyISO()}.json`;
+  document.body.append(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+});
+$('importar').addEventListener('change', async (e) => {
+  const f = e.target.files[0]; e.target.value = '';
+  if (!f) return;
+  try {
+    const d = JSON.parse(await f.text());
+    if (!d || !Array.isArray(d.registros)) throw new Error('no es un respaldo de la bitácora');
+    if (!confirm(`¿Reemplazar lo que hay en pantalla por el respaldo (${d.registros.length} registros)?`)) return;
+    datos = { version: 1, demo: false, registros: d.registros, verificaciones: Array.isArray(d.verificaciones) ? d.verificaciones : [] };
+    guardar(); pintarTodo();
+    alert('Respaldo cargado.');
+  } catch (err) { alert(`No se pudo leer el archivo: ${err.message}.`); }
+});
+$('en-blanco').addEventListener('click', () => {
+  if (!confirm('¿Borrar los datos de ejemplo y empezar la bitácora en blanco?')) return;
+  datos = { version: 1, demo: false, registros: [], verificaciones: [] };
+  verif = { id: null, citas: [] }; $('texto-citas').value = '';
+  guardar(); pintarTodo(); pintarCitas();
+  show('registrar'); $('r-abog').focus();
+});
+
+/* ───────── Pestañas ───────── */
+const TABS = ['indicadores', 'registrar', 'citas', 'recetas', 'informe'];
+function show(nombre) {
+  for (const t of TABS) {
+    const activo = t === nombre;
+    $(`tab-${t}`).setAttribute('aria-selected', activo);
+    $(`tab-${t}`).tabIndex = activo ? 0 : -1;
+    $(`panel-${t}`).hidden = !activo;
+  }
+  $('barra-periodo').hidden = !['indicadores', 'recetas'].includes(nombre);
+}
+document.querySelector('.vistas').addEventListener('click', (e) => {
+  const b = e.target.closest('[role=tab]');
+  if (b) show(b.id.replace('tab-', ''));
+});
+document.querySelector('.vistas').addEventListener('keydown', (e) => {
+  if (!['ArrowRight', 'ArrowLeft', 'Home', 'End'].includes(e.key)) return;
+  const i = TABS.findIndex((t) => $(`tab-${t}`).getAttribute('aria-selected') === 'true');
+  const j = e.key === 'Home' ? 0 : e.key === 'End' ? TABS.length - 1 : (i + (e.key === 'ArrowRight' ? 1 : -1) + TABS.length) % TABS.length;
+  e.preventDefault(); show(TABS[j]); $(`tab-${TABS[j]}`).focus();
+});
+$('periodo').addEventListener('change', () => { pintarIndicadores(); pintarRecetas(); });
+$('mes').addEventListener('change', pintarInforme);
+
+function pintarTodo() {
+  $('aviso-demo').hidden = !datos.demo;
+  pintarIndicadores(); pintarRegistros(); pintarVerifs(); pintarRecetas(); pintarMeses(); pintarInforme();
+}
+
+/* ───────── Guía de primer uso (la misma en todas las herramientas del estudio) ─────────
+   Cada paso: { titulo, texto, el: selector que se destaca (opcional), ir: ruta '#/…' o función que prepara la pantalla (opcional) }.
+   Se abre sola la primera vez y después con el botón «Cómo se usa». No guarda nada más que «ya la vi». */
+const Guia = (() => {
+  let pasos = [], i = 0, capa, foco, globo, antes = null, rutaInicial = '';
+  const vista = (clave) => { try { return localStorage.getItem(clave) === '1'; } catch { return true; } };
+  const enfocables = () => [...globo.querySelectorAll('button')];
+
+  function construir() {
+    capa = document.createElement('div');
+    capa.className = 'guia-capa';
+    foco = document.createElement('div');
+    foco.className = 'guia-foco';
+    globo = document.createElement('div');
+    globo.className = 'guia-globo';
+    globo.tabIndex = -1;
+    globo.setAttribute('role', 'dialog');
+    globo.setAttribute('aria-modal', 'true');
+    globo.setAttribute('aria-labelledby', 'guiaTit');
+    globo.setAttribute('aria-describedby', 'guiaTxt');
+    globo.innerHTML = `<p class="guia-n" id="guiaN"></p><h2 id="guiaTit"></h2><p class="guia-txt" id="guiaTxt"></p>
+      <div class="guia-puntos" aria-hidden="true"></div>
+      <div class="guia-pie"><button type="button" class="guia-saltar" data-tour-cerrar>Saltar la guía</button>
+        <button type="button" class="btn" data-guia="atras">Anterior</button><button type="button" class="btn primario" data-guia="sig">Siguiente</button></div>`;
+    globo.addEventListener('click', (e) => {
+      const b = e.target.closest('button');
+      if (!b) return;
+      if (b.hasAttribute('data-tour-cerrar')) cerrar();
+      else if (b.dataset.guia === 'atras') ir(i - 1);
+      else if (b.dataset.guia === 'sig') ir(i + 1);
+    });
+    document.body.append(capa, foco, globo);
+  }
+
+  function teclas(e) {
+    if (e.key === 'Escape') { e.preventDefault(); cerrar(); return; }
+    if (e.key === 'ArrowRight' && !e.altKey) { e.preventDefault(); ir(i + 1); return; }
+    if (e.key === 'ArrowLeft' && !e.altKey) { e.preventDefault(); ir(i - 1); return; }
+    if (e.key === 'Tab') {   // el foco no sale del globo mientras la guía está abierta
+      const b = enfocables(), primero = b[0], ultimo = b[b.length - 1];
+      if (e.shiftKey && document.activeElement === primero) { e.preventDefault(); ultimo.focus(); }
+      else if (!e.shiftKey && document.activeElement === ultimo) { e.preventDefault(); primero.focus(); }
+      else if (!globo.contains(document.activeElement)) { e.preventDefault(); primero.focus(); }
+    }
+  }
+
+  function ubicar() {
+    if (!globo || globo.hidden) return;
+    const p = pasos[i];
+    const el = p.el && document.querySelector(p.el);
+    const r = el && el.getBoundingClientRect();
+    const visible = r && r.width > 0 && r.height > 0;
+    capa.classList.toggle('con-foco', !!visible);
+    foco.hidden = !visible;
+    const W = window.innerWidth, H = window.innerHeight, m = 8;
+    const gw = globo.offsetWidth, gh = globo.offsetHeight;
+    if (!visible) {   // sin elemento: el globo va al centro
+      globo.style.left = Math.max(12, (W - gw) / 2) + 'px';
+      globo.style.top = Math.max(12, (H - gh) / 2) + 'px';
+      return;
+    }
+    Object.assign(foco.style, { left: r.left - m + 'px', top: r.top - m + 'px', width: r.width + 2 * m + 'px', height: r.height + 2 * m + 'px' });
+    let top = r.bottom + m + 12;
+    if (top + gh > H - 12) top = r.top - m - 12 - gh;   // no cabe abajo: arriba
+    if (top < 12) top = Math.min(H - gh - 12, Math.max(12, r.top + 12));   // tampoco arriba: encima del elemento
+    const left = Math.min(W - gw - 12, Math.max(12, r.left));
+    globo.style.left = left + 'px';
+    globo.style.top = top + 'px';
+  }
+
+  function ir(n) {
+    if (n < 0) return;
+    if (n >= pasos.length) { cerrar(); return; }
+    i = n;
+    const p = pasos[i];
+    if (typeof p.ir === 'function') p.ir();
+    else if (p.ir && location.hash !== p.ir) location.hash = p.ir;
+    globo.querySelector('#guiaN').textContent = `Paso ${i + 1} de ${pasos.length}`;
+    globo.querySelector('#guiaTit').textContent = p.titulo;
+    globo.querySelector('#guiaTxt').textContent = p.texto;
+    globo.querySelector('.guia-puntos').innerHTML = pasos.map((_, k) => `<i${k === i ? ' class="on"' : ''}></i>`).join('');
+    globo.querySelector('[data-guia="atras"]').hidden = i === 0;
+    globo.querySelector('[data-guia="sig"]').textContent = i === pasos.length - 1 ? 'Terminar' : 'Siguiente';
+    // Se espera a que la pantalla se pinte (cambio de ruta) antes de buscar el elemento.
+    setTimeout(() => {
+      const el = p.el && document.querySelector(p.el);
+      if (el) {
+        const chico = window.innerWidth <= 600;
+        el.scrollIntoView({ block: chico ? 'start' : 'center', behavior: 'instant' });
+        if (chico) window.scrollBy(0, -16);
+      }
+      ubicar();
+      globo.querySelector('[data-guia="sig"]').focus();
+    }, 60);
+  }
+
+  function abrir(lista, clave) {
+    if (!lista || !lista.length) return;
+    pasos = lista;
+    antes = document.activeElement;
+    rutaInicial = location.hash;
+    try { localStorage.setItem(clave, '1'); } catch { /* sin almacenamiento: igual se muestra */ }
+    if (!globo) construir();
+    capa.hidden = foco.hidden = globo.hidden = false;
+    document.addEventListener('keydown', teclas, true);
+    window.addEventListener('resize', ubicar);
+    window.addEventListener('scroll', ubicar, { passive: true });
+    ir(0);
+  }
+
+  function cerrar() {
+    if (!globo || globo.hidden) return;
+    capa.hidden = foco.hidden = globo.hidden = true;
+    document.removeEventListener('keydown', teclas, true);
+    window.removeEventListener('resize', ubicar);
+    window.removeEventListener('scroll', ubicar);
+    if (location.hash !== rutaInicial) location.hash = rutaInicial || '#/';
+    // Si se abrió sola, el foco vuelve al botón «Cómo se usa», que es donde se reabre.
+    const volver = antes && antes !== document.body && document.contains(antes) ? antes : document.querySelector('[data-guia-abrir]');
+    if (volver) volver.focus();
+  }
+
+  return { abrir, cerrar, vista };
+})();
+
+/* Los pasos de la guía de esta herramienta. */
+const CLAVE_GUIA = 'mlv-bitacora-guia-v1';
+const GUIA = [
+  { ir: () => show('indicadores'), titulo: 'Para qué sirve',
+    texto: 'Para saber, con números del propio estudio, si Claude ahorra tiempo y dónde se equivoca. Lo que ve ahora son tres meses de uso ficticio.' },
+  { ir: () => show('indicadores'), el: '#cifras', titulo: 'Los indicadores',
+    texto: 'Horas ahorradas medidas (no promesas de proveedores), cuántos borradores sirven sin reescribirlos y cuántos errores graves se atajaron antes de entregar.' },
+  { ir: () => show('indicadores'), el: '#caja-alertas', titulo: 'Lo que hay que atender',
+    texto: 'Datos sin tachar, citas inexistentes, recetas que hay que corregir y trabajos que todavía no tienen receta.' },
+  { ir: () => show('registrar'), el: '#form-registro', titulo: 'Registrar un uso',
+    texto: 'Un minuto al terminar: receta, minutos sin y con IA, cuánto se reescribió y qué errores hubo. Sin nombres de clientes ni de personas.' },
+  { ir: () => show('registrar'), el: '#caja-pegar', titulo: 'O pegar lo que preparó Claude',
+    texto: 'La receta «registro-bitacora» del estudio entrega el bloque listo. Se pega aquí y rellena el formulario.' },
+  { ir: () => show('citas'), el: '#zona-citas', titulo: 'Verificar citas',
+    texto: 'Pegue un escrito y la página lista cada ley, artículo, fallo, dictamen y doctrina. Un abogado las marca como verificadas; con una sola pendiente, el escrito no sale.' },
+  { ir: () => show('recetas'), el: '#caja-recetas', titulo: 'Recetas',
+    texto: 'Cómo rinde cada receta y cuáles hay que corregir. Es la lista de trabajo del encargado de IA.' },
+  { ir: () => show('informe'), el: '#informe-mes', titulo: 'Informe mensual',
+    texto: 'Una página para la reunión mensual de la dirección: cifras contra el mes anterior, errores y lo que hay que decidir.' },
+  { ir: () => show('indicadores'), el: '.acciones-cab', titulo: 'Respaldo',
+    texto: 'Todo queda en este navegador. Use «Descargar respaldo» para guardarlo o pasarlo a otro computador. Esta guía se vuelve a abrir con «Cómo se usa».' },
+];
+
+/* ───────── Arranque ───────── */
+prepararFormulario();
+if (datos.demo) $('texto-citas').value = TEXTO_EJEMPLO;
+show('indicadores');
+pintarTodo();
+pintarCitas();
+$('msg-alm').hidden = !sinGuardar;
+document.addEventListener('click', (e) => { if (e.target.closest('[data-guia-abrir]')) Guia.abrir(GUIA, CLAVE_GUIA); });
+if (!Guia.vista(CLAVE_GUIA)) setTimeout(() => Guia.abrir(GUIA, CLAVE_GUIA), 500);
+</script>
+</body>
+</html>

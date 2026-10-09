@@ -7,6 +7,9 @@ los clientes de la firma a adecuarse a la Ley 21.719 de protección de datos per
 
 | Carpeta | Contenido |
 |---|---|
+| `herramientas/claude-en-el-estudio.html` | **La propuesta**: cómo organizar y gestionar el uso de Claude en el estudio. Seis piezas, roles y responsabilidades, calendario de gestión, configuración de Claude, recetas por área, control de calidad medido, capacitación, plan en cuatro fases y riesgos. Se imprime como PDF. |
+| `herramientas/bitacora-ia.html` | Bitácora de IA y control de calidad: registro de usos (horas ahorradas medidas, borradores útiles, errores), verificación de citas con constancia, recetas a corregir e informe mensual para el comité. Demo con tres meses ficticios. |
+| `claude/` | Manual del estudio para Claude y paquete de 9 recetas (plugin `mlv-estudio`) instalable en Claude: verificar citas, revisar datos antes, minuta laboral, carta de despido, Ley Karin, solicitudes de titulares, informe al cliente, bitácora y nueva receta. Ver `claude/README.md`. |
 | `herramientas/panel-clientes.html` | Panel de clientes: cada cliente con el estado de su adecuación a la Ley 21.719. |
 | `herramientas/derechos-y-consentimientos.html` | Para la empresa cliente: usos de datos con su base legal (las seis de los arts. 12 y 13), solicitudes de titulares con sus plazos del art. 11 y cartas borrador, consentimientos y revocaciones, formulario para titulares e historial con huellas encadenadas (SHA-256). Demo con una empresa ficticia. |
 | `herramientas/tachar.html` | Tachador: cambia nombres, RUT, direcciones y otros datos por etiquetas antes de pegar un texto en una IA. |
@@ -18,10 +21,10 @@ los clientes de la firma a adecuarse a la Ley 21.719 de protección de datos per
 Todo son páginas sueltas: se abren con doble clic en Chrome o Edge, sin instalar nada y sin internet.
 Ninguna envía datos fuera del computador (lo bloquea la propia página).
 
-Las cinco herramientas comparten el mismo diseño: los mismos colores y botones, un enlace de vuelta a la portada,
+Las herramientas comparten el mismo diseño: los mismos colores y botones, un enlace de vuelta a la portada,
 y una guía de primer uso que se abre sola la primera vez y después con «Cómo se usa». En los tableros, las tarjetas
 se mueven con los botones «Volver» y «Avanzar» (en el computador también se pueden arrastrar). El código de la guía
-es idéntico en las cinco (busca «Guía de primer uso»): si se corrige en una, hay que copiarlo a las otras.
+es idéntico en todas (busca «Guía de primer uso»): si se corrige en una, hay que copiarlo a las otras.
 
 ## Reglas
 

@@ -1,0 +1,566 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Página de lectura: no se conecta a nada. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; connect-src 'none'; form-action 'none'; base-uri 'none'">
+<meta name="robots" content="noindex">
+<title>Claude en el estudio · MLV Abogados</title>
+<style>
+  :root {
+    --fondo: #f6f5f1; --papel: #ffffff; --papel2: #fbfaf7; --hundido: #efede6;
+    --tinta: #1a2636; --tinta2: #3b4859; --suave: #5f6873; --linea: #dddbd2; --linea2: #ebe9e2;
+    --acento: #0d5c68; --acento-osc: #094650; --acento-claro: #e3eef0; --acento-borde: #c3dbde;
+    --verde: #2b7549; --verde-f: #e4f0e8; --verde-b: #bcd8c6;
+    --ambar: #94600f; --ambar-f: #f9eed8; --ambar-b: #ead2a2;
+    --rojo: #a12f2a; --rojo-f: #f7e2e0; --rojo-b: #e6bdb9;
+    --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", serif;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --mono: ui-monospace, "Cascadia Mono", Consolas, "Courier New", monospace;
+    --radio: 10px;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+  body { margin: 0; background: var(--fondo); color: var(--tinta); font: 16px/1.6 var(--sans); }
+  .app { max-width: 1080px; margin: 0 auto; padding: 0 28px 36px; }
+  a { color: var(--acento); }
+  h1, h2, h3 { font-family: var(--serif); font-weight: 600; color: var(--tinta); }
+  :focus-visible { outline: 2px solid var(--acento); outline-offset: 2px; }
+  .ico { width: 1.15em; height: 1.15em; flex: none; vertical-align: -.2em; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+  /* Cabecera (igual que las demás herramientas) */
+  .cabecera { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px 24px; padding: 26px 0 18px; }
+  .firma { font: 600 25px/1.1 var(--serif); letter-spacing: .01em; color: var(--tinta); }
+  .sub { color: var(--suave); font-size: 12.5px; letter-spacing: .1em; text-transform: uppercase; margin-top: 6px; }
+  .portada { display: inline-flex; align-items: center; gap: 5px; margin-bottom: 8px; font-size: 13px; color: var(--suave); text-decoration: none; }
+  .portada:hover { color: var(--acento); text-decoration: underline; text-underline-offset: 3px; }
+  .btn { font: inherit; font-size: 14px; font-weight: 500; line-height: 1.3; color: var(--tinta); background: var(--papel); border: 1px solid var(--linea); border-radius: 8px; padding: 8px 14px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; }
+  .btn:hover { border-color: var(--acento); color: var(--acento); }
+
+  /* Título */
+  .sec-cab { display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 10px 20px; }
+  .sec-cab h1 { font-size: 32px; line-height: 1.15; margin: 0; }
+  .chip { display: inline-flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 500; padding: 4px 11px; border-radius: 999px; border: 1px solid transparent; white-space: nowrap; }
+  .chip i { width: 8px; height: 8px; border-radius: 50%; background: currentColor; flex: none; }
+  .chip.ambar { background: var(--ambar-f); color: var(--ambar); border-color: var(--ambar-b); }
+  .chip.verde { background: var(--verde-f); color: var(--verde); border-color: var(--verde-b); }
+  .chip.azul { background: var(--acento-claro); color: var(--acento); border-color: var(--acento-borde); }
+  .chip.gris { background: var(--hundido); color: var(--suave); border-color: var(--linea); }
+  .lead { margin: 14px 0 0; color: var(--tinta2); font-size: 18px; max-width: 840px; }
+  .tesis { margin: 22px 0 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+  .tesis div { background: var(--papel); border: 1px solid var(--linea); border-radius: var(--radio); padding: 14px 16px; }
+  .tesis b { display: block; font: 600 19px/1.25 var(--serif); color: var(--acento); margin-bottom: 4px; }
+  .tesis span { font-size: 14.5px; color: var(--tinta2); }
+  @media (max-width: 860px) { .tesis { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 480px) { .tesis { grid-template-columns: 1fr; } }
+
+  /* Índice */
+  .indice { display: flex; flex-wrap: wrap; gap: 6px; margin: 24px 0 6px; padding: 0; list-style: none; }
+  .indice a { display: inline-block; font-size: 14px; color: var(--tinta2); background: var(--papel); border: 1px solid var(--linea); border-radius: 999px; padding: 5px 12px; text-decoration: none; }
+  .indice a:hover { border-color: var(--acento); color: var(--acento); }
+
+  /* Secciones */
+  section { margin-top: 44px; scroll-margin-top: 16px; }
+  section > h2 { font-size: 25px; line-height: 1.2; margin: 0 0 6px; }
+  section > h2 .n { color: var(--acento); margin-right: 6px; }
+  .nota { font-size: 14.5px; color: var(--suave); margin: 0 0 16px; max-width: 840px; }
+  .caja { background: var(--papel); border: 1px solid var(--linea); border-radius: var(--radio); padding: 18px 22px; min-width: 0; }
+  .caja h3 { font-size: 19px; margin: 0 0 6px; }
+  .caja p { margin: 0 0 10px; color: var(--tinta2); }
+  .caja p:last-child { margin-bottom: 0; }
+  .caja ul, .caja ol { margin: 6px 0 0; padding-left: 20px; color: var(--tinta2); }
+  .caja li { margin: 6px 0; }
+  .rejilla { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; }
+  .rejilla.dos { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  @media (max-width: 760px) { .rejilla.dos { grid-template-columns: 1fr; } }
+  @media (max-width: 1100px) { .rejilla.dos.org { grid-template-columns: 1fr; } }
+  .cita { border-left: 3px solid var(--acento); background: var(--acento-claro); padding: 14px 18px; border-radius: 0 8px 8px 0; color: var(--tinta); font-size: 17px; margin: 0 0 16px; max-width: 840px; }
+  .fuentes { font-size: 13px; color: var(--suave); margin-top: 10px; }
+
+  /* Piezas */
+  .pieza { display: flex; flex-direction: column; }
+  .pieza .cab { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+  .pieza .num { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: var(--acento); color: #fff; font: 600 15px/1 var(--sans); flex: none; }
+  .pieza h3 { margin: 0; }
+  .pieza .ver { margin-top: auto; padding-top: 10px; font-size: 14px; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
+  .pieza .ver a { font-weight: 600; }
+
+  /* Tablas */
+  .tabla-env { position: relative; overflow-x: auto; border: 1px solid var(--linea); border-radius: var(--radio); background: var(--papel); }
+  table { border-collapse: collapse; width: 100%; min-width: 760px; font-size: 14.5px; }
+  th, td { text-align: left; vertical-align: top; padding: 11px 14px; border-bottom: 1px solid var(--linea2); }
+  th { font-size: 12.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--suave); font-weight: 600; background: var(--papel2); }
+  tbody th { font: 600 14.5px/1.4 var(--sans); letter-spacing: 0; text-transform: none; color: var(--tinta); background: none; }
+  tr:last-child td, tr:last-child th { border-bottom: 0; }
+  td.hoy { color: var(--suave); }
+  td.cod { font: 600 13px/1.4 var(--mono); color: var(--acento); white-space: nowrap; }
+  .raci td { text-align: center; }
+  .raci td:first-child, .raci th:first-child { text-align: left; }
+  .l { display: inline-grid; place-items: center; min-width: 26px; height: 26px; padding: 0 6px; border-radius: 6px; font: 600 13px/1 var(--sans); }
+  .l.R { background: var(--acento); color: #fff; } .l.A { background: var(--verde-f); color: var(--verde); border: 1px solid var(--verde-b); }
+  .l.C { background: var(--ambar-f); color: var(--ambar); } .l.I { background: var(--hundido); color: var(--suave); }
+  .leyenda { display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: 13.5px; color: var(--tinta2); margin: 10px 0 0; }
+  .leyenda span { display: inline-flex; align-items: center; gap: 6px; }
+
+  /* Roles */
+  dl.roles { margin: 0; display: grid; grid-template-columns: minmax(150px, 230px) minmax(0, 1fr); }
+  dl.roles dt, dl.roles dd { margin: 0; padding: 10px 0; border-bottom: 1px solid var(--linea2); }
+  dl.roles dt { font-weight: 600; padding-right: 16px; }
+  dl.roles dd { color: var(--tinta2); }
+  dl.roles dt:last-of-type, dl.roles dd:last-of-type { border-bottom: 0; }
+
+  /* Ciclo de una receta */
+  .ciclo { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; counter-reset: c; }
+  .ciclo li { counter-increment: c; position: relative; background: var(--papel); border: 1px solid var(--linea); border-top: 4px solid var(--acento); border-radius: var(--radio); padding: 12px 12px 14px; font-size: 14px; color: var(--tinta2); }
+  .ciclo li b { display: block; font: 600 16px/1.25 var(--serif); color: var(--tinta); margin-bottom: 4px; }
+  .ciclo li b::before { content: counter(c) ". "; color: var(--acento); }
+  @media (max-width: 900px) { .ciclo { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  @media (max-width: 520px) { .ciclo { grid-template-columns: 1fr; } }
+
+  /* Lista de control */
+  .control { list-style: none; padding: 0 !important; margin: 6px 0 0; }
+  .control li { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 8px; align-items: start; }
+  .control li::before { content: ""; width: 16px; height: 16px; margin-top: 4px; border: 2px solid var(--acento); border-radius: 4px; }
+
+  /* Fases */
+  .fases { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+  @media (max-width: 900px) { .fases { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 520px) { .fases { grid-template-columns: 1fr; } }
+  .fase { background: var(--papel); border: 1px solid var(--linea); border-radius: var(--radio); padding: 16px 18px; display: flex; flex-direction: column; }
+  .fase .cuando { font-size: 12.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--acento); font-weight: 600; }
+  .fase h3 { font-size: 20px; margin: 2px 0 8px; }
+  .fase ul { margin: 0; padding-left: 18px; color: var(--tinta2); font-size: 14.5px; }
+  .fase li { margin: 4px 0; }
+  .fase .sale { margin-top: auto; padding-top: 10px; font-size: 13.5px; color: var(--tinta2); border-top: 1px solid var(--linea2); }
+  .fase .sale b { color: var(--tinta); }
+
+  /* Tarjeta de bolsillo */
+  .bolsillo { background: var(--tinta); color: #fff; border-radius: 12px; padding: 20px 24px; }
+  .bolsillo h3 { color: #fff; margin: 0 0 8px; font-size: 20px; }
+  .bolsillo ol { margin: 0; padding-left: 22px; columns: 2; column-gap: 32px; }
+  .bolsillo li { margin: 0 0 8px; break-inside: avoid; color: #e8edf2; }
+  .bolsillo li b { color: #fff; }
+  @media (max-width: 700px) { .bolsillo ol { columns: 1; } }
+
+  /* Hecho */
+  .hecho { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 10px; }
+  .hecho li { background: var(--papel); border: 1px solid var(--linea); border-radius: var(--radio); padding: 14px 16px; display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 4px 10px; }
+  .hecho li .ico { color: var(--verde); margin-top: 3px; }
+  .hecho b { font-family: var(--serif); font-size: 17px; }
+  .hecho span { grid-column: 2; color: var(--tinta2); font-size: 14.5px; }
+
+  .siguiente { background: var(--acento); color: #fff; border-radius: 12px; padding: 22px 26px; margin-top: 16px; }
+  .siguiente h3 { color: #fff; margin: 0 0 6px; font-size: 21px; }
+  .siguiente p { margin: 0; color: #e3eef0; }
+
+  .pie { margin-top: 44px; padding-top: 14px; border-top: 1px solid var(--linea); font-size: 13px; color: var(--suave); }
+  .pie p { margin: 4px 0; }
+
+  @media (pointer: coarse) { .btn, .indice a { min-height: 44px; display: inline-flex; align-items: center; } }
+  @media (max-width: 760px) {
+    .app { padding: 0 16px 28px; }
+    .sec-cab h1 { font-size: 27px; }
+    .lead { font-size: 16.5px; }
+    .caja { padding: 16px; }
+    dl.roles { grid-template-columns: 1fr; }
+    dl.roles dt { padding-bottom: 0; border-bottom: 0; }
+  }
+  @media print {
+    body { background: #fff; font-size: 11.5pt; }
+    .app { max-width: none; padding: 0; }
+    .portada, .btn, .indice { display: none !important; }
+    .tabla-env { overflow: visible; }
+    table { min-width: 0; }
+    .caja, .fase, .ciclo li, .hecho li, tr { break-inside: avoid; }
+    section > h2 { break-after: avoid; }
+    .bolsillo, .siguiente, .l, .pieza .num { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="cabecera">
+    <div>
+      <a class="portada" href="../index.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg> Herramientas del estudio</a><br>
+      <span class="firma">MLV Abogados</span>
+      <div class="sub">Claude en el estudio · Propuesta de organización y gestión</div>
+    </div>
+    <button class="btn" type="button" id="imprimir"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg> Imprimir o guardar en PDF</button>
+  </header>
+
+  <main>
+    <div class="sec-cab">
+      <h1>Claude en el estudio: de uso individual a sistema</h1>
+      <span class="chip ambar"><i aria-hidden="true"></i>Propuesta v0.1 · para conversar con MLV</span>
+    </div>
+    <p class="lead">Que cada abogado use Claude a su manera no es una estrategia: es un riesgo con algo de ahorro. Lo que convierte a Claude en una ventaja del estudio es <b>la organización alrededor</b>: reglas comunes, recetas compartidas, un encargado, control de calidad medido y una dirección que decide con datos.</p>
+
+    <div class="tesis" role="list" aria-label="La propuesta en cuatro ideas">
+      <div role="listitem"><b>Reglas que se cumplen solas</b><span>El protocolo se configura en Claude: no depende de la memoria de nadie.</span></div>
+      <div role="listitem"><b>Lo que funciona, para todos</b><span>Cada trabajo que se repite se vuelve una receta del estudio, con dueño.</span></div>
+      <div role="listitem"><b>Ninguna cita sin verificar</b><span>Con constancia de quién verificó, antes de que el escrito salga.</span></div>
+      <div role="listitem"><b>Medido, no prometido</b><span>Horas ahorradas y errores, con números del propio estudio.</span></div>
+    </div>
+
+    <ul class="indice" aria-label="Contenido">
+      <li><a href="#por-que">Por qué ahora</a></li>
+      <li><a href="#de-a">Hoy y con sistema</a></li>
+      <li><a href="#modelo">Las seis piezas</a></li>
+      <li><a href="#organizacion">Quién hace qué</a></li>
+      <li><a href="#gestion">Cómo se gestiona</a></li>
+      <li><a href="#configuracion">Configurar Claude</a></li>
+      <li><a href="#recetas">Recetas por área</a></li>
+      <li><a href="#calidad">Control de calidad</a></li>
+      <li><a href="#capacitacion">Capacitación</a></li>
+      <li><a href="#plan">Plan</a></li>
+      <li><a href="#riesgos">Riesgos</a></li>
+      <li><a href="#construido">Ya construido</a></li>
+      <li><a href="#decide-mlv">Lo que decide MLV</a></li>
+    </ul>
+
+    <!-- ───────── Por qué ahora ───────── -->
+    <section id="por-que" aria-labelledby="t-por-que">
+      <h2 id="t-por-que">Por qué ahora</h2>
+      <p class="cita">El riesgo de la IA en un estudio no es de quien la usa: es de quien firma. Sin método común, cualquier abogado puede comprometer al socio que presenta el escrito.</p>
+      <div class="rejilla">
+        <div class="caja"><h3>La profesión ya fijó estándares</h3><p>El Colegio de Abogados de Chile publicó en 2026 una guía para el uso responsable de IA: el abogado verifica personalmente cada cita, evalúa la plataforma antes de usarla y quienes dirigen un estudio tienen deberes de supervisión.</p></div>
+        <div class="caja"><h3>Los tribunales ya sancionan</h3><p>En 2026 hubo abogados sancionados en Chile por presentar citas inexistentes generadas con IA, incluso en un caso en que el escrito lo había preparado otro abogado del mismo estudio.</p></div>
+        <div class="caja"><h3>La Ley 21.719 también aplica al estudio</h3><p>Desde el 01-12-2026 (salvo que se apruebe la postergación del boletín 18.623-07), pegar datos de clientes en una IA activa deberes de secreto, contrato con el proveedor, transferencia internacional y seguridad. MLV asesora en esto: le conviene predicar con el ejemplo.</p></div>
+        <div class="caja"><h3>Las piezas existen, pero no para Chile</h3><p>Claude ya ofrece paquetes para trabajo jurídico y permite publicar recetas propias para toda una organización. Están pensados para Estados Unidos y en inglés: adaptarlos al derecho chileno y a la forma de trabajar de MLV es el trabajo.</p></div>
+      </div>
+      <p class="fuentes">Fuentes: guía del Colegio de Abogados de Chile (julio de 2026) y prensa jurídica sobre las sanciones; texto de la Ley 21.719 según la Matriz normativa del estudio. Antes de citarlas en un documento formal, revisar las fuentes originales.</p>
+    </section>
+
+    <!-- ───────── Hoy y con sistema ───────── -->
+    <section id="de-a" aria-labelledby="t-de-a">
+      <h2 id="t-de-a">Hoy y con sistema</h2>
+      <p class="nota">La columna «Lo típico hoy» es lo que suele encontrarse en estudios de este tamaño; el diagnóstico confirma cómo es en MLV.</p>
+      <div class="tabla-env" tabindex="0" role="region" aria-label="Comparación (se desplaza hacia el lado en pantallas chicas)">
+        <table>
+          <thead><tr><th scope="col">Tema</th><th scope="col">Lo típico hoy</th><th scope="col">Con el sistema del estudio</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">Cuentas</th><td class="hoy">Cada uno con su cuenta; algunas personales y gratuitas.</td><td>Cuentas del estudio en un plan de organización, con administrador y altas y bajas.</td></tr>
+            <tr><th scope="row">Instrucciones</th><td class="hoy">Cada abogado le explica todo desde cero, cada vez.</td><td>El manual del estudio: Claude conoce las reglas y el estilo MLV sin que nadie lo pegue.</td></tr>
+            <tr><th scope="row">Lo que funciona</th><td class="hoy">Queda en el computador de quien lo descubrió.</td><td>Recetas del estudio, con dueño, versión y fecha de revisión, para todos.</td></tr>
+            <tr><th scope="row">Datos de clientes</th><td class="hoy">Se pegan según el criterio de cada uno.</td><td>Semáforo, tachador antes de pegar y una receta que detiene el trabajo si hay datos sin tachar.</td></tr>
+            <tr><th scope="row">Citas</th><td class="hoy">Se revisan cuando hay tiempo.</td><td>Lista de cada cita con su riesgo y constancia de verificación antes de entregar.</td></tr>
+            <tr><th scope="row">Errores de la IA</th><td class="hoy">Se corrigen en el escrito y se olvidan.</td><td>Se anotan en la bitácora y la receta se corrige para todos.</td></tr>
+            <tr><th scope="row">El cliente</th><td class="hoy">No sabe si se usó IA.</td><td>Regla del estudio sobre cuándo y cómo se informa (la decide MLV).</td></tr>
+            <tr><th scope="row">La dirección</th><td class="hoy">No sabe cuánto se usa ni cuánto ahorra.</td><td>Informe mensual de una página: horas, errores y lo que hay que decidir.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ───────── Modelo ───────── -->
+    <section id="modelo" aria-labelledby="t-modelo">
+      <h2 id="t-modelo">Las seis piezas</h2>
+      <p class="nota">Cada pieza tiene una demo funcionando en este sitio. No son ideas: son borradores listos para ajustar con el estudio.</p>
+      <div class="rejilla">
+        <div class="caja pieza"><div class="cab"><span class="num">1</span><h3>Protocolo de uso de IA</h3></div>
+          <p>Qué herramientas están autorizadas, qué datos entran y cuáles se tachan, quién revisa y quién firma. Deducido del perfil del estudio y de la Ley 21.719.</p>
+          <div class="ver"><a href="protocolo-ia.html">Ver el borrador</a><span class="chip verde"><i aria-hidden="true"></i>Construido</span></div></div>
+        <div class="caja pieza"><div class="cab"><span class="num">2</span><h3>Manual del estudio para Claude</h3></div>
+          <p>Las instrucciones que Claude lee siempre: datos de personas, citas, quién decide y estilo MLV. Se configura una vez para toda la organización.</p>
+          <div class="ver"><a href="https://github.com/dojedacifuentes/MLV/blob/main/claude/manual-del-estudio.md" target="_blank" rel="noopener">Ver el manual</a><span class="chip verde"><i aria-hidden="true"></i>Construido</span></div></div>
+        <div class="caja pieza"><div class="cab"><span class="num">3</span><h3>Biblioteca de recetas</h3></div>
+          <p>Cada trabajo que se repite, hecho siempre igual: el abogado pide «la carta de despido» y Claude sigue el procedimiento del estudio. Nueve recetas en borrador, instalables en Claude.</p>
+          <div class="ver"><a href="#recetas">Ver las recetas</a><span class="chip verde"><i aria-hidden="true"></i>9 en borrador</span></div></div>
+        <div class="caja pieza"><div class="cab"><span class="num">4</span><h3>Procesos con dueño</h3></div>
+          <p>Antes de la receta, el proceso: pasos, plazos, qué hace Claude y qué revisa el abogado, con un dueño y una fecha de revisión para que no se muera.</p>
+          <div class="ver"><a href="sistema-de-trabajo.html">Ver el Sistema de trabajo</a><span class="chip verde"><i aria-hidden="true"></i>Construido</span></div></div>
+        <div class="caja pieza"><div class="cab"><span class="num">5</span><h3>Bitácora y control de calidad</h3></div>
+          <p>Registro de usos en un minuto, verificación de citas con constancia, recetas a corregir e informe mensual para la dirección.</p>
+          <div class="ver"><a href="bitacora-ia.html">Ver la Bitácora</a><span class="chip verde"><i aria-hidden="true"></i>Construido</span></div></div>
+        <div class="caja pieza"><div class="cab"><span class="num">6</span><h3>Capacitación</h3></div>
+          <p>Dos sesiones cortas para todos y una para el encargado. Práctica con casos ficticios, no charlas.</p>
+          <div class="ver"><a href="#capacitacion">Ver el programa</a><span class="chip azul"><i aria-hidden="true"></i>Programa listo</span></div></div>
+      </div>
+    </section>
+
+    <!-- ───────── Organización ───────── -->
+    <section id="organizacion" aria-labelledby="t-org">
+      <h2 id="t-org">Quién hace qué</h2>
+      <p class="nota">Pocos roles, con nombre y apellido. En un estudio de 18 profesionales nadie se dedica solo a esto: son horas acotadas al mes.</p>
+      <div class="rejilla dos org">
+        <div class="caja">
+          <h3>Los roles</h3>
+          <dl class="roles">
+            <dt>Comité de IA</dt><dd>Un socio, el encargado y un referente por área. 45 minutos al mes con el informe de la bitácora.</dd>
+            <dt>Dueño del protocolo</dt><dd>Un socio o director. Aprueba herramientas, recetas y cambios; recibe los incidentes el mismo día.</dd>
+            <dt>Encargado de IA</dt><dd>Configura Claude, mantiene el manual y las recetas, corrige con la bitácora y prepara el informe. Al comienzo lo hacemos nosotros; después, una persona del estudio capacitada.</dd>
+            <dt>Referente por área</dt><dd>Un abogado por área que prueba las recetas nuevas y es dueño de las de su área.</dd>
+            <dt>Abogados</dt><dd>Usan las recetas, tachan antes de pegar, verifican citas y anotan en la bitácora.</dd>
+            <dt>Administración</dt><dd>Contrato con el proveedor, cuentas, altas y bajas cuando alguien entra o sale.</dd>
+          </dl>
+        </div>
+        <div class="caja">
+          <h3>Las responsabilidades</h3>
+          <div class="tabla-env" tabindex="0" role="region" aria-label="Matriz de responsabilidades (se desplaza hacia el lado)" style="border:0">
+            <table class="raci" style="min-width:520px">
+              <thead><tr><th scope="col">Tarea</th><th scope="col">Dueño</th><th scope="col">Encarg.</th><th scope="col">Refer.</th><th scope="col">Abog.</th><th scope="col">Admin.</th></tr></thead>
+              <tbody>
+                <tr><th scope="row">Aprobar el protocolo</th><td><span class="l A">A</span></td><td><span class="l R">R</span></td><td><span class="l C">C</span></td><td><span class="l I">I</span></td><td><span class="l I">I</span></td></tr>
+                <tr><th scope="row">Autorizar herramientas</th><td><span class="l A">A</span></td><td><span class="l R">R</span></td><td></td><td><span class="l I">I</span></td><td><span class="l C">C</span></td></tr>
+                <tr><th scope="row">Crear y corregir recetas</th><td><span class="l I">I</span></td><td><span class="l R">R</span></td><td><span class="l A">A</span></td><td><span class="l C">C</span></td><td></td></tr>
+                <tr><th scope="row">Verificar citas</th><td></td><td></td><td></td><td><span class="l R">R</span></td><td></td></tr>
+                <tr><th scope="row">Anotar en la bitácora</th><td></td><td><span class="l I">I</span></td><td></td><td><span class="l R">R</span></td><td></td></tr>
+                <tr><th scope="row">Avisar un incidente</th><td><span class="l A">A</span></td><td><span class="l C">C</span></td><td></td><td><span class="l R">R</span></td><td><span class="l I">I</span></td></tr>
+                <tr><th scope="row">Informe mensual</th><td><span class="l A">A</span></td><td><span class="l R">R</span></td><td><span class="l C">C</span></td><td></td><td></td></tr>
+                <tr><th scope="row">Cuentas, altas y bajas</th><td><span class="l A">A</span></td><td><span class="l C">C</span></td><td></td><td></td><td><span class="l R">R</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="leyenda"><span><span class="l R">R</span> lo hace</span><span><span class="l A">A</span> aprueba y responde</span><span><span class="l C">C</span> se le consulta</span><span><span class="l I">I</span> se le informa</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ───────── Gestión ───────── -->
+    <section id="gestion" aria-labelledby="t-gestion">
+      <h2 id="t-gestion">Cómo se gestiona</h2>
+      <p class="nota">Un sistema que no tiene calendario se muere en tres meses. Este es el ritmo.</p>
+      <div class="tabla-env" tabindex="0" role="region" aria-label="Calendario de gestión (se desplaza hacia el lado en pantallas chicas)">
+        <table>
+          <thead><tr><th scope="col">Cuándo</th><th scope="col">Qué se hace</th><th scope="col">Quién</th><th scope="col">Con qué</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">En cada trabajo</th><td>Tachar si hay datos de personas; usar la receta; verificar las citas; anotar en la bitácora (1 minuto).</td><td>Cada abogado</td><td>Tachador, recetas, Bitácora</td></tr>
+            <tr><th scope="row">Cada semana (piloto)</th><td>30 minutos: qué funcionó, qué falló, qué receta se ajusta.</td><td>Encargado y abogados del piloto</td><td>Bitácora · pestaña Recetas</td></tr>
+            <tr><th scope="row">Cada mes</th><td>Comité de 45 minutos: cifras contra el mes anterior, recetas a corregir, incidentes, receta nueva del mes.</td><td>Comité de IA</td><td>Bitácora · Informe mensual</td></tr>
+            <tr><th scope="row">Cada semestre</th><td>Revisión del protocolo y del manual; repaso de capacitación; revisión de proveedores y condiciones del plan.</td><td>Dueño del protocolo y encargado</td><td>Protocolo, manual, contrato</td></tr>
+            <tr><th scope="row">Cuando cambia la ley</th><td>Revisar las recetas y procesos afectados y bajarlos a «en prueba» hasta ajustarlos.</td><td>Referente del área</td><td>Sistema de trabajo, Matriz normativa</td></tr>
+            <tr><th scope="row">Si hay un incidente</th><td>Aviso el mismo día, registro y evaluación de si debe reportarse.</td><td>Abogado → dueño del protocolo</td><td>Protocolo (regla BRECHA)</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <h3 style="font-size:19px;margin:24px 0 10px">La vida de una receta</h3>
+      <ol class="ciclo">
+        <li><b>Se repite</b>Un trabajo «sin receta» aparece varias veces en la bitácora.</li>
+        <li><b>Se documenta</b>El dueño responde las 10 preguntas del Sistema de trabajo.</li>
+        <li><b>Borrador</b>El encargado escribe la receta: qué hace Claude y qué decide el abogado.</li>
+        <li><b>En prueba</b>Dos o tres abogados la usan en casos reales y anotan.</li>
+        <li><b>En uso</b>El referente la aprueba: es la forma oficial de hacer ese trabajo.</li>
+        <li><b>Se corrige</b>Los errores de la bitácora la mejoran; cada versión queda registrada.</li>
+      </ol>
+    </section>
+
+    <!-- ───────── Configuración ───────── -->
+    <section id="configuracion" aria-labelledby="t-config">
+      <h2 id="t-config">Cómo se configura Claude en el estudio</h2>
+      <p class="nota">Lo técnico va primero porque es lo único que funciona aunque nadie se acuerde. Las condiciones del proveedor se revisan al contratar: cambian.</p>
+      <div class="rejilla">
+        <div class="caja">
+          <h3>Cuentas y seguridad</h3>
+          <ul class="control">
+            <li>Plan de organización (Team o Enterprise), con administrador del estudio.</li>
+            <li>Todas las cuentas con el correo del estudio; ninguna cuenta personal con datos de clientes.</li>
+            <li>Confirmar por escrito que el plan no usa las conversaciones para entrenar modelos.</li>
+            <li>Contrato de tratamiento de datos con el proveedor, archivado (art. 15 bis).</li>
+            <li>Transferencia al extranjero documentada e informada en la política de privacidad (arts. 27 y 14 ter).</li>
+            <li>Altas y bajas ligadas a la entrada y salida de personas.</li>
+          </ul>
+        </div>
+        <div class="caja">
+          <h3>Trabajo diario</h3>
+          <ul class="control">
+            <li>El manual del estudio en las instrucciones de la organización.</li>
+            <li>Un proyecto por área con plantillas y modelos del estudio (no expedientes de clientes).</li>
+            <li>El paquete de recetas del estudio publicado por el administrador para todos.</li>
+            <li>Conectores solo los autorizados (por ejemplo, Microsoft 365), con el mínimo acceso.</li>
+            <li>Claude Code solo para el encargado, con carpetas prohibidas y permiso antes de cada acción.</li>
+          </ul>
+        </div>
+        <div class="caja">
+          <h3>¿Team o Enterprise?</h3>
+          <p>Para 18 personas, <b>Team</b> suele bastar para partir: cuentas del estudio, administración central y recetas compartidas.</p>
+          <p><b>Enterprise</b> conviene si MLV necesita fijar cuánto tiempo se guardan las conversaciones, registros de auditoría o permisos por rol, por exigencias de clientes o de confidencialidad.</p>
+          <p class="fuentes">Se decide con MLV según su exigencia de confidencialidad. Precios y condiciones: verificar en la página oficial al cotizar.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ───────── Recetas ───────── -->
+    <section id="recetas" aria-labelledby="t-recetas">
+      <h2 id="t-recetas">Biblioteca de recetas por área</h2>
+      <p class="nota">Las de estado «Borrador» ya están escritas y se pueden instalar en Claude (carpeta <a href="https://github.com/dojedacifuentes/MLV/tree/main/claude" target="_blank" rel="noopener">claude/</a> del repositorio). Las «Propuesta» salen del perfil del estudio y se priorizan con el diagnóstico. Ninguna inventa plazos: los que el estudio no ha verificado quedan como «[MLV confirma]».</p>
+      <div class="tabla-env" tabindex="0" role="region" aria-label="Recetas por área (se desplaza hacia el lado en pantallas chicas)">
+        <table>
+          <thead><tr><th scope="col">Área</th><th scope="col">Receta</th><th scope="col">Qué hace Claude</th><th scope="col">Qué decide el abogado</th><th scope="col">Estado</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">Todas</th><td class="cod">verificar-citas</td><td>Lista cada cita con su riesgo y dónde verificarla.</td><td>Verifica cada una en la fuente.</td><td><span class="chip verde">Borrador</span></td></tr>
+            <tr><th scope="row">Todas</th><td class="cod">revisar-datos-antes</td><td>Detiene el trabajo si hay datos de personas sin tachar.</td><td>Tacha y vuelve a pegar.</td><td><span class="chip verde">Borrador</span></td></tr>
+            <tr><th scope="row">Todas</th><td class="cod">informe-cliente</td><td>Informe de una página para gerencia o RR. HH., sin jerga.</td><td>Revisa riesgos y tono.</td><td><span class="chip verde">Borrador</span></td></tr>
+            <tr><th scope="row">Laboral</th><td class="cod">minuta-laboral</td><td>Borrador de la actualización mensual, solo con las fuentes entregadas.</td><td>Elige qué se publica.</td><td><span class="chip verde">Borrador</span></td></tr>
+            <tr><th scope="row">Laboral</th><td class="cod">carta-despido</td><td>Borrador de la carta y lista de control de forma y plazos.</td><td>La causal, los hechos y la firma.</td><td><span class="chip verde">Borrador</span></td></tr>
+            <tr><th scope="row">Ley Karin</th><td class="cod">investigacion-ley-karin</td><td>Plan, cronograma, pauta de entrevistas, matriz de hechos, estructura del informe.</td><td>Las conclusiones y las medidas. Siempre.</td><td><span class="chip verde">Borrador</span></td></tr>
+            <tr><th scope="row">Datos personales</th><td class="cod">solicitud-titular</td><td>Plazos del art. 11 de la Ley 21.719 y cartas en borrador.</td><td>Si procede una excepción o denegación.</td><td><span class="chip verde">Borrador</span></td></tr>
+            <tr><th scope="row">Gestión</th><td class="cod">registro-bitacora</td><td>Arma la línea para la bitácora al cerrar un trabajo.</td><td>Confirma los minutos y errores.</td><td><span class="chip verde">Borrador</span></td></tr>
+            <tr><th scope="row">Gestión</th><td class="cod">nueva-receta</td><td>Convierte un proceso en receta y la corrige con la bitácora.</td><td>El dueño aprueba la versión.</td><td><span class="chip verde">Borrador</span></td></tr>
+            <tr><th scope="row">Corporativo</th><td class="cod">acta-directorio</td><td>Borrador de acta a partir de la tabla y las notas de la sesión.</td><td>Acuerdos y quórum.</td><td><span class="chip gris">Propuesta</span></td></tr>
+            <tr><th scope="row">Corporativo</th><td class="cod">contrato-proveedor-datos</td><td>Revisa las cláusulas de tratamiento de datos de un contrato con proveedor.</td><td>Qué se negocia.</td><td><span class="chip gris">Propuesta</span></td></tr>
+            <tr><th scope="row">Derecho público</th><td class="cod">bases-licitacion</td><td>Resumen de bases: requisitos, plazos, garantías y causales de inadmisibilidad.</td><td>Si se postula y con qué riesgos.</td><td><span class="chip gris">Propuesta</span></td></tr>
+            <tr><th scope="row">Litigación</th><td class="cod">cronologia-expediente</td><td>Cronología de hechos y actuaciones desde piezas tachadas.</td><td>Estrategia y teoría del caso.</td><td><span class="chip gris">Propuesta</span></td></tr>
+            <tr><th scope="row">Gestión</th><td class="cod">postulacion-ranking</td><td>Ordena casos y logros del año para las postulaciones a rankings.</td><td>Qué se informa y con qué permiso del cliente.</td><td><span class="chip gris">Propuesta</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ───────── Calidad ───────── -->
+    <section id="calidad" aria-labelledby="t-calidad">
+      <h2 id="t-calidad">Control de calidad medido</h2>
+      <p class="nota">Tres controles y cinco números. Los números son del propio estudio: no hace falta creer en cifras de proveedores.</p>
+      <div class="rejilla">
+        <div class="caja">
+          <h3>Los tres controles</h3>
+          <ol>
+            <li><b>Verificación de citas con constancia.</b> Con una cita pendiente, el escrito no sale.</li>
+            <li><b>Revisión del abogado que firma.</b> Todo lo de Claude es borrador.</li>
+            <li><b>Bitácora.</b> Cada error anotado se convierte en una corrección de la receta.</li>
+          </ol>
+        </div>
+        <div class="caja">
+          <h3>Los cinco indicadores</h3>
+          <ul>
+            <li><b>Horas ahorradas medidas:</b> estimado sin IA menos real con IA, incluida la revisión.</li>
+            <li><b>Borradores útiles:</b> porcentaje que se usa sin reescribir o con poco.</li>
+            <li><b>Errores graves cada 100 usos:</b> citas inexistentes o mal atribuidas, normas o plazos errados.</li>
+            <li><b>Incidentes de datos:</b> datos sin tachar o fuera de las cuentas del estudio.</li>
+            <li><b>Trabajos con receta:</b> cuánto del uso ya sigue el método del estudio.</li>
+          </ul>
+        </div>
+        <div class="caja">
+          <h3>Criterios para extender el piloto</h3>
+          <p>Los fija MLV antes de empezar. Sugerencia:</p>
+          <ul>
+            <li>Ningún escrito entregado con citas sin verificar.</li>
+            <li>Ningún dato de cliente fuera de las cuentas del estudio.</li>
+            <li>Ahorro medido en al menos dos recetas.</li>
+            <li>Los abogados del piloto la quieren seguir usando.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ───────── Capacitación ───────── -->
+    <section id="capacitacion" aria-labelledby="t-capac">
+      <h2 id="t-capac">Capacitación</h2>
+      <p class="nota">Corta, práctica y con casos ficticios. Se repite al entrar alguien nuevo y una vez al año.</p>
+      <div class="rejilla">
+        <div class="caja"><h3>Sesión 1 · todos (60 min)</h3><ul><li>El semáforo y por qué existe.</li><li>Tachar antes de pegar, en vivo.</li><li>Verificar citas: un escrito con una cita inventada.</li><li>Dónde están las recetas y cómo se piden.</li></ul></div>
+        <div class="caja"><h3>Sesión 2 · por área (60 min)</h3><ul><li>Dos recetas del área sobre casos ficticios.</li><li>Qué revisar siempre en lo que entrega Claude.</li><li>Anotar en la bitácora en un minuto.</li></ul></div>
+        <div class="caja"><h3>Encargado de IA (2 sesiones)</h3><ul><li>Configurar la organización en Claude.</li><li>Escribir y corregir recetas con la bitácora.</li><li>Preparar el informe mensual y la revisión semestral.</li></ul></div>
+      </div>
+      <div class="bolsillo" style="margin-top:14px">
+        <h3>Tarjeta de bolsillo</h3>
+        <ol>
+          <li><b>Solo cuentas del estudio.</b> Nunca la personal con datos de clientes.</li>
+          <li><b>Tachar antes de pegar</b> si hay datos de personas, también de la contraparte.</li>
+          <li><b>Lo mínimo:</b> el fragmento necesario, no el expediente.</li>
+          <li><b>Rojo no se toca:</b> Ley Karin, salud o causas sin tachar.</li>
+          <li><b>Toda cita se verifica en la fuente.</b> Otra IA no cuenta.</li>
+          <li><b>La IA no decide sobre personas.</b> Concluye y firma un abogado.</li>
+          <li><b>Si algo salió mal, se avisa hoy</b> al dueño del protocolo.</li>
+          <li><b>Un minuto en la bitácora</b> al terminar.</li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- ───────── Plan ───────── -->
+    <section id="plan" aria-labelledby="t-plan">
+      <h2 id="t-plan">Plan de implementación</h2>
+      <p class="nota">Empieza chico, mide y se extiende con lo que funcionó. Es la secuencia que recomienda Anthropic para estudios jurídicos (base, piloto, extensión), ajustada a un estudio de 18 profesionales.</p>
+      <div class="fases">
+        <div class="fase"><span class="cuando">Semanas 1 y 2</span><h3>0 · Diagnóstico</h3>
+          <ul><li>Encuesta anónima al equipo.</li><li>Inventario de cuentas e IA en uso.</li><li>Protocolo y manual en revisión.</li><li>Elegir área piloto y dueño.</li></ul>
+          <div class="sale"><b>Sale:</b> mapa de uso y riesgos; protocolo v0.2.</div></div>
+        <div class="fase"><span class="cuando">Semanas 3 a 6</span><h3>1 · Piloto</h3>
+          <ul><li>Un área, 2 o 3 abogados.</li><li>Configurar la organización en Claude.</li><li>3 recetas (sugerido en Laboral: minuta, carta de despido, verificar citas).</li><li>Revisión semanal de 30 minutos.</li></ul>
+          <div class="sale"><b>Sale:</b> primeros ahorros medidos y recetas corregidas.</div></div>
+        <div class="fase"><span class="cuando">Meses 2 y 3</span><h3>2 · Extender</h3>
+          <ul><li>Las demás áreas, con su referente.</li><li>Capacitación por área.</li><li>Una receta nueva por área.</li><li>Primer comité mensual.</li></ul>
+          <div class="sale"><b>Sale:</b> biblioteca del estudio y encargado interno.</div></div>
+        <div class="fase"><span class="cuando">Cada mes</span><h3>3 · Mantener</h3>
+          <ul><li>Bitácora e informe mensual.</li><li>Recetas corregidas y nuevas.</li><li>Ajustes por cambios legales.</li><li>Revisión semestral del protocolo.</li></ul>
+          <div class="sale"><b>Sale:</b> un sistema que sigue vivo.</div></div>
+      </div>
+    </section>
+
+    <!-- ───────── Riesgos ───────── -->
+    <section id="riesgos" aria-labelledby="t-riesgos">
+      <h2 id="t-riesgos">Riesgos y cómo se controlan</h2>
+      <div class="tabla-env" tabindex="0" role="region" aria-label="Riesgos (se desplaza hacia el lado en pantallas chicas)">
+        <table>
+          <thead><tr><th scope="col">Riesgo</th><th scope="col">Cómo se controla</th><th scope="col">Pieza</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">Una cita inventada llega a un tribunal</th><td>Lista de citas con constancia; nada sale con una pendiente.</td><td>Recetas · Bitácora</td></tr>
+            <tr><th scope="row">Datos de clientes en una IA no autorizada</th><td>Cuentas del estudio, semáforo, tachador y receta que detiene el trabajo.</td><td>Protocolo · Configuración</td></tr>
+            <tr><th scope="row">Las recetas envejecen</th><td>Dueño y fecha de revisión; alerta cuando cambia la ley; corrección con la bitácora.</td><td>Sistema de trabajo</td></tr>
+            <tr><th scope="row">Todo depende de una persona</th><td>Recetas y manual en un repositorio con historial; encargado interno capacitado.</td><td>Gestión · Capacitación</td></tr>
+            <tr><th scope="row">Se usa a escondidas con cuentas personales</th><td>Diagnóstico anónimo y, sobre todo, una alternativa del estudio mejor que la personal.</td><td>Diagnóstico · Configuración</td></tr>
+            <tr><th scope="row">Expectativas infladas</th><td>No se prometen cifras: se miden en el piloto y se decide con ellas.</td><td>Bitácora</td></tr>
+            <tr><th scope="row">La IA termina decidiendo sobre personas</th><td>Regla expresa: concluye y firma un abogado; las recetas no concluyen.</td><td>Protocolo · Recetas</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ───────── Ya construido ───────── -->
+    <section id="construido" aria-labelledby="t-construido">
+      <h2 id="t-construido">Lo que ya está construido</h2>
+      <p class="nota">Este sitio entero se construyó con Claude bajo las mismas reglas que se proponen: instrucciones permanentes, datos ficticios, una fuente de verdad, uno hace y otro revisa, y nada se publica sin un «sí».</p>
+      <ul class="hecho">
+        <li><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><b><a href="diagnostico.html">Diagnóstico de herramientas</a></b><span>Encuesta anónima en Microsoft Forms y su informe con prioridades.</span></li>
+        <li><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><b><a href="protocolo-ia.html">Protocolo de uso de IA</a></b><span>Deducido del perfil del estudio, con semáforo y artículos de la Ley 21.719.</span></li>
+        <li><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><b><a href="sistema-de-trabajo.html">Sistema de trabajo</a></b><span>Procesos con dueño, tablero de casos e instrucciones para Claude.</span></li>
+        <li><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><b><a href="bitacora-ia.html">Bitácora de IA</a></b><span>Usos, verificación de citas, recetas a corregir e informe mensual.</span></li>
+        <li><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><b><a href="https://github.com/dojedacifuentes/MLV/tree/main/claude" target="_blank" rel="noopener">Manual y 9 recetas</a></b><span>Instalables en Claude para toda la organización.</span></li>
+        <li><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><b><a href="tachar.html">Tachar antes de pegar</a></b><span>La regla más importante del protocolo, hecha herramienta.</span></li>
+        <li><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><b>Matriz normativa de 643 exigencias</b><span>La Ley 21.719 desde el texto oficial, contra la que se audita cada herramienta. Así se encontraron y corrigieron errores propios.</span></li>
+        <li><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><b><a href="panel-clientes.html">Panel de clientes</a> y <a href="derechos-y-consentimientos.html">Derechos</a></b><span>Muestra de lo que el estudio puede ofrecer a sus propios clientes.</span></li>
+      </ul>
+    </section>
+
+    <!-- ───────── Decide MLV ───────── -->
+    <section id="decide-mlv" aria-labelledby="t-decide">
+      <h2 id="t-decide">Lo que decide MLV</h2>
+      <div class="rejilla dos">
+        <div class="caja">
+          <h3>Decisiones para partir</h3>
+          <ul>
+            <li>Quién es el dueño del protocolo.</li>
+            <li>Qué área parte el piloto y con qué abogados.</li>
+            <li>Qué plan de Claude y quién lo administra.</li>
+            <li>Cuándo y cómo se informa al cliente el uso de IA.</li>
+            <li>Quién será el encargado interno después del piloto.</li>
+          </ul>
+        </div>
+        <div class="caja">
+          <h3>Lo que conviene saber antes</h3>
+          <ul>
+            <li>¿Qué IA se usa hoy, con qué cuentas y quiénes?</li>
+            <li>¿Dónde se guardan los expedientes y las plantillas?</li>
+            <li>¿Qué trabajo se repite todas las semanas en cada área?</li>
+            <li>¿Se registran horas por tarea?</li>
+            <li>¿Algún cliente exige condiciones sobre el uso de IA?</li>
+          </ul>
+        </div>
+      </div>
+      <div class="siguiente">
+        <h3>El primer paso</h3>
+        <p>Elegir el dueño del protocolo y el área piloto. Con eso, el diagnóstico parte la semana siguiente y en seis semanas el estudio tiene sus primeros números.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="pie">
+    <p>Propuesta de trabajo para conversar con MLV Abogados; no es una política aprobada ni asesoría jurídica. Las demos usan datos ficticios.</p>
+    <p>Artículos de la Ley 21.719 según la Matriz normativa del estudio (texto refundido oficial de la BCN, versión vigente desde el 01-12-2026, salvo que se apruebe la postergación del boletín 18.623-07). Íconos: Lucide (licencia ISC).</p>
+  </footer>
+</div>
+<script>
+  document.getElementById('imprimir').addEventListener('click', () => window.print());
+</script>
+</body>
+</html>

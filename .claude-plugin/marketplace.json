@@ -1,0 +1,18 @@
+{
+  "name": "mlv",
+  "owner": {
+    "name": "MLV Abogados · demo de trabajo"
+  },
+  "metadata": {
+    "description": "Recetas del estudio para trabajar con Claude: verificación de citas, revisión de datos antes de pegar, minuta laboral, despido, Ley Karin, solicitudes de titulares (Ley 21.719), informe al cliente y bitácora.",
+    "version": "0.1.0"
+  },
+  "plugins": [
+    {
+      "name": "mlv-estudio",
+      "source": "./claude/mlv-estudio",
+      "description": "Recetas del estudio MLV para Claude (borrador v0.1, para revisión del estudio).",
+      "version": "0.1.0"
+    }
+  ]
+}
