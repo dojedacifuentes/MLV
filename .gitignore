@@ -1,0 +1,11 @@
+# Nada con datos reales de clientes entra al repositorio.
+llave-*.json
+*.llave.json
+respaldo-*.json
+datos/
+privado/
+
+# Sistema
+desktop.ini
+Thumbs.db
+.DS_Store

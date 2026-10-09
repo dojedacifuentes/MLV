@@ -1,0 +1,535 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- La página no puede conectarse a nada: el navegador bloquea cualquier envío. Así se puede prometer que los datos no salen del computador. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; connect-src 'none'; form-action 'none'; base-uri 'none'">
+<title>Tachar antes de pegar · EVA</title>
+<style>
+  :root {
+    --bg: #03050d; --panel: #0a0f1e; --panel2: #0e1528; --line: #1c2742;
+    --text: #e8f3ff; --soft: #a9b8d6; --muted: #6f7fa3;
+    --blue: #2a8cff; --indigo: #5a60ff; --violet: #a24dff; --ok: #3ddc97; --warn: #ffb547;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--text); }
+  body { font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; padding: 0 16px 64px; }
+  .wrap { max-width: 1180px; margin: 0 auto; }
+  header { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; padding: 22px 0 18px; border-bottom: 1px solid var(--line); }
+  .brand { font: 600 13px/1 ui-monospace, "Cascadia Mono", Consolas, monospace; letter-spacing: .18em; color: var(--blue); }
+  h1 { margin: 0; font-size: 26px; line-height: 1.15; }
+  .badge { margin-left: auto; font: 600 12px/1.3 ui-monospace, Consolas, monospace; letter-spacing: .06em; color: var(--ok); border: 1px solid #1f5f48; background: #06201a; padding: 8px 12px; border-radius: 8px; }
+  .lead { color: var(--soft); max-width: 820px; margin: 16px 0 6px; }
+  .tabs { display: flex; gap: 8px; margin: 22px 0 18px; }
+  .tab { font: inherit; font-weight: 600; color: var(--soft); background: var(--panel); border: 1px solid var(--line); padding: 10px 18px; border-radius: 10px; cursor: pointer; }
+  .tab[aria-selected="true"] { color: var(--text); border-color: var(--blue); background: #0b1a33; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  @media (max-width: 860px) { .grid { grid-template-columns: 1fr; } .badge { margin-left: 0; } }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 18px; min-width: 0; }
+  .card h2 { margin: 0 0 4px; font-size: 17px; }
+  .step { font: 600 12px/1 ui-monospace, Consolas, monospace; color: var(--blue); letter-spacing: .12em; margin-bottom: 8px; display: block; }
+  .hint { color: var(--muted); font-size: 14px; margin: 4px 0 10px; }
+  textarea { width: 100%; min-height: 190px; resize: vertical; font: 15px/1.5 ui-monospace, Consolas, monospace; color: var(--text); background: var(--panel2); border: 1px solid var(--line); border-radius: 10px; padding: 12px; }
+  textarea:focus { outline: 2px solid var(--blue); outline-offset: 1px; }
+  textarea.small { min-height: 90px; }
+  label.lbl { display: block; font-weight: 600; font-size: 14px; margin: 14px 0 4px; }
+  .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 10px; }
+  button.btn, label.btn { font: inherit; font-size: 14px; font-weight: 600; color: var(--text); background: #12203d; border: 1px solid #27406f; padding: 9px 14px; border-radius: 9px; cursor: pointer; }
+  button.btn:hover, label.btn:hover { border-color: var(--blue); }
+  button.primary { background: var(--blue); border-color: var(--blue); color: #021022; }
+  input[type=file] { display: none; }
+  .msg { font-size: 14px; color: var(--soft); min-height: 1.4em; }
+  .msg.warn { color: var(--warn); }
+  .preview { white-space: pre-wrap; word-wrap: break-word; font: 15px/1.6 ui-monospace, Consolas, monospace; background: var(--panel2); border: 1px solid var(--line); border-radius: 10px; padding: 12px; max-height: 420px; overflow: auto; }
+  .preview:empty::before { content: "Aquí verás el texto con los datos marcados."; color: var(--muted); }
+  mark { color: var(--text); border-radius: 4px; padding: 0 2px; cursor: pointer; background: rgba(42,140,255,.28); box-shadow: inset 0 -2px 0 var(--c, var(--blue)); }
+  mark.off { background: transparent; box-shadow: inset 0 -1px 0 var(--muted); color: var(--soft); text-decoration: line-through dotted var(--muted); }
+  .list { list-style: none; margin: 10px 0 0; padding: 0; max-height: 300px; overflow: auto; border-top: 1px solid var(--line); }
+  .list li { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: center; padding: 8px 2px; border-bottom: 1px solid var(--line); font-size: 14px; }
+  .list .val { overflow-wrap: anywhere; }
+  .tok { font: 600 12px/1.2 ui-monospace, Consolas, monospace; color: var(--c, var(--blue)); white-space: nowrap; }
+  .list input { width: 18px; height: 18px; accent-color: var(--blue); }
+  details { margin-top: 18px; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 14px 18px; }
+  summary { cursor: pointer; font-weight: 700; }
+  details ul { color: var(--soft); padding-left: 20px; }
+  details li { margin: 6px 0; }
+  .check { display: flex; gap: 8px; align-items: flex-start; font-size: 14px; color: var(--soft); margin-top: 10px; }
+  .check input { margin-top: 3px; accent-color: var(--blue); }
+  footer { margin-top: 28px; color: var(--muted); font-size: 13px; border-top: 1px solid var(--line); padding-top: 14px; }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <div class="brand">ƎVΛ · ACADEMY</div>
+      <h1>Tachar antes de pegar</h1>
+    </div>
+    <div class="badge">● SIN INTERNET · NADA SALE DE ESTE COMPUTADOR</div>
+  </header>
+
+  <p class="lead">Pega un escrito o abre un Word. Esta página cambia nombres, RUT, direcciones y otros datos por etiquetas como <b>[PERSONA_1]</b>, para que puedas consultar a una IA sin entregarle quién es tu cliente. Cuando la IA responda, la pestaña «Devolver» pone los nombres de vuelta.</p>
+
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" id="tab-tachar" aria-selected="true">1 · Tachar</button>
+    <button class="tab" role="tab" id="tab-devolver" aria-selected="false">2 · Devolver</button>
+  </div>
+
+  <section id="panel-tachar">
+    <div class="grid">
+      <div class="card">
+        <span class="step">PASO 1</span>
+        <h2>Tu texto</h2>
+        <p class="hint">Pega el texto, o abre un archivo .docx o .txt. Si es un PDF, copia su texto y pégalo aquí.</p>
+        <textarea id="src" spellcheck="false" placeholder="Pega aquí el escrito, el contrato o el correo…"></textarea>
+        <div class="row">
+          <label class="btn" for="file">Abrir Word o .txt</label>
+          <input type="file" id="file" accept=".docx,.txt,text/plain">
+          <button class="btn" id="ejemplo">Probar con un ejemplo</button>
+          <button class="btn" id="limpiar">Borrar todo</button>
+        </div>
+        <div class="msg" id="fileMsg"></div>
+
+        <label class="lbl" for="personas">Personas que quieres tachar sí o sí</label>
+        <p class="hint">Una por línea. Si la misma persona aparece de varias formas, sepáralas con «/»: <i>Juan Pérez Soto / don Juan / el señor Pérez</i>.</p>
+        <textarea id="personas" class="small" spellcheck="false"></textarea>
+
+        <label class="lbl" for="otros">Otras cosas que quieres tachar</label>
+        <p class="hint">Empresas, lugares, nombres de proyectos, montos: lo que delate el caso. Una por línea.</p>
+        <textarea id="otros" class="small" spellcheck="false"></textarea>
+      </div>
+
+      <div class="card">
+        <span class="step">PASO 2</span>
+        <h2>Revisa lo que encontré</h2>
+        <p class="hint">Busco patrones, no entiendo el texto. Toca un dato marcado para no tacharlo. <b>Lo que no está marcado no se tacha</b>: léelo entero.</p>
+        <div class="msg" id="stats"></div>
+        <div class="preview" id="preview"></div>
+        <ul class="list" id="list"></ul>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:18px">
+      <span class="step">PASO 3</span>
+      <h2>Texto tachado, listo para la IA</h2>
+      <label class="check"><input type="checkbox" id="aviso" checked> Agregar al inicio una nota para que la IA respete las etiquetas</label>
+      <textarea id="out" readonly spellcheck="false"></textarea>
+      <div class="row">
+        <button class="btn primary" id="copiar">Copiar texto tachado</button>
+        <button class="btn" id="bajarLlave">Guardar la llave (.json)</button>
+        <span class="msg" id="outMsg"></span>
+      </div>
+      <p class="hint">La llave es la lista de qué etiqueta corresponde a qué dato real. Queda sólo en este computador: guárdala con el expediente y <b>no la subas a ninguna IA</b>. Si cierras esta página sin guardarla, se pierde.</p>
+    </div>
+  </section>
+
+  <section id="panel-devolver" hidden>
+    <div class="grid">
+      <div class="card">
+        <span class="step">PASO 4</span>
+        <h2>Respuesta de la IA</h2>
+        <p class="hint">Pega aquí lo que respondió la IA, con sus etiquetas. Uso la llave de esta sesión; si cerraste la página, carga la que guardaste.</p>
+        <textarea id="resp" spellcheck="false" placeholder="Pega aquí la respuesta de la IA…"></textarea>
+        <div class="row">
+          <label class="btn" for="llaveFile">Cargar una llave guardada</label>
+          <input type="file" id="llaveFile" accept=".json,application/json">
+          <span class="msg" id="llaveMsg"></span>
+        </div>
+      </div>
+      <div class="card">
+        <span class="step">PASO 5</span>
+        <h2>Con los nombres de vuelta</h2>
+        <textarea id="restored" readonly spellcheck="false"></textarea>
+        <div class="row">
+          <button class="btn primary" id="copiar2">Copiar</button>
+          <span class="msg" id="restMsg"></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <details>
+    <summary>Lo que esta herramienta no hace (léelo una vez)</summary>
+    <ul>
+      <li><b>Tachar no es anonimizar.</b> La Ley 21.719 llama anonimización a un procedimiento irreversible. Esto es seudonimización: con la llave se vuelve atrás, y para la ley siguen siendo datos personales.</li>
+      <li><b>El contexto delata.</b> «La gerenta de la única farmacia de Puerto Williams» identifica a alguien sin decir su nombre. Tacha también lo que, junto, apunte a una persona.</li>
+      <li><b>No reconoce todo.</b> Las fechas, los montos, los cargos, los apodos y los nombres escritos sin mayúscula pasan sin marcar. Agrégalos en «Otras cosas».</li>
+      <li><b>Los hechos siguen siendo secretos.</b> El deber de confidencialidad cubre los asuntos del cliente, no sólo su nombre. Tachar baja el riesgo; no reemplaza un plan de empresa con contrato ni el consentimiento del cliente cuando hay riesgo.</li>
+      <li><b>No guarda nada.</b> No usa internet ni memoria del navegador: al cerrar la página se borra todo. Para comprobarlo, apaga el wifi y úsala igual.</li>
+      <li>De un Word sólo toma el texto: el resultado no conserva el formato.</li>
+    </ul>
+  </details>
+
+  <footer>EVA ACADEMY · Material educativo, no asesoría legal. Revisa siempre el resultado antes de pegarlo. EVA es un personaje.</footer>
+</div>
+
+<script>
+'use strict';
+
+/* ───────── Tipos de dato ───────── */
+const TYPES = {
+  PERSONA:   { label: 'Persona',     color: '#2a8cff' },
+  EMPRESA:   { label: 'Empresa',     color: '#a24dff' },
+  RUT:       { label: 'RUT',         color: '#ff5fa2' },
+  CORREO:    { label: 'Correo',      color: '#3ddc97' },
+  TELEFONO:  { label: 'Teléfono',    color: '#3ddc97' },
+  DIRECCION: { label: 'Dirección',   color: '#ffb547' },
+  CAUSA:     { label: 'Causa',       color: '#5a60ff' },
+  PATENTE:   { label: 'Patente',     color: '#ffb547' },
+  CUENTA:    { label: 'Cuenta',      color: '#ff5fa2' },
+  DATO:      { label: 'Dato',        color: '#a9b8d6' },
+};
+
+const L = '[A-ZÁÉÍÓÚÑÜ]';          // inicial mayúscula
+const W = "[\\p{L}'’-]+";          // resto de la palabra
+const SP = '[ \\t]+';              // un nombre no cruza de línea
+const NAME = `${L}${W}(?:${SP}(?:de${SP}(?:la${SP}|las${SP}|los${SP})?|del${SP})?${L}${W}){0,4}`;
+const HONOR = "(?:[Dd]on|[Dd]oña|[Ss]eñora|[Ss]eñorita|[Ss]eñor|[Ss]rta\\.|[Ss]ra\\.|[Ss]r\\.)";
+// Palabras que siguen a «señor» o «don» y no son nombres.
+const NOT_NAMES = new Set(['juez', 'jueza', 'ministro', 'ministra', 'presidente', 'presidenta', 'fiscal', 'notario', 'notaria', 'conservador', 'secretario', 'secretaria', 'tribunal', 'abogado', 'abogada', 'defensor', 'defensora', 'receptor', 'receptora', 'relator', 'relatora', 'director', 'directora', 'gerente', 'alcalde', 'alcaldesa', 'administrador', 'liquidador']);
+
+const norm = (s) => s.toLowerCase().normalize('NFC').replace(/\s+/g, ' ').trim();
+const escRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\s+/g, '\\s+');
+const escHtml = (s) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+function rutOk(body, dv) {
+  let s = 0, m = 2;
+  for (let i = body.length - 1; i >= 0; i--) { s += +body[i] * m; m = m === 7 ? 2 : m + 1; }
+  const r = 11 - (s % 11);
+  return (r === 11 ? '0' : r === 10 ? 'K' : String(r)) === dv.toUpperCase();
+}
+
+/** Todas las coincidencias de `re`; si `group` se indica, sólo ese grupo (necesita la bandera d). */
+function scan(text, re, group = 0) {
+  const out = [];
+  re.lastIndex = 0;
+  let m;
+  while ((m = re.exec(text))) {
+    if (m[0] === '') { re.lastIndex++; continue; }
+    const g = m.indices ? m.indices[group] : [m.index, m.index + m[0].length];
+    if (g) out.push({ start: g[0], end: g[1], text: text.slice(g[0], g[1]) });
+  }
+  return out;
+}
+
+/* Detectores automáticos, en orden de prioridad (el primero gana si se pisan). */
+const DETECTORS = [
+  { type: 'CORREO', rules: [[/[\w.+-]+@[\w-]+(?:\.[\w-]+)+/g]] },
+  { type: 'CAUSA', rules: [
+    [/(?<![\p{L}])(?:RIT|RUC|ROL|Rol|rol|Rit|Ruc)\.?\s*(?:N\s?[°º.]\s*|n\s?[°º.]\s*|número\s+)?:?\s*([A-Za-z]{0,3}-?\s?\d[\d.]*(?:-\d+)*(?:-[\dkK])?)/gdu, 1],
+    [/(?<![\w-])[A-Z]{1,2}-\d{1,6}-\d{4}(?![\w-])/g],
+    [/(?<![\d.])\d{10}-[\dkK](?!\w)/g],
+  ] },
+  { type: 'RUT', rules: [[/(?<![\w.-])(?:\d{1,2}\.\d{3}\.\d{3}|\d{7,8})\s?-\s?[\dkK](?!\w)/g]] },
+  { type: 'CUENTA', rules: [
+    [/(?:cuenta(?:\s+(?:corriente|vista|rut|de\s+ahorros?|bancaria))?|cta\.?\s*cte\.?|tarjeta(?:\s+de\s+(?:crédito|débito))?)\s*(?:n\s?[°º.]?|número|nro\.?)?\s*:?\s*(\d[\d\s-]{4,22}\d)/gdi, 1],
+    [/(?<!\d)(?:\d{4}[\s-]){3}\d{4}(?!\d)/g],
+  ] },
+  { type: 'TELEFONO', rules: [
+    [/(?<![\d+])\+?\s?56[\s-]?\(?\d{1,2}\)?[\s-]?\d{3,4}[\s-]?\d{4}(?!\d)/g],
+    [/\(\d{1,2}\)\s?\d{3,4}[\s-]?\d{4}(?!\d)/g],
+    [/(?<![\d.$])9[\s-]?\d{4}[\s-]?\d{4}(?![\d.])/g],
+    [/(?:tel[ée]fono|fono|celular|m[óo]vil|whatsapp)\s*(?:n\s?[°º.]\s*)?:?\s*(\+?\d[\d\s-]{6,16}\d)/gdi, 1],
+  ] },
+  { type: 'DIRECCION', rules: [
+    [/(?:domiciliad[oa]s?|con\s+domicilio|domicilio|residente|reside)\s+en\s+([^\n,;()]{2,60}?\s(?:n\s?[°º.]\s*)?\d{1,5}(?:\s*,?\s*(?:depto\.?|departamento|dpto\.?|oficina|of\.|casa|block|torre|piso)\s*[\w-]+)*)/gdi, 1],
+    [/(?<![\p{L}])(?:calle|avenida|av\.|avda\.|pasaje|psje\.|camino|callejón|parcela)\s+[^\n,;()]{2,60}?\s(?:n\s?[°º.]\s*)?\d{1,5}(?:\s*,?\s*(?:depto\.?|departamento|dpto\.?|oficina|of\.|casa|block|torre|piso)\s*[\w-]+)*/giu],
+  ] },
+  { type: 'EMPRESA', rules: [[new RegExp(`${L.replace(']', '0-9]')}[\\p{L}\\p{N}&'.-]*\\s+(?:(?:${L.replace(']', '0-9]')}[\\p{L}\\p{N}&'.-]*|de|del|la|las|los|y|e|&)\\s+){0,6}(?:S\\.\\s?A\\.|SpA|SPA|S\\.p\\.A\\.|Ltda\\.?|LTDA\\.?|Limitada|LIMITADA|E\\.I\\.R\\.L\\.?|EIRL|S\\.A(?![\\p{L}]))(?![\\p{L}])`, 'gu')]] },
+  { type: 'PATENTE', rules: [[/(?<![\w-])(?:[B-DF-HJ-LPR-TV-Z]{4}[\s·.-]?\d{2}|[A-Z]{2}[\s·.-]?\d{2}[\s·.-]?\d{2})(?![\w-])/g]] },
+];
+
+/* Personas detectadas solas: tras «don», «señora»…, en mayúsculas antes de «chileno», o tras un rol procesal. */
+const PERSON_RULES = [
+  [new RegExp(`(?<![\\p{L}])${HONOR}\\s+(${NAME})`, 'gdu'), 1],
+  [new RegExp(`(?<![\\p{L}])((?:[A-ZÁÉÍÓÚÑÜ]{2,}${SP}){1,4}[A-ZÁÉÍÓÚÑÜ]{2,})(?=\\s*,\\s*(?:[Cc]hilen|[Aa]rgentin|[Pp]eruan|[Vv]enezolan|[Cc]olombian|[Bb]olivian|[Hh]aitian|[Ee]xtranjer|[Cc]asad|[Ss]olter|[Dd]ivorciad|[Vv]iud|[Mm]ayor de edad|[Mm]enor de edad|[Aa]bogad|[Ii]ngenier|[Ee]mplead|[Cc]omerciante|[Pp]rofesor|[Ee]studiante|[Jj]ubilad|[Cc]édula|[Cc]\\.\\s?[Ii]\\.|RUT|RUN|[Rr]ut|[Nn]acionalidad|[Dd]omiciliad|[Dd]e profesión|[Dd]e oficio|[Mm]édic|[Cc]onductor|[Tt]écnic|[Dd]ueñ))`, 'gdu'), 1],
+  [new RegExp(`(?<![\\p{L}])(?:[Dd]emandante|[Dd]emandad[oa]|[Ii]mputad[oa]|[Qq]uerellante|[Qq]uerellad[oa]|[Vv]íctima|[Tt]rabajador(?:a)?|[Aa]rrendador(?:a)?|[Aa]rrendatari[oa]|[Tt]estigo|[Cc]ausante|[Hh]ereder[oa]|[Cc]ónyuge|[Ss]olicitante|[Rr]equirente|[Rr]equerid[oa]|[Cc]ontratante)\\s*,?\\s*(?:${HONOR}\\s+)?(${L}${W}(?:${SP}(?:de${SP}(?:la${SP}|los${SP})?|del${SP})?${L}${W}){1,4})`, 'gdu'), 1],
+];
+
+/* ───────── El motor ───────── */
+let lastMap = new Map();     // canon -> { type, token, value }
+let off = new Set();         // canon que el usuario decidió no tachar
+
+function userEntries(raw, type, prefix) {
+  return raw.split('\n').map((line, i) => ({
+    canon: `${prefix}${i}`, type,
+    variants: line.split('/').map((v) => v.trim()).filter((v) => v.length >= 2),
+  })).filter((e) => e.variants.length);
+}
+
+/** Formas en que reaparece un nombre: completo, sus apellidos, y «señor Apellido». */
+function nameVariants(name) {
+  const words = name.split(/\s+/).filter((w) => !/^(de|del|la|las|los)$/i.test(w));
+  const v = [name];
+  if (words.length >= 3) v.push(words.slice(-2).join(' '));
+  if (words.length >= 2) {
+    const first = words.length >= 3 ? words[words.length - 2] : words[1];
+    v.push({ honor: first });
+  }
+  return v;
+}
+
+function variantRe(v) {
+  if (typeof v === 'string') return new RegExp(`(?<![\\p{L}\\p{N}])${escRe(v)}(?![\\p{L}\\p{N}])`, 'giu');
+  return new RegExp(`(?<=${HONOR}\\s+)${escRe(v.honor)}(?![\\p{L}\\p{N}])`, 'giu');
+}
+
+function analyze(text) {
+  const cands = [];
+  const add = (spans, type, canon, prio, display) => {
+    for (const s of spans) cands.push({ ...s, type, canon: canon ?? `${type}:${norm(s.text)}`, prio, display: display ?? s.text });
+  };
+
+  // 1) Lo que el usuario pidió.
+  const people = userEntries(document.getElementById('personas').value, 'PERSONA', 'u:p:');
+  const others = userEntries(document.getElementById('otros').value, 'DATO', 'u:o:');
+  for (const e of others) for (const v of e.variants) add(scan(text, variantRe(v)), 'DATO', e.canon, 1, e.variants[0]);
+
+  // 2) Personas detectadas solas; se agrupan con las del usuario si son parte del mismo nombre.
+  const known = people.map((e) => ({ canon: e.canon, display: e.variants[0], words: new Set(norm(e.variants.join(' ')).split(' ')) }));
+  for (const [re, g] of PERSON_RULES) {
+    for (const s of scan(text, re, g)) {
+      const first = norm(s.text).split(' ')[0];
+      if (NOT_NAMES.has(first)) continue;
+      const words = norm(s.text).split(' ').filter((w) => !/^(de|del|la|las|los)$/.test(w));
+      let k = known.find((n) => words.every((w) => n.words.has(w)));
+      if (!k) {
+        // Un nombre más largo que absorbe a uno ya visto («Salinas» → «Pedro Pablo Salinas Mora»).
+        const sub = known.find((n) => n.auto && [...n.words].every((w) => words.includes(w)));
+        if (sub) { sub.words = new Set(words); sub.display = s.text; k = sub; }
+      }
+      if (!k) { k = { canon: `p:${norm(s.text)}`, display: s.text, words: new Set(words), auto: true }; known.push(k); }
+    }
+  }
+  // Cada persona se busca en todas sus formas, con la prioridad más alta.
+  for (const k of known) {
+    const user = people.find((e) => e.canon === k.canon);
+    const forms = user ? user.variants.flatMap((v) => nameVariants(v)) : nameVariants(k.display);
+    if (!user) for (const n of known) if (n !== k && n.auto && [...n.words].every((w) => k.words.has(w))) forms.push(n.display);
+    for (const v of forms) add(scan(text, variantRe(v)), 'PERSONA', k.canon, 0, k.display);
+  }
+
+  // 3) Patrones.
+  DETECTORS.forEach((d, i) => {
+    for (const [re, g] of d.rules) {
+      let spans = scan(text, re, g ?? 0);
+      if (d.type === 'RUT') spans = spans.map((s) => {
+        const c = s.text.replace(/[.\s]/g, '');
+        const [body, dv] = c.split('-');
+        return { ...s, canonText: c.toUpperCase(), weak: !rutOk(body, dv) };
+      });
+      for (const s of spans) cands.push({ ...s, type: d.type, canon: `${d.type}:${s.canonText ?? norm(s.text)}`, prio: 2 + i, display: s.text });
+    }
+  });
+
+  // 4) Si se pisan, gana la prioridad más alta y después el tramo más largo.
+  cands.sort((a, b) => a.prio - b.prio || (b.end - b.start) - (a.end - a.start) || a.start - b.start);
+  const taken = [];
+  for (const c of cands) {
+    if (c.end <= c.start) continue;
+    if (taken.some((t) => c.start < t.end && t.start < c.end)) continue;
+    taken.push(c);
+  }
+  taken.sort((a, b) => a.start - b.start);
+
+  // 5) Etiquetas en orden de aparición, una por dato distinto.
+  const map = new Map();
+  const count = {};
+  for (const t of taken) {
+    if (!map.has(t.canon)) {
+      count[t.type] = (count[t.type] ?? 0) + 1;
+      map.set(t.canon, { type: t.type, token: `[${t.type}_${count[t.type]}]`, value: t.display.replace(/\s+/g, ' ').trim(), n: 0, weak: t.weak });
+    }
+    map.get(t.canon).n++;
+  }
+  return { spans: taken, map };
+}
+
+/* ───────── Pantalla ───────── */
+const $ = (id) => document.getElementById(id);
+
+function render() {
+  const text = $('src').value;
+  const { spans, map } = analyze(text);
+  lastMap = map;
+  for (const c of [...off]) if (!map.has(c)) off.delete(c);
+
+  // Vista con marcas.
+  let html = '', out = '', pos = 0;
+  for (const s of spans) {
+    const e = map.get(s.canon);
+    const isOff = off.has(s.canon);
+    html += escHtml(text.slice(pos, s.start));
+    html += `<mark data-canon="${escHtml(s.canon)}" class="${isOff ? 'off' : ''}" style="--c:${TYPES[e.type].color}" title="${escHtml(e.token)} · ${TYPES[e.type].label}${isOff ? ' · no se tacha' : ''}">${escHtml(text.slice(s.start, s.end))}</mark>`;
+    out += text.slice(pos, s.start) + (isOff ? text.slice(s.start, s.end) : e.token);
+    pos = s.end;
+  }
+  html += escHtml(text.slice(pos));
+  out += text.slice(pos);
+  $('preview').innerHTML = text ? html : '';
+
+  // Lista de datos.
+  $('list').innerHTML = [...map.entries()].map(([canon, e]) => `
+    <li style="--c:${TYPES[e.type].color}">
+      <input type="checkbox" data-canon="${escHtml(canon)}" ${off.has(canon) ? '' : 'checked'} aria-label="Tachar ${escHtml(e.value)}">
+      <span class="val">${escHtml(e.value)}${e.weak ? ' <span class="hint">(el dígito verificador no cuadra: revisa)</span>' : ''}${e.n > 1 ? ` <span class="hint">×${e.n}</span>` : ''}</span>
+      <span class="tok">${escHtml(e.token)}</span>
+    </li>`).join('');
+
+  const active = [...map.keys()].filter((c) => !off.has(c)).length;
+  $('stats').textContent = text
+    ? (map.size ? `Encontré ${spans.length} marcas de ${map.size} datos distintos. Se tachan ${active}.` : 'No encontré datos. Agrega a mano lo que quieras tachar.')
+    : '';
+  $('stats').className = 'msg' + (text && !map.size ? ' warn' : '');
+
+  const nota = 'Nota: los textos entre corchetes, como [PERSONA_1], reemplazan datos reales. Úsalos tal cual en tu respuesta y no intentes adivinar a qué corresponden.\n\n';
+  $('out').value = text ? ($('aviso').checked && active ? nota : '') + out : '';
+  restore();
+}
+
+let timer;
+const later = () => { clearTimeout(timer); timer = setTimeout(render, 120); };
+['src', 'personas', 'otros'].forEach((id) => $(id).addEventListener('input', later));
+$('aviso').addEventListener('change', render);
+
+function toggle(canon) { off.has(canon) ? off.delete(canon) : off.add(canon); render(); }
+$('preview').addEventListener('click', (e) => { const m = e.target.closest('mark'); if (m) toggle(m.dataset.canon); });
+$('list').addEventListener('change', (e) => { if (e.target.dataset.canon) toggle(e.target.dataset.canon); });
+
+/* Copiar y guardar: todo local. */
+async function copy(text, msgEl) {
+  try { await navigator.clipboard.writeText(text); }
+  catch { const t = document.createElement('textarea'); t.value = text; document.body.append(t); t.select(); document.execCommand('copy'); t.remove(); }
+  msgEl.textContent = 'Copiado.';
+  setTimeout(() => { msgEl.textContent = ''; }, 2200);
+}
+$('copiar').addEventListener('click', () => copy($('out').value, $('outMsg')));
+$('copiar2').addEventListener('click', () => copy($('restored').value, $('restMsg')));
+
+function keyObject() {
+  const llave = {};
+  for (const [canon, e] of lastMap) if (!off.has(canon)) llave[e.token] = e.value;
+  return llave;
+}
+$('bajarLlave').addEventListener('click', () => {
+  const llave = keyObject();
+  if (!Object.keys(llave).length) { $('outMsg').textContent = 'No hay nada tachado todavía.'; return; }
+  const data = { herramienta: 'EVA · Tachar antes de pegar', creada: new Date().toISOString(), aviso: 'Contiene los datos reales. No la subas a ninguna IA.', llave };
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }));
+  const d = new Date();
+  a.download = `llave-${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}-${String(d.getHours()).padStart(2, '0')}${String(d.getMinutes()).padStart(2, '0')}.json`;
+  document.body.append(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+  $('outMsg').textContent = 'Llave guardada en tu carpeta de descargas.';
+});
+
+/* ───────── Devolver ───────── */
+let loadedKey = null;
+function restore() {
+  const llave = loadedKey ?? keyObject();
+  const text = $('resp').value;
+  let n = 0;
+  const unknown = new Set();
+  // Acepta [PERSONA_1] y también PERSONA_1 si la IA quitó los corchetes.
+  const out = text.replace(/\[?\b(PERSONA|EMPRESA|RUT|CORREO|TELEFONO|DIRECCION|CAUSA|PATENTE|CUENTA|DATO)_(\d+)\b\]?/g, (m, t, i) => {
+    const k = `[${t}_${i}]`;
+    if (k in llave) { n++; return llave[k]; }
+    unknown.add(k); return m;
+  });
+  $('restored').value = text ? out : '';
+  $('restMsg').textContent = text ? `Devolví ${n} datos.` + (unknown.size ? ` Sin llave para: ${[...unknown].join(', ')}.` : '') : '';
+  $('restMsg').className = 'msg' + (unknown.size ? ' warn' : '');
+}
+$('resp').addEventListener('input', restore);
+$('llaveFile').addEventListener('change', async (e) => {
+  const f = e.target.files[0]; if (!f) return;
+  try {
+    const data = JSON.parse(await f.text());
+    loadedKey = data.llave ?? data;
+    $('llaveMsg').textContent = `Llave cargada: ${Object.keys(loadedKey).length} datos.`;
+  } catch { $('llaveMsg').textContent = 'Ese archivo no es una llave de esta herramienta.'; }
+  e.target.value = '';
+  restore();
+});
+
+/* ───────── Leer un Word sin subirlo a ningún lado ───────── */
+async function readDocx(buf) {
+  const dv = new DataView(buf);
+  let eocd = -1;
+  for (let i = buf.byteLength - 22; i >= Math.max(0, buf.byteLength - 65557); i--) if (dv.getUint32(i, true) === 0x06054b50) { eocd = i; break; }
+  if (eocd < 0) throw new Error('zip');
+  const total = dv.getUint16(eocd + 10, true);
+  let p = dv.getUint32(eocd + 16, true);
+  for (let n = 0; n < total; n++) {
+    const method = dv.getUint16(p + 10, true), csize = dv.getUint32(p + 20, true);
+    const nlen = dv.getUint16(p + 28, true), xlen = dv.getUint16(p + 30, true), clen = dv.getUint16(p + 32, true), lho = dv.getUint32(p + 42, true);
+    const name = new TextDecoder().decode(new Uint8Array(buf, p + 46, nlen));
+    if (name === 'word/document.xml') {
+      const start = lho + 30 + dv.getUint16(lho + 26, true) + dv.getUint16(lho + 28, true);
+      const data = new Uint8Array(buf, start, csize);
+      const bytes = method === 0 ? data : new Uint8Array(await new Response(new Blob([data]).stream().pipeThrough(new DecompressionStream('deflate-raw'))).arrayBuffer());
+      const doc = new DOMParser().parseFromString(new TextDecoder().decode(bytes), 'application/xml');
+      const NS = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main';
+      const paras = [];
+      for (const para of doc.getElementsByTagNameNS(NS, 'p')) {
+        let s = '';
+        for (const node of para.getElementsByTagNameNS(NS, '*')) {
+          if (node.localName === 't') s += node.textContent;
+          else if (node.localName === 'tab') s += '\t';
+          else if (node.localName === 'br' || node.localName === 'cr') s += '\n';
+        }
+        paras.push(s);
+      }
+      return paras.join('\n');
+    }
+    p += 46 + nlen + xlen + clen;
+  }
+  throw new Error('nodoc');
+}
+$('file').addEventListener('change', async (e) => {
+  const f = e.target.files[0]; if (!f) return;
+  const msg = $('fileMsg');
+  try {
+    $('src').value = /\.docx$/i.test(f.name) ? await readDocx(await f.arrayBuffer()) : await f.text();
+    msg.textContent = `Abrí «${f.name}» en este computador. No se subió a ningún lado.`;
+    msg.className = 'msg';
+  } catch {
+    msg.textContent = 'No pude leer ese archivo. Si es un .doc antiguo o un PDF, copia el texto y pégalo.';
+    msg.className = 'msg warn';
+  }
+  e.target.value = '';
+  render();
+});
+
+/* ───────── Ejemplo ficticio ───────── */
+const EJEMPLO = `EN LO PRINCIPAL: Demanda de indemnización de perjuicios.
+
+S.J.L. EN LO CIVIL DE SANTIAGO
+
+MARÍA JOSÉ FUENTEALBA ROJAS, chilena, ingeniera comercial, cédula nacional de identidad N° 11.111.111-1, domiciliada en calle Los Aromos 1234, depto. 56, comuna de Ñuñoa, correo mj.fuentealba@ejemplo.cl, teléfono +56 9 1234 5678, a US. respetuosamente digo:
+
+Que vengo en deducir demanda en contra de Inmobiliaria Los Aromos SpA, RUT 76.000.000-0, representada por don Pedro Pablo Salinas Mora, cédula 22.222.222-2, ambos domiciliados en avenida Providencia 1550, oficina 801, comuna de Providencia.
+
+El 3 de marzo de 2025, el vehículo patente BCDF·12, conducido por el señor Salinas, dañó el inmueble de la Sra. Fuentealba. Mi representada pagó $1.250.000 en reparaciones desde su cuenta corriente N° 00-123-45678-09. Existe una causa previa entre las mismas partes, Rol C-9999-2024.
+
+(Datos ficticios: el ejemplo es para probar la herramienta.)`;
+$('ejemplo').addEventListener('click', () => { $('src').value = EJEMPLO; off.clear(); render(); });
+$('limpiar').addEventListener('click', () => { for (const id of ['src', 'personas', 'otros', 'resp']) $(id).value = ''; off.clear(); loadedKey = null; $('fileMsg').textContent = ''; $('llaveMsg').textContent = ''; render(); });
+
+/* ───────── Pestañas ───────── */
+function show(which) {
+  $('tab-tachar').setAttribute('aria-selected', which === 'tachar');
+  $('tab-devolver').setAttribute('aria-selected', which === 'devolver');
+  $('panel-tachar').hidden = which !== 'tachar';
+  $('panel-devolver').hidden = which !== 'devolver';
+}
+$('tab-tachar').addEventListener('click', () => show('tachar'));
+$('tab-devolver').addEventListener('click', () => show('devolver'));
+
+render();
+</script>
+</body>
+</html>
