@@ -8,6 +8,7 @@ los clientes de la firma a adecuarse a la Ley 21.719 de protección de datos per
 | Carpeta | Contenido |
 |---|---|
 | `herramientas/panel-clientes.html` | Panel de clientes: cada cliente con el estado de su adecuación a la Ley 21.719. |
+| `herramientas/derechos-y-consentimientos.html` | Para la empresa cliente: usos de datos con su base legal (las seis de los arts. 12 y 13), solicitudes de titulares con sus plazos del art. 11 y cartas borrador, consentimientos y revocaciones, formulario para titulares e historial con huellas encadenadas (SHA-256). Demo con una empresa ficticia. |
 | `herramientas/tachar.html` | Tachador: cambia nombres, RUT, direcciones y otros datos por etiquetas antes de pegar un texto en una IA. |
 | `reunion/` | Material para las reuniones con MLV. |
 
