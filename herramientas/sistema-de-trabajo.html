@@ -1,0 +1,787 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- La página no puede conectarse a nada: el navegador bloquea cualquier envío. Lo que se escribe queda solo en este computador. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; connect-src 'none'; form-action 'none'; base-uri 'none'">
+<title>Sistema de trabajo · MLV Abogados</title>
+<style>
+  :root {
+    --fondo: #f6f5f1; --papel: #ffffff; --papel2: #fbfaf7; --hundido: #efede6;
+    --tinta: #1a2636; --tinta2: #3b4859; --suave: #69737f; --linea: #dddbd2; --linea2: #ebe9e2;
+    --acento: #0d5c68; --acento-osc: #094650; --acento-claro: #e3eef0; --acento-borde: #c3dbde;
+    --verde: #2b7549; --verde-f: #e4f0e8; --verde-b: #bcd8c6;
+    --ambar: #94600f; --ambar-f: #f9eed8; --ambar-b: #ead2a2;
+    --rojo: #a12f2a; --rojo-f: #f7e2e0; --rojo-b: #e6bdb9;
+    --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", serif;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --radio: 10px;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; background: var(--fondo); color: var(--tinta); font: 15px/1.5 var(--sans); }
+  .app { max-width: 1180px; margin: 0 auto; padding: 0 28px 40px; }
+  a { color: var(--acento); }
+  h1, h2, h3 { font-family: var(--serif); font-weight: 600; color: var(--tinta); }
+  :focus-visible { outline: 2px solid var(--acento); outline-offset: 2px; }
+  [hidden] { display: none !important; }
+
+  /* Cabecera */
+  .cabecera { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px 24px; padding: 26px 0 20px; border-bottom: 1px solid var(--linea); }
+  .firma { font: 600 25px/1.1 var(--serif); letter-spacing: .01em; color: var(--tinta); text-decoration: none; }
+  .sub { color: var(--suave); font-size: 12.5px; letter-spacing: .1em; text-transform: uppercase; margin-top: 6px; }
+  .acciones-cab { display: flex; align-items: center; flex-wrap: wrap; gap: 10px 14px; }
+  .guardado { font-size: 12.5px; color: var(--suave); }
+  .guardado.mal { color: var(--ambar); }
+
+  /* Botones y campos */
+  .btn { font: inherit; font-size: 14px; font-weight: 500; line-height: 1.3; color: var(--tinta); background: var(--papel); border: 1px solid var(--linea); border-radius: 8px; padding: 8px 14px; cursor: pointer; text-decoration: none; display: inline-block; }
+  .btn:hover { border-color: var(--acento); color: var(--acento); }
+  .btn.primario { background: var(--acento); border-color: var(--acento); color: #fff; }
+  .btn.primario:hover { background: var(--acento-osc); color: #fff; }
+  .btn.peligro { color: var(--rojo); }
+  .btn.peligro:hover { border-color: var(--rojo); }
+  .btn.chico { font-size: 13px; padding: 5px 10px; }
+  .btn[disabled] { opacity: .45; cursor: default; }
+  input, select, textarea { font: inherit; font-size: 14px; color: var(--tinta); background: var(--papel); border: 1px solid var(--linea); border-radius: 7px; padding: 7px 10px; min-width: 0; max-width: 100%; width: 100%; }
+  input:focus, select:focus, textarea:focus { border-color: var(--acento); outline: none; box-shadow: 0 0 0 3px var(--acento-claro); }
+  textarea { resize: vertical; min-height: 64px; line-height: 1.45; }
+  label.campo { display: flex; flex-direction: column; gap: 4px; font-size: 12.5px; color: var(--suave); min-width: 0; }
+  label.campo > span { font-weight: 500; }
+  label.campo small { font-weight: 400; }
+
+  .franja { margin-top: 16px; background: var(--acento-claro); border: 1px solid var(--acento-borde); color: var(--acento-osc); border-radius: 8px; padding: 9px 14px; font-size: 14px; }
+
+  /* Vistas */
+  .vistas { display: flex; flex-wrap: wrap; gap: 4px; border-bottom: 1px solid var(--linea); margin: 18px 0 22px; }
+  .vistas a { padding: 10px 14px; color: var(--tinta2); text-decoration: none; border-bottom: 2px solid transparent; margin-bottom: -1px; font-weight: 500; }
+  .vistas a[aria-current="page"] { color: var(--tinta); border-color: var(--acento); }
+
+  /* Indicadores */
+  .resumen { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 14px; margin-bottom: 24px; }
+  .kpi { background: var(--papel); border: 1px solid var(--linea); border-radius: var(--radio); padding: 15px 18px; min-width: 0; }
+  .kpi .eti { font-size: 12.5px; color: var(--suave); }
+  .kpi .num { font: 600 30px/1.15 var(--serif); margin-top: 6px; font-variant-numeric: tabular-nums; }
+  .kpi .num small { font-size: 16px; font-weight: 500; }
+  .kpi .det { font-size: 12.5px; color: var(--tinta2); margin-top: 4px; }
+  .kpi .num.rojo { color: var(--rojo); }
+  .kpi .num.ambar { color: var(--ambar); }
+  @media (max-width: 960px) { .resumen { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  @media (max-width: 600px) { .resumen { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; } .kpi { padding: 13px 14px; } .kpi .num { font-size: 26px; } }
+
+  .dos { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 22px; align-items: start; }
+  @media (max-width: 900px) { .dos { grid-template-columns: 1fr; } }
+  .caja { background: var(--papel); border: 1px solid var(--linea); border-radius: var(--radio); padding: 18px 20px; min-width: 0; }
+  .caja h3 { font-size: 17px; margin: 0 0 10px; }
+  .caja + .caja { margin-top: 14px; }
+  .nota { font-size: 13px; color: var(--suave); margin: 6px 0 12px; }
+
+  /* Mapa de procesos */
+  .area { margin-bottom: 26px; }
+  .area h2 { font-size: 20px; margin: 0 0 10px; display: flex; align-items: baseline; gap: 10px; }
+  .area h2 span { font: 500 13px var(--sans); color: var(--suave); }
+  .tarjetas { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 12px; }
+  .tarjeta { display: block; background: var(--papel); border: 1px solid var(--linea); border-radius: var(--radio); padding: 15px 16px; color: inherit; text-decoration: none; min-width: 0; }
+  .tarjeta:hover { border-color: var(--acento); }
+  .tarjeta b { display: block; font: 600 16.5px/1.3 var(--serif); color: var(--tinta); margin-bottom: 8px; overflow-wrap: anywhere; }
+  .tarjeta .fila-t { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .tarjeta .mini { display: block; font-size: 12.5px; color: var(--suave); margin-top: 6px; }
+  .tarjeta .mini.rojo { color: var(--rojo); font-weight: 600; }
+  .chip { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 500; padding: 2px 10px; border-radius: 999px; white-space: nowrap; border: 1px solid transparent; }
+  .chip.gris { background: var(--hundido); color: var(--suave); }
+  .chip.ambar { background: var(--ambar-f); color: var(--ambar); border-color: var(--ambar-b); }
+  .chip.verde { background: var(--verde-f); color: var(--verde); border-color: var(--verde-b); }
+  .chip.rojo { background: var(--rojo-f); color: var(--rojo); border-color: var(--rojo-b); }
+  .alertas { list-style: none; margin: 0; padding: 0; }
+  .alertas li { padding: 9px 0; border-bottom: 1px solid var(--linea2); font-size: 14px; }
+  .alertas li:last-child { border-bottom: 0; }
+  .alertas a { font-weight: 600; text-decoration: none; }
+  .alertas a:hover { text-decoration: underline; }
+  .alertas .por { display: block; font-size: 13px; color: var(--tinta2); }
+  .ok { color: var(--verde); font-size: 14px; }
+  .ciclo { counter-reset: c; list-style: none; padding: 0; margin: 0; }
+  .ciclo li { counter-increment: c; position: relative; padding: 0 0 12px 34px; font-size: 14px; color: var(--tinta2); }
+  .ciclo li::before { content: counter(c); position: absolute; left: 0; top: 0; width: 23px; height: 23px; border-radius: 50%; background: var(--acento-claro); color: var(--acento-osc); font: 600 12.5px/23px var(--sans); text-align: center; }
+  .ciclo b { color: var(--tinta); }
+
+  /* Ficha */
+  .miga { margin: 0 0 10px; font-size: 14px; }
+  .miga a { text-decoration: none; }
+  .titulo-ficha { font: 600 28px/1.2 var(--serif); border: 1px solid transparent; background: transparent; padding: 4px 8px; margin-left: -9px; color: var(--tinta); }
+  .titulo-ficha:hover { border-color: var(--linea); }
+  .ficha-acc { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 18px; }
+  .rejilla { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+  .rejilla.tres { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  @media (max-width: 860px) { .rejilla, .rejilla.tres { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 520px) { .rejilla, .rejilla.tres { grid-template-columns: 1fr; } }
+  .revision { display: flex; align-items: flex-end; gap: 8px; }
+  .revision label { flex: 1; }
+  .paso { border: 1px solid var(--linea); border-radius: var(--radio); background: var(--papel2); margin-bottom: 10px; }
+  .paso > summary { list-style: none; display: flex; align-items: center; gap: 12px; padding: 12px 14px; cursor: pointer; }
+  .paso > summary::-webkit-details-marker { display: none; }
+  .paso .n { flex: none; width: 28px; height: 28px; border-radius: 50%; background: var(--acento); color: #fff; font: 600 13px/28px var(--sans); text-align: center; }
+  .paso .t { flex: 1; min-width: 0; font-weight: 600; overflow-wrap: anywhere; }
+  .paso .t small { display: block; font-weight: 400; color: var(--suave); font-size: 12.5px; }
+  .paso .ia { flex: none; font-size: 12px; color: var(--acento-osc); background: var(--acento-claro); border-radius: 999px; padding: 2px 9px; }
+  .paso[open] > summary { border-bottom: 1px solid var(--linea2); }
+  .paso .cuerpo { padding: 14px; display: grid; gap: 12px; }
+  .paso .mover { display: flex; gap: 6px; flex-wrap: wrap; }
+  .claude-par { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; background: var(--acento-claro); border: 1px solid var(--acento-borde); border-radius: 8px; padding: 12px; }
+  .claude-par label.campo { color: var(--acento-osc); }
+  @media (max-width: 640px) { .claude-par { grid-template-columns: 1fr; } }
+  .historial { list-style: none; margin: 0; padding: 0; font-size: 13.5px; }
+  .historial li { padding: 6px 0; border-bottom: 1px solid var(--linea2); color: var(--tinta2); }
+  .historial li:last-child { border-bottom: 0; }
+  .historial time { color: var(--suave); margin-right: 8px; font-variant-numeric: tabular-nums; }
+
+  /* Levantar un proceso */
+  .entrevista { max-width: 720px; }
+  .progreso { height: 6px; background: var(--linea2); border-radius: 3px; overflow: hidden; margin: 0 0 18px; }
+  .progreso i { display: block; height: 100%; background: var(--acento); }
+  .pregunta { font: 600 23px/1.3 var(--serif); margin: 0 0 6px; }
+  .ayuda { color: var(--suave); margin: 0 0 14px; font-size: 14px; }
+  .entrevista textarea { min-height: 150px; font-size: 15px; }
+  .entrevista input, .entrevista select { font-size: 15px; padding: 10px 12px; }
+  .nav-e { display: flex; justify-content: space-between; gap: 10px; margin-top: 16px; }
+  .consejo { border-left: 3px solid var(--acento); padding: 4px 0 4px 14px; color: var(--tinta2); font-size: 14px; margin-top: 22px; }
+
+  /* Diálogo */
+  dialog { border: 1px solid var(--linea); border-radius: 12px; padding: 0; width: min(760px, calc(100vw - 32px)); max-height: calc(100vh - 48px); color: var(--tinta); background: var(--papel); }
+  dialog::backdrop { background: rgba(26, 38, 54, .45); }
+  .dlg { padding: 20px 22px; display: flex; flex-direction: column; gap: 12px; max-height: calc(100vh - 50px); }
+  .dlg h3 { margin: 0; font-size: 20px; }
+  .dlg textarea { flex: 1; min-height: 300px; font: 13px/1.5 ui-monospace, Consolas, monospace; background: var(--papel2); }
+  .dlg .pie { display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap; }
+
+  .aviso { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); background: var(--tinta); color: #fff; padding: 10px 18px; border-radius: 8px; font-size: 14px; z-index: 50; }
+  footer { margin-top: 36px; border-top: 1px solid var(--linea); padding-top: 14px; color: var(--suave); font-size: 13px; }
+
+  @media (max-width: 760px) { .app { padding: 0 16px 28px; } .titulo-ficha { font-size: 23px; } }
+
+  /* Impresión: solo la ficha en limpio */
+  #impresion { display: none; }
+  @media print {
+    body { background: #fff; font-size: 11.5pt; }
+    .app, dialog, .aviso { display: none !important; }
+    #impresion { display: block; }
+    #impresion h1 { font-size: 20pt; margin: 0 0 4pt; }
+    #impresion h2 { font-size: 13pt; margin: 16pt 0 6pt; border-bottom: 1px solid #999; padding-bottom: 3pt; }
+    #impresion .meta { color: #444; margin: 0 0 10pt; }
+    #impresion .p { break-inside: avoid; margin-bottom: 10pt; }
+    #impresion .p h3 { font-size: 12pt; margin: 0 0 3pt; }
+    #impresion ul { margin: 3pt 0; padding-left: 16pt; }
+    #impresion .pie-i { margin-top: 18pt; font-size: 9pt; color: #666; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="cabecera">
+    <div>
+      <a class="firma" href="#/">MLV Abogados</a>
+      <div class="sub">Sistema de trabajo del estudio</div>
+    </div>
+    <div class="acciones-cab">
+      <span class="guardado" id="guardado"></span>
+      <button class="btn chico" id="btn-respaldo" title="Descarga un archivo con todos los procesos">Respaldo</button>
+      <button class="btn chico" id="btn-importar" title="Carga un respaldo descargado antes">Cargar respaldo</button>
+      <input type="file" id="archivo" accept="application/json,.json" hidden>
+    </div>
+  </header>
+  <div class="franja" id="franja-demo" hidden>Los procesos que vienen son <b>ejemplos</b> para mostrar la idea: los pasos, los plazos y los responsables los define MLV. <button class="btn chico" id="sin-ejemplos" style="margin-left:6px">Empezar sin ejemplos</button></div>
+  <nav class="vistas" aria-label="Secciones">
+    <a href="#/" data-v="mapa">Mapa de procesos</a>
+    <a href="#/levantar" data-v="levantar">Levantar un proceso</a>
+    <a href="#/claude" data-v="claude">Llevarlo a Claude</a>
+  </nav>
+  <main id="vista"></main>
+  <footer>Todo se guarda solo en este navegador. Para pasarlo a otro computador, usa «Respaldo» y «Cargar respaldo».</footer>
+</div>
+
+<div id="impresion"></div>
+
+<dialog id="dlg">
+  <div class="dlg">
+    <h3 id="dlg-titulo"></h3>
+    <p class="nota" id="dlg-nota" style="margin:0"></p>
+    <textarea id="dlg-texto" readonly></textarea>
+    <div class="pie">
+      <button class="btn" id="dlg-descargar">Descargar</button>
+      <button class="btn primario" id="dlg-copiar">Copiar</button>
+      <button class="btn" id="dlg-cerrar">Cerrar</button>
+    </div>
+  </div>
+</dialog>
+
+<script>
+'use strict';
+
+const CLAVE = 'mlv-sistema-trabajo-v1';
+const AREAS = ['Laboral', 'Ley Karin', 'Datos personales', 'Compliance', 'Gestión del estudio', 'Otra'];
+const ESTADOS = {
+  borrador: { t: 'Borrador', c: 'gris', d: 'Recién levantado; falta que el dueño lo revise.' },
+  prueba:   { t: 'En prueba', c: 'ambar', d: 'Se está usando con algunos casos para ajustarlo.' },
+  uso:      { t: 'En uso', c: 'verde', d: 'Es la forma oficial de hacer este trabajo en el estudio.' },
+};
+const REGLAS_BASE = [
+  'Antes de pegar un documento con datos de personas (nombres, RUT, salud, remuneraciones), pásalo por el tachador.',
+  'No cites artículos, plazos ni jurisprudencia que no puedas verificar en la fuente oficial; marca con [VERIFICAR] lo que no esté confirmado.',
+  'Todo lo que redactes es un borrador: lo revisa y firma un abogado del estudio antes de salir.',
+  'Escribe en el estilo de MLV: claro, directo y sin relleno; en español de Chile.',
+  'Si falta información para hacer bien el paso, pregunta antes de inventar.',
+].join('\n');
+
+// ───────────────────────── utilidades ─────────────────────────
+const $ = (s, r = document) => r.querySelector(s);
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const nuevoId = () => Math.random().toString(36).slice(2, 9);
+const lineas = (t) => String(t || '').split('\n').map((x) => x.trim()).filter(Boolean);
+function hoyISO() { const d = new Date(); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); return d.toISOString().slice(0, 10); }
+function diasAtras(n) { const d = new Date(); d.setDate(d.getDate() - n); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); return d.toISOString().slice(0, 10); }
+function fecha(iso) { if (!iso) return '—'; const [a, m, d] = iso.split('-'); return `${d}-${m}-${a}`; }
+function proximaRevision(p) {
+  if (!p.revision?.ultima) return null;
+  const d = new Date(p.revision.ultima + 'T12:00:00');
+  d.setMonth(d.getMonth() + (Number(p.revision.cadaMeses) || 6));
+  return d.toISOString().slice(0, 10);
+}
+const revisionVencida = (p) => { const r = proximaRevision(p); return !r || r < hoyISO(); };
+function avisar(t) {
+  const a = document.createElement('div'); a.className = 'aviso'; a.textContent = t; document.body.append(a);
+  setTimeout(() => a.remove(), 2200);
+}
+
+// ───────────────────────── ejemplos ─────────────────────────
+function paso(titulo, quien, plazo, entregable, plantilla, checklist, puede, revisa) {
+  return { id: nuevoId(), titulo, quien, plazo, entregable, plantilla, checklist, claude: { puede, revisa } };
+}
+function ejemplos() {
+  const hoy = hoyISO();
+  return [
+    {
+      id: nuevoId(), nombre: 'Despido: carta y comunicación', area: 'Laboral', dueno: 'Socio del área laboral', estado: 'uso',
+      objetivo: 'Que el cliente despida con una carta que resista un juicio: causal bien elegida, hechos concretos y plazos cumplidos.',
+      gatillo: 'El cliente (empresa) avisa que quiere desvincular a un trabajador.',
+      termino: 'Carta entregada, copia enviada a la Inspección del Trabajo y finiquito calculado.',
+      documentos: 'Plantilla de carta por causal · Calculadora de finiquito · Lista de antecedentes que se piden al cliente',
+      errores: 'Hechos genéricos en la carta («faltas reiteradas» sin fechas).\nCotizaciones previsionales impagas al momento del despido.\nCarta enviada fuera de plazo o a una dirección antigua.',
+      pasos: [
+        paso('Recibir los antecedentes', 'Abogado asociado', 'Mismo día', 'Ficha del caso', 'Lista de antecedentes',
+          'Contrato y anexos\nLiquidaciones de los últimos 3 meses\nCertificado de cotizaciones al día\nHechos con fechas, testigos y documentos',
+          'Ordenar los antecedentes y armar una cronología de los hechos.', 'Que no falte ningún antecedente y que las fechas cuadren.'),
+        paso('Elegir la causal', 'Socio del área laboral', '24 horas internas', 'Causal decidida y riesgo explicado al cliente', '',
+          'Causal coherente con los hechos\nRiesgo de despido injustificado evaluado\nFueros o protecciones especiales revisados',
+          'Comparar los hechos con cada causal posible y listar los argumentos en contra.', 'La decisión de la causal es siempre del socio.'),
+        paso('Redactar la carta', 'Abogado asociado', '24 horas internas', 'Borrador de carta', 'Plantilla de carta por causal',
+          'Causal y hechos concretos, con fechas\nEstado de las cotizaciones\nMonto de indemnizaciones si corresponde',
+          'Primer borrador de la carta a partir de la cronología y la plantilla (con datos tachados).', 'Cada hecho debe estar respaldado por un documento.'),
+        paso('Entregar y comunicar', 'Cliente, con apoyo del estudio', '3 días hábiles desde la separación (art. 162 del Código del Trabajo)', 'Comprobante de entrega y de la copia a la Inspección', '',
+          'Entrega personal o carta certificada al domicilio del contrato\nCopia a la Inspección del Trabajo en el mismo plazo\nComprobantes guardados en la carpeta del caso',
+          '', ''),
+        paso('Calcular el finiquito y cerrar', 'Abogado asociado', '5 días hábiles internos', 'Finiquito revisado', 'Calculadora de finiquito',
+          'Vacaciones proporcionales\nIndemnizaciones que correspondan\nReserva de derechos si el trabajador la pide',
+          'Revisar el cálculo y explicar cada ítem en lenguaje simple para el cliente.', 'Los montos los confirma el abogado con las liquidaciones.'),
+      ],
+      revision: { ultima: diasAtras(40), cadaMeses: 6 }, historial: [{ f: diasAtras(40), t: 'Revisado y aprobado por el socio del área.' }],
+    },
+    {
+      id: nuevoId(), nombre: 'Investigación de acoso (Ley Karin)', area: 'Ley Karin', dueno: 'Encargada de investigaciones', estado: 'prueba',
+      objetivo: 'Investigar una denuncia de acoso con imparcialidad, confidencialidad y dentro de plazo, dejando todo documentado.',
+      gatillo: 'La empresa cliente recibe una denuncia y encarga la investigación al estudio.',
+      termino: 'Informe final entregado y remitido a quien corresponda, con las medidas propuestas.',
+      documentos: 'Protocolo del cliente · Modelo de acta de declaración · Modelo de informe final',
+      errores: 'Se olvidan las medidas de resguardo al inicio.\nActas sin firma o sin fecha.\nEl informe mezcla opiniones con hechos acreditados.\nDatos de salud de las partes circulando por correo.',
+      pasos: [
+        paso('Recibir la denuncia y abrir el expediente', 'Encargada de investigaciones', 'Mismo día', 'Expediente abierto con acceso restringido', 'Ficha de ingreso',
+          'Denuncia recibida por escrito\nAcceso al expediente solo para el equipo asignado\nConflictos de interés revisados',
+          'Resumir la denuncia y proponer la lista de hechos a investigar.', 'Que el resumen no deje fuera hechos de la denuncia.'),
+        paso('Proponer medidas de resguardo', 'Encargada de investigaciones', 'Plazo legal: MLV lo completa', 'Medidas comunicadas al cliente', '',
+          'Medidas proporcionales a los hechos\nConsideran la situación de la persona denunciante',
+          'Proponer alternativas de medidas según el tipo de hecho denunciado.', 'La decisión es del cliente, asesorado por el estudio.'),
+        paso('Tomar declaraciones', 'Abogado investigador', 'Plazo legal: MLV lo completa', 'Actas firmadas', 'Modelo de acta',
+          'Citación por escrito\nActa firmada por quien declara\nPreguntas preparadas por adelantado',
+          'Preparar las preguntas para cada declaración y ordenar las actas por hecho.', 'Las preguntas no deben inducir respuestas.'),
+        paso('Redactar el informe final', 'Abogado investigador', 'Plazo legal: MLV lo completa', 'Informe final', 'Modelo de informe',
+          'Hechos, pruebas y conclusiones separados\nCada conclusión con su prueba\nMedidas y sanciones propuestas',
+          'Primer borrador del informe a partir de las actas (con datos tachados) y control de que cada conclusión cite su prueba.', 'Las conclusiones las firma el investigador; nunca las decide la IA.'),
+        paso('Entregar, remitir y cerrar', 'Encargada de investigaciones', 'Plazo legal: MLV lo completa', 'Constancia de remisión', '',
+          'Informe entregado al cliente\nRemitido a la autoridad que corresponda\nExpediente cerrado y archivado con acceso restringido',
+          '', ''),
+      ],
+      revision: { ultima: diasAtras(20), cadaMeses: 3 }, historial: [{ f: diasAtras(20), t: 'Pasado a «En prueba» con dos investigaciones.' }],
+    },
+    {
+      id: nuevoId(), nombre: 'Adecuación a la Ley 21.719 de un cliente', area: 'Datos personales', dueno: '', estado: 'borrador',
+      objetivo: 'Dejar al cliente preparado para la nueva ley de datos personales, con un plan priorizado y documentos listos.',
+      gatillo: 'El cliente contrata el servicio de adecuación.',
+      termino: 'Plan cumplido, documentos entregados y personas capacitadas.',
+      documentos: 'Panel de clientes · Matriz normativa · Derechos y consentimientos',
+      errores: 'Se parte por los documentos sin saber qué datos tiene la empresa.\nNadie del cliente queda a cargo después.',
+      pasos: [
+        paso('Diagnóstico', 'Abogado asociado', '2 semanas internas', 'Informe de brechas', 'Cuestionario de diagnóstico',
+          'Entrevista con las áreas que manejan datos\nRiesgos priorizados',
+          'Ordenar las respuestas del cuestionario y detectar brechas frente a la matriz.', 'Que cada brecha cite la exigencia de la ley.'),
+        paso('Inventario de datos', 'Cliente, guiado por el estudio', '3 semanas internas', 'Inventario', 'Planilla de inventario', '', 'Sugerir categorías y finalidades a partir de lo que describe el cliente.', ''),
+        paso('Documentos y procedimientos', 'Abogado asociado', '3 semanas internas', 'Políticas, avisos y procedimientos', 'Plantillas MLV', '', 'Primeros borradores adaptados al inventario.', 'Revisión completa del socio.'),
+        paso('Capacitación y cierre', 'Socio', '1 semana interna', 'Capacitación hecha', '', '', '', ''),
+      ],
+      revision: { ultima: '', cadaMeses: 3 }, historial: [{ f: hoy, t: 'Levantado como borrador.' }],
+    },
+    {
+      id: nuevoId(), nombre: 'Ingreso de un cliente nuevo', area: 'Gestión del estudio', dueno: 'Administración', estado: 'uso',
+      objetivo: 'Que todo cliente nuevo entre igual: sin conflictos de interés, con encargo firmado y con un responsable claro.',
+      gatillo: 'Un cliente acepta la propuesta.',
+      termino: 'Carpeta abierta, responsable asignado y primera reunión agendada.',
+      documentos: 'Carta de encargo · Formulario de conflicto de interés',
+      errores: 'Se empieza a trabajar antes de firmar el encargo.\nNo queda claro quién es el responsable del cliente.',
+      pasos: [
+        paso('Revisar conflictos de interés', 'Administración', 'Antes de aceptar', 'Constancia de revisión', 'Formulario de conflicto', 'Contraparte revisada\nGrupo empresarial revisado', '', ''),
+        paso('Firmar la carta de encargo', 'Socio responsable', '3 días internos', 'Carta firmada', 'Carta de encargo', 'Alcance\nHonorarios\nConfidencialidad y datos', 'Adaptar la carta de encargo al alcance acordado.', 'Honorarios y alcance los fija el socio.'),
+        paso('Abrir carpeta y asignar responsable', 'Administración', 'Mismo día', 'Carpeta y responsable', '', 'Permisos de acceso solo para el equipo', '', ''),
+      ],
+      revision: { ultima: diasAtras(210), cadaMeses: 6 }, historial: [{ f: diasAtras(210), t: 'Aprobado.' }],
+    },
+  ];
+}
+
+// ───────────────────────── datos y guardado ─────────────────────────
+let sinGuardar = false;
+function cargar() {
+  let crudo = null;
+  try { crudo = localStorage.getItem(CLAVE); } catch { sinGuardar = true; return null; }
+  if (!crudo) return null;
+  try { return JSON.parse(crudo); } catch { return null; }
+}
+let datos = cargar() || { version: 1, demo: true, reglas: REGLAS_BASE, procesos: ejemplos() };
+let tGuardar;
+function guardar() {
+  try { localStorage.setItem(CLAVE, JSON.stringify(datos)); sinGuardar = false; } catch { sinGuardar = true; }
+  const g = $('#guardado');
+  g.textContent = sinGuardar ? 'No se pudo guardar en este navegador: descarga un respaldo' : 'Guardado en este computador';
+  g.classList.toggle('mal', sinGuardar);
+}
+function guardarLuego() { clearTimeout(tGuardar); $('#guardado').textContent = 'Guardando…'; tGuardar = setTimeout(guardar, 400); }
+const proceso = (id) => datos.procesos.find((p) => p.id === id);
+function anotar(p, t) { p.historial = p.historial || []; p.historial.unshift({ f: hoyISO(), t }); }
+
+// ───────────────────────── rutas ─────────────────────────
+function ruta() {
+  const r = location.hash.replace(/^#\/?/, '').split('/');
+  if (r[0] === 'p' && r[1]) return { v: 'ficha', id: r[1] };
+  if (r[0] === 'levantar') return { v: 'levantar' };
+  if (r[0] === 'claude') return { v: 'claude' };
+  return { v: 'mapa' };
+}
+function pintar() {
+  const r = ruta();
+  document.querySelectorAll('.vistas a').forEach((a) => {
+    const activo = a.dataset.v === r.v || (r.v === 'ficha' && a.dataset.v === 'mapa');
+    if (activo) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
+  });
+  $('#franja-demo').hidden = !datos.demo;
+  if (r.v === 'ficha') { const p = proceso(r.id); if (!p) { location.hash = '#/'; return; } pintarFicha(p); }
+  else if (r.v === 'levantar') pintarLevantar();
+  else if (r.v === 'claude') pintarClaude();
+  else pintarMapa();
+  window.scrollTo(0, 0);
+}
+
+// ───────────────────────── mapa ─────────────────────────
+function problemas(p) {
+  const out = [];
+  if (!p.dueno?.trim()) out.push('No tiene dueño: nadie responde por mantenerlo al día.');
+  if (!p.revision?.ultima) out.push('Nunca se ha revisado.');
+  else if (revisionVencida(p)) out.push(`Su revisión venció el ${fecha(proximaRevision(p))}.`);
+  const sinQuien = (p.pasos || []).filter((s) => !s.quien?.trim()).length;
+  if (sinQuien) out.push(`${sinQuien} paso${sinQuien > 1 ? 's' : ''} sin responsable.`);
+  if (!(p.pasos || []).length) out.push('Todavía no tiene pasos.');
+  return out;
+}
+function pintarMapa() {
+  const ps = datos.procesos;
+  const enUso = ps.filter((p) => p.estado === 'uso').length;
+  const sinDueno = ps.filter((p) => !p.dueno?.trim()).length;
+  const vencidas = ps.filter(revisionVencida).length;
+  const pasos = ps.flatMap((p) => p.pasos || []);
+  const conIA = pasos.filter((s) => s.claude?.puede?.trim()).length;
+  const conAlerta = ps.map((p) => ({ p, m: problemas(p) })).filter((x) => x.m.length);
+
+  const porArea = AREAS.map((a) => ({ a, ps: ps.filter((p) => (p.area || 'Otra') === a) })).filter((x) => x.ps.length);
+  const tarjeta = (p) => {
+    const e = ESTADOS[p.estado] || ESTADOS.borrador;
+    const prox = proximaRevision(p);
+    return `<a class="tarjeta" href="#/p/${p.id}">
+      <b>${esc(p.nombre || 'Proceso sin nombre')}</b>
+      <span class="fila-t"><span class="chip ${e.c}">${e.t}</span><span class="mini" style="margin:0">${(p.pasos || []).length} pasos</span></span>
+      <span class="mini">Dueño: ${p.dueno?.trim() ? esc(p.dueno) : '<span class="rojo">sin dueño</span>'}</span>
+      <span class="mini ${revisionVencida(p) ? 'rojo' : ''}">Revisión: ${prox ? (revisionVencida(p) ? 'vencida el ' : 'próxima el ') + fecha(prox) : 'pendiente'}</span>
+    </a>`;
+  };
+
+  $('#vista').innerHTML = `
+    <section class="resumen" aria-label="Resumen">
+      <div class="kpi"><div class="eti">Procesos levantados</div><div class="num">${ps.length}</div><div class="det">${pasos.length} pasos en total</div></div>
+      <div class="kpi"><div class="eti">En uso</div><div class="num">${enUso}</div><div class="det">${ps.filter((p) => p.estado === 'prueba').length} en prueba · ${ps.filter((p) => p.estado === 'borrador').length} borradores</div></div>
+      <div class="kpi"><div class="eti">Sin dueño</div><div class="num ${sinDueno ? 'rojo' : ''}">${sinDueno}</div><div class="det">Nadie los mantiene</div></div>
+      <div class="kpi"><div class="eti">Revisión pendiente</div><div class="num ${vencidas ? 'ambar' : ''}">${vencidas}</div><div class="det">Vencida o nunca hecha</div></div>
+      <div class="kpi"><div class="eti">Pasos con apoyo de Claude</div><div class="num">${conIA}<small> / ${pasos.length}</small></div><div class="det">Con su revisión humana definida</div></div>
+    </section>
+    <div class="dos">
+      <div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px">
+          <a class="btn primario" href="#/levantar">Levantar un proceso con preguntas</a>
+          <button class="btn" id="btn-blanco">Proceso en blanco</button>
+        </div>
+        ${porArea.map((x) => `<section class="area"><h2>${esc(x.a)} <span>${x.ps.length}</span></h2><div class="tarjetas">${x.ps.map(tarjeta).join('')}</div></section>`).join('') || '<p class="nota">Todavía no hay procesos. Empieza por «Levantar un proceso con preguntas».</p>'}
+      </div>
+      <aside>
+        <div class="caja">
+          <h3>Para que no se muera</h3>
+          <p class="nota">Un sistema se abandona cuando nadie responde por él o cuando deja de calzar con la realidad. Esto es lo que hay que atender:</p>
+          ${conAlerta.length ? `<ul class="alertas">${conAlerta.map((x) => `<li><a href="#/p/${x.p.id}">${esc(x.p.nombre)}</a>${x.m.map((m) => `<span class="por">${esc(m)}</span>`).join('')}</li>`).join('')}</ul>` : '<p class="ok">Todo al día.</p>'}
+        </div>
+        <div class="caja">
+          <h3>El ciclo</h3>
+          <ol class="ciclo">
+            <li><b>Levantar</b> el proceso con quien lo hace todos los días.</li>
+            <li><b>Asignar un dueño</b> y probarlo con casos reales.</li>
+            <li><b>Pasarlo a «En uso»</b>: es la forma oficial del estudio.</li>
+            <li><b>Llevarlo a Claude</b>, con lo que Claude hace y lo que revisa el abogado.</li>
+            <li><b>Revisarlo</b> cada pocos meses o cuando cambie la ley.</li>
+          </ol>
+        </div>
+      </aside>
+    </div>`;
+  $('#btn-blanco').onclick = () => {
+    const p = { id: nuevoId(), nombre: 'Proceso nuevo', area: 'Laboral', dueno: '', estado: 'borrador', objetivo: '', gatillo: '', termino: '', documentos: '', errores: '',
+      pasos: [paso('', '', '', '', '', '', '', '')], revision: { ultima: '', cadaMeses: 6 }, historial: [] };
+    anotar(p, 'Creado en blanco.');
+    datos.procesos.push(p); guardar(); location.hash = `#/p/${p.id}`;
+  };
+}
+
+// ───────────────────────── ficha ─────────────────────────
+function campo(etiqueta, ruta, valor, tipo = 'input', extra = '') {
+  const ctrl = tipo === 'textarea'
+    ? `<textarea data-c="${ruta}" ${extra}>${esc(valor)}</textarea>`
+    : `<input data-c="${ruta}" value="${esc(valor)}" ${extra}>`;
+  return `<label class="campo"><span>${etiqueta}</span>${ctrl}</label>`;
+}
+function resumenPaso(s) {
+  const partes = [s.quien, s.plazo].filter((x) => x?.trim());
+  return partes.length ? esc(partes.join(' · ')) : 'Falta responsable y plazo';
+}
+function pintarPaso(s, i, total) {
+  return `<details class="paso" data-i="${i}" ${s._abierto ? 'open' : ''}>
+    <summary><span class="n">${i + 1}</span><span class="t">${esc(s.titulo || 'Paso sin nombre')}<small>${resumenPaso(s)}</small></span>${s.claude?.puede?.trim() ? '<span class="ia">Claude</span>' : ''}</summary>
+    <div class="cuerpo">
+      ${campo('Qué se hace', `p.${i}.titulo`, s.titulo, 'input', 'placeholder="Ej.: Redactar la carta"')}
+      <div class="rejilla">
+        ${campo('Quién', `p.${i}.quien`, s.quien, 'input', 'placeholder="Un cargo, no un nombre"')}
+        ${campo('Plazo', `p.${i}.plazo`, s.plazo, 'input', 'placeholder="Legal o interno"')}
+        ${campo('Qué entrega', `p.${i}.entregable`, s.entregable)}
+        ${campo('Plantilla o documento', `p.${i}.plantilla`, s.plantilla)}
+      </div>
+      ${campo('Lista de control <small>(una por línea)</small>', `p.${i}.checklist`, s.checklist, 'textarea')}
+      <div class="claude-par">
+        ${campo('En qué puede ayudar Claude', `p.${i}.claude.puede`, s.claude?.puede, 'textarea', 'placeholder="Vacío si este paso no lleva IA"')}
+        ${campo('Qué revisa siempre el abogado', `p.${i}.claude.revisa`, s.claude?.revisa, 'textarea')}
+      </div>
+      <div class="mover">
+        <button class="btn chico" data-acc="subir" data-i="${i}" ${i === 0 ? 'disabled' : ''}>↑ Subir</button>
+        <button class="btn chico" data-acc="bajar" data-i="${i}" ${i === total - 1 ? 'disabled' : ''}>↓ Bajar</button>
+        <button class="btn chico peligro" data-acc="quitar" data-i="${i}">Quitar paso</button>
+      </div>
+    </div>
+  </details>`;
+}
+function pintarFicha(p) {
+  const prox = proximaRevision(p);
+  $('#vista').innerHTML = `
+    <p class="miga"><a href="#/">← Mapa de procesos</a></p>
+    <input class="titulo-ficha" data-c="nombre" value="${esc(p.nombre)}" aria-label="Nombre del proceso">
+    <div class="ficha-acc">
+      <button class="btn primario" data-acc="claude">Instrucciones para Claude</button>
+      <button class="btn" data-acc="imprimir">Imprimir ficha</button>
+      <button class="btn" data-acc="duplicar">Duplicar</button>
+      <button class="btn peligro" data-acc="borrar">Eliminar</button>
+    </div>
+    <div class="caja">
+      <div class="rejilla">
+        <label class="campo"><span>Área</span><select data-c="area">${AREAS.map((a) => `<option ${a === p.area ? 'selected' : ''}>${a}</option>`).join('')}</select></label>
+        ${campo('Dueño del proceso', 'dueno', p.dueno, 'input', 'placeholder="Quién lo mantiene al día"')}
+        <label class="campo"><span>Estado</span><select data-c="estado">${Object.entries(ESTADOS).map(([k, e]) => `<option value="${k}" ${k === p.estado ? 'selected' : ''}>${e.t}</option>`).join('')}</select></label>
+        <label class="campo"><span>Revisar cada</span><select data-c="revision.cadaMeses">${[3, 6, 12].map((m) => `<option value="${m}" ${Number(p.revision?.cadaMeses) === m ? 'selected' : ''}>${m} meses</option>`).join('')}</select></label>
+      </div>
+      <p class="nota" id="estado-nota" style="margin-bottom:0">${esc((ESTADOS[p.estado] || ESTADOS.borrador).d)} Última revisión: <b>${fecha(p.revision?.ultima)}</b>${prox ? ` · próxima: <b class="${revisionVencida(p) ? 'vencida' : ''}">${fecha(prox)}</b>` : ''}. <button class="btn chico" data-acc="revisado">Marcar revisado hoy</button></p>
+    </div>
+    <div class="caja">
+      <h3>De qué se trata</h3>
+      <div class="rejilla tres">
+        ${campo('Para qué sirve', 'objetivo', p.objetivo, 'textarea')}
+        ${campo('Empieza cuando…', 'gatillo', p.gatillo, 'textarea')}
+        ${campo('Está terminado cuando…', 'termino', p.termino, 'textarea')}
+      </div>
+    </div>
+    <div class="caja">
+      <h3>Pasos</h3>
+      <p class="nota">Cada paso dice quién lo hace, en qué plazo y qué entrega. En azul, lo que puede hacer Claude y lo que revisa siempre una persona.</p>
+      <div id="pasos">${(p.pasos || []).map((s, i) => pintarPaso(s, i, p.pasos.length)).join('')}</div>
+      <button class="btn" data-acc="agregar">+ Agregar paso</button>
+    </div>
+    <div class="caja">
+      <div class="rejilla" style="grid-template-columns:1fr 1fr">
+        ${campo('Documentos y plantillas que se usan', 'documentos', p.documentos, 'textarea')}
+        ${campo('Lo que suele salir mal <small>(uno por línea)</small>', 'errores', p.errores, 'textarea')}
+      </div>
+    </div>
+    <div class="caja">
+      <h3>Historial</h3>
+      ${(p.historial || []).length ? `<ul class="historial">${p.historial.map((h) => `<li><time>${fecha(h.f)}</time>${esc(h.t)}</li>`).join('')}</ul>` : '<p class="nota">Sin cambios registrados.</p>'}
+    </div>`;
+
+  const v = $('#vista');
+  v.oninput = (e) => {
+    const c = e.target.dataset.c; if (!c) return;
+    asignar(p, c, e.target.value);
+    if (c.endsWith('.titulo') || c.endsWith('.quien') || c.endsWith('.plazo') || c.endsWith('.claude.puede')) refrescarResumen(p, c);
+    guardarLuego();
+  };
+  v.onchange = (e) => {
+    const c = e.target.dataset.c;
+    if (c === 'estado') { anotar(p, `Pasa a «${ESTADOS[p.estado].t}».`); guardar(); pintarFicha(p); }
+    else if (c === 'revision.cadaMeses' || c === 'area') { guardar(); pintarFicha(p); }
+    else if (c === 'dueno' && p.dueno.trim()) { anotar(p, `Dueño: ${p.dueno.trim()}.`); guardar(); }
+  };
+  v.ontoggle = null;
+  v.querySelectorAll('details.paso').forEach((d) => d.addEventListener('toggle', () => { p.pasos[d.dataset.i]._abierto = d.open; }));
+  v.onclick = (e) => {
+    const b = e.target.closest('[data-acc]'); if (!b) return;
+    const i = Number(b.dataset.i);
+    const acc = b.dataset.acc;
+    if (acc === 'agregar') { p.pasos.forEach((s) => { s._abierto = false; }); const s = paso('', '', '', '', '', '', '', ''); s._abierto = true; p.pasos.push(s); guardar(); pintarFicha(p); }
+    else if (acc === 'subir' && i > 0) { [p.pasos[i - 1], p.pasos[i]] = [p.pasos[i], p.pasos[i - 1]]; guardar(); pintarFicha(p); }
+    else if (acc === 'bajar' && i < p.pasos.length - 1) { [p.pasos[i + 1], p.pasos[i]] = [p.pasos[i], p.pasos[i + 1]]; guardar(); pintarFicha(p); }
+    else if (acc === 'quitar') { if (confirm(`¿Quitar el paso ${i + 1}?`)) { p.pasos.splice(i, 1); guardar(); pintarFicha(p); } }
+    else if (acc === 'revisado') { p.revision = p.revision || { cadaMeses: 6 }; p.revision.ultima = hoyISO(); anotar(p, 'Revisado: sigue calzando con cómo se trabaja.'); guardar(); pintarFicha(p); avisar('Revisión registrada'); }
+    else if (acc === 'claude') abrirDialogo(`Instrucciones para Claude · ${p.nombre}`, 'Pégalas en las instrucciones de un proyecto de Claude del área y adjunta las plantillas que se mencionan.', textoClaude(p), `instrucciones-${slug(p.nombre)}.md`);
+    else if (acc === 'imprimir') imprimir(p);
+    else if (acc === 'duplicar') { const c = JSON.parse(JSON.stringify(p)); c.id = nuevoId(); c.nombre += ' (copia)'; c.estado = 'borrador'; c.historial = []; anotar(c, `Copiado de «${p.nombre}».`); datos.procesos.push(c); guardar(); location.hash = `#/p/${c.id}`; }
+    else if (acc === 'borrar') { if (confirm(`¿Eliminar «${p.nombre}»? No se puede deshacer (salvo con un respaldo).`)) { datos.procesos = datos.procesos.filter((x) => x !== p); guardar(); location.hash = '#/'; } }
+  };
+}
+function asignar(p, ruta, valor) {
+  const r = ruta.split('.');
+  let o = p;
+  if (r[0] === 'p') { o = p.pasos[Number(r[1])]; r.splice(0, 2); }
+  while (r.length > 1) { const k = r.shift(); o[k] = o[k] || {}; o = o[k]; }
+  o[r[0]] = valor;
+}
+function refrescarResumen(p, c) {
+  const i = Number(c.split('.')[1]);
+  const d = document.querySelector(`details.paso[data-i="${i}"]`); if (!d) return;
+  const s = p.pasos[i];
+  d.querySelector('.t').innerHTML = `${esc(s.titulo || 'Paso sin nombre')}<small>${resumenPaso(s)}</small>`;
+  const ia = d.querySelector('.ia');
+  if (s.claude?.puede?.trim() && !ia) d.querySelector('summary').insertAdjacentHTML('beforeend', '<span class="ia">Claude</span>');
+  if (!s.claude?.puede?.trim() && ia) ia.remove();
+}
+const slug = (t) => String(t || 'proceso').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 50);
+
+// ───────────────────────── Claude ─────────────────────────
+function textoClaude(p, conReglas = true) {
+  const L = [];
+  L.push(`# ${p.nombre} · MLV Abogados`, '');
+  L.push(`Eres el asistente del equipo de ${p.area || 'MLV'} de MLV Abogados para este proceso. Tu trabajo es apoyar a los abogados en los pasos indicados abajo, nunca reemplazar su criterio.`, '');
+  if (p.objetivo) L.push(`**Para qué sirve:** ${p.objetivo}`);
+  if (p.gatillo) L.push(`**Empieza cuando:** ${p.gatillo}`);
+  if (p.termino) L.push(`**Está terminado cuando:** ${p.termino}`);
+  if (p.dueno) L.push(`**Dueño del proceso:** ${p.dueno} (a quien se consultan las dudas sobre cómo se hace).`);
+  L.push('', '## Pasos', '');
+  (p.pasos || []).forEach((s, i) => {
+    L.push(`### ${i + 1}. ${s.titulo || 'Paso sin nombre'}`);
+    const meta = [s.quien && `Responsable: ${s.quien}`, s.plazo && `Plazo: ${s.plazo}`, s.entregable && `Entrega: ${s.entregable}`, s.plantilla && `Plantilla: ${s.plantilla}`].filter(Boolean);
+    if (meta.length) L.push(meta.join(' · '));
+    const ch = lineas(s.checklist);
+    if (ch.length) { L.push('Lista de control:'); ch.forEach((x) => L.push(`- [ ] ${x}`)); }
+    if (s.claude?.puede?.trim()) {
+      L.push(`**Tu tarea en este paso:** ${s.claude.puede.trim()}`);
+      if (s.claude.revisa?.trim()) L.push(`**Lo revisa siempre el abogado:** ${s.claude.revisa.trim()}`);
+    } else L.push('_Este paso lo hacen personas; no intervengas salvo que te lo pidan._');
+    L.push('');
+  });
+  const err = lineas(p.errores);
+  if (err.length) { L.push('## Errores frecuentes que debes ayudar a evitar', ''); err.forEach((x) => L.push(`- ${x}`)); L.push(''); }
+  if (p.documentos) L.push('## Documentos de referencia', '', p.documentos, '');
+  if (conReglas) { L.push('## Reglas del estudio', ''); lineas(datos.reglas).forEach((x) => L.push(`- ${x}`)); L.push(''); }
+  L.push(`_Versión del ${fecha(p.revision?.ultima || hoyISO())}. Estado: ${(ESTADOS[p.estado] || ESTADOS.borrador).t}._`);
+  return L.join('\n');
+}
+function pintarClaude() {
+  const listos = datos.procesos.filter((p) => p.estado !== 'borrador');
+  $('#vista').innerHTML = `
+    <div class="dos">
+      <div>
+        <div class="caja">
+          <h3>Cómo pasa un proceso a Claude</h3>
+          <ol class="ciclo">
+            <li><b>Un proyecto de Claude por área</b> (Laboral, Ley Karin, Datos…), compartido por el equipo del área. Así todos parten de la misma base y no cada uno a su manera.</li>
+            <li><b>Las instrucciones del proyecto</b> son las que genera esta página para cada proceso («Instrucciones para Claude» en la ficha): los pasos, qué hace Claude, qué revisa siempre el abogado y las reglas del estudio.</li>
+            <li><b>Los documentos del proyecto</b> son las plantillas y modelos que el proceso menciona. Nunca expedientes de clientes sin tachar.</li>
+            <li><b>Cuando el proceso cambia</b>, se edita aquí, se marca revisado y se vuelve a copiar en Claude. El proceso manda; Claude lo sigue.</li>
+          </ol>
+          <p class="nota">Antes de usarlo con documentos de clientes: confirmar las condiciones del plan de Claude para empresas (privacidad y uso de los datos) y que esté de acuerdo con la política de uso de IA del estudio.</p>
+        </div>
+        <div class="caja">
+          <h3>Reglas del estudio para usar IA</h3>
+          <p class="nota">Van al final de las instrucciones de cada proceso. Una por línea. Son el borrador de la política de uso de IA de MLV.</p>
+          <textarea id="reglas" style="min-height:170px">${esc(datos.reglas)}</textarea>
+          <div style="margin-top:8px"><button class="btn chico" id="reglas-base">Volver a las reglas sugeridas</button></div>
+        </div>
+      </div>
+      <aside>
+        <div class="caja">
+          <h3>Manual completo</h3>
+          <p class="nota">Todos los procesos en prueba y en uso (${listos.length}) en un solo texto, con las reglas al final. Sirve como manual del estudio o como instrucciones de un proyecto general.</p>
+          <button class="btn primario" id="manual" ${listos.length ? '' : 'disabled'}>Ver el manual</button>
+        </div>
+        <div class="caja">
+          <h3>Por proceso</h3>
+          <ul class="alertas">${datos.procesos.map((p) => `<li><a href="#/p/${p.id}">${esc(p.nombre)}</a><span class="por"><span class="chip ${(ESTADOS[p.estado] || ESTADOS.borrador).c}">${(ESTADOS[p.estado] || ESTADOS.borrador).t}</span> · ${(p.pasos || []).filter((s) => s.claude?.puede?.trim()).length} pasos con Claude</span></li>`).join('')}</ul>
+        </div>
+      </aside>
+    </div>`;
+  $('#reglas').oninput = (e) => { datos.reglas = e.target.value; guardarLuego(); };
+  $('#reglas-base').onclick = () => { datos.reglas = REGLAS_BASE; guardar(); pintarClaude(); };
+  $('#manual').onclick = () => {
+    const t = ['# Manual de trabajo · MLV Abogados', '', `Generado el ${fecha(hoyISO())}. Procesos en prueba y en uso.`, '',
+      ...listos.map((p) => textoClaude(p, false).replace(/^# /, '## ').replace(/\n## /g, '\n### ').replace(/\n### (\d)/g, '\n#### $1') + '\n\n---\n'),
+      '## Reglas del estudio para usar IA', '', ...lineas(datos.reglas).map((x) => `- ${x}`)].join('\n');
+    abrirDialogo('Manual de trabajo del estudio', 'Texto completo para revisar, imprimir o cargar en Claude.', t, `manual-mlv-${hoyISO()}.md`);
+  };
+}
+
+// ───────────────────────── levantar con preguntas ─────────────────────────
+const PREGUNTAS = [
+  { k: 'nombre', q: '¿Qué trabajo vamos a ordenar?', a: 'Un trabajo que el estudio hace seguido. Ej.: «Contestar una demanda laboral», «Revisar un contrato de trabajo».', t: 'input' },
+  { k: 'area', q: '¿De qué área es?', a: '', t: 'select' },
+  { k: 'objetivo', q: '¿Para qué sirve? ¿Qué gana el cliente cuando sale bien?', a: 'Una o dos frases.' },
+  { k: 'gatillo', q: '¿Qué lo pone en marcha?', a: 'El hecho que hace que alguien del estudio empiece. Ej.: «El cliente reenvía la notificación de la demanda».' },
+  { k: 'termino', q: '¿Cuándo está terminado?', a: 'Lo que tiene que existir para decir «listo».' },
+  { k: 'pasos', q: 'Cuéntame los pasos, en orden.', a: 'Uno por línea, tal como se hace hoy (no como debería hacerse). Después se agrega quién, plazo y qué entrega cada uno.' },
+  { k: 'documentos', q: '¿Qué documentos o plantillas usan?', a: 'Modelos, planillas, formularios, correos tipo.' },
+  { k: 'errores', q: '¿Qué sale mal o se olvida con más frecuencia?', a: 'Uno por línea. Es la pregunta más valiosa: ahí está lo que el sistema tiene que evitar.' },
+  { k: 'ia', q: '¿En qué paso se pierde más tiempo escribiendo, leyendo o revisando?', a: 'Ahí es donde Claude suele ayudar más. Puede quedar en blanco.' },
+  { k: 'dueno', q: '¿Quién debería responder por que este proceso esté al día?', a: 'Un cargo. Si nadie, el sistema lo va a marcar en rojo.', t: 'input' },
+];
+let borrador = null;
+function pintarLevantar() {
+  if (!borrador) borrador = { i: 0, r: { area: 'Laboral' } };
+  const { i, r } = borrador;
+  const P = PREGUNTAS[i];
+  const valor = r[P.k] || '';
+  const ctrl = P.t === 'select'
+    ? `<select id="resp">${AREAS.map((a) => `<option ${a === valor ? 'selected' : ''}>${a}</option>`).join('')}</select>`
+    : P.t === 'input' ? `<input id="resp" value="${esc(valor)}">` : `<textarea id="resp">${esc(valor)}</textarea>`;
+  $('#vista').innerHTML = `
+    <div class="entrevista">
+      <p class="nota" style="margin-top:0">Pregunta ${i + 1} de ${PREGUNTAS.length}</p>
+      <div class="progreso"><i style="width:${((i + 1) / PREGUNTAS.length) * 100}%"></i></div>
+      <h2 class="pregunta">${P.q}</h2>
+      <p class="ayuda">${P.a}</p>
+      ${ctrl}
+      <div class="nav-e">
+        <button class="btn" id="atras" ${i === 0 ? 'disabled' : ''}>← Atrás</button>
+        ${i < PREGUNTAS.length - 1 ? '<button class="btn primario" id="sig">Siguiente →</button>' : '<button class="btn primario" id="crear">Crear el proceso</button>'}
+      </div>
+      <p class="consejo"><b>Consejo para la reunión:</b> pregúntale a quien hace este trabajo todos los días, no solo a quien lo supervisa. Anota lo que se hace de verdad, aunque no sea lo ideal: el proceso se mejora después.</p>
+    </div>`;
+  const resp = $('#resp'); resp.focus();
+  const tomar = () => { r[P.k] = resp.value; };
+  resp.oninput = tomar;
+  if (P.t === 'input') resp.onkeydown = (e) => { if (e.key === 'Enter') { e.preventDefault(); ($('#sig') || $('#crear')).click(); } };
+  $('#atras').onclick = () => { tomar(); borrador.i--; pintarLevantar(); };
+  if ($('#sig')) $('#sig').onclick = () => { tomar(); borrador.i++; pintarLevantar(); };
+  if ($('#crear')) $('#crear').onclick = () => {
+    tomar();
+    const titulos = lineas(r.pasos);
+    const p = {
+      id: nuevoId(), nombre: r.nombre?.trim() || 'Proceso sin nombre', area: r.area || 'Otra', dueno: r.dueno?.trim() || '', estado: 'borrador',
+      objetivo: r.objetivo || '', gatillo: r.gatillo || '', termino: r.termino || '', documentos: r.documentos || '', errores: r.errores || '',
+      pasos: (titulos.length ? titulos : ['']).map((t) => paso(t.replace(/^\d+[.)-]\s*/, ''), '', '', '', '', '', '', '')),
+      revision: { ultima: '', cadaMeses: 6 }, historial: [],
+    };
+    if (r.ia?.trim()) p.notaIA = r.ia.trim();
+    if (p.notaIA && p.pasos[0]) p.pasos[0]._abierto = true;
+    anotar(p, 'Levantado con preguntas.' + (p.notaIA ? ` Donde se pierde tiempo: ${p.notaIA}` : ''));
+    datos.procesos.push(p); borrador = null; guardar();
+    location.hash = `#/p/${p.id}`;
+    avisar('Proceso creado: completa quién, plazo y qué entrega cada paso');
+  };
+}
+
+// ───────────────────────── diálogo, impresión, respaldo ─────────────────────────
+let dlgArchivo = '';
+function abrirDialogo(titulo, nota, texto, archivo) {
+  $('#dlg-titulo').textContent = titulo; $('#dlg-nota').textContent = nota; $('#dlg-texto').value = texto; dlgArchivo = archivo;
+  $('#dlg').showModal(); $('#dlg-texto').scrollTop = 0;
+}
+$('#dlg-cerrar').onclick = () => $('#dlg').close();
+$('#dlg-copiar').onclick = async () => {
+  const t = $('#dlg-texto');
+  try { await navigator.clipboard.writeText(t.value); } catch { t.select(); document.execCommand('copy'); }
+  avisar('Copiado');
+};
+$('#dlg-descargar').onclick = () => descargar($('#dlg-texto').value, dlgArchivo, 'text/markdown');
+function descargar(texto, nombre, tipo) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([texto], { type: tipo }));
+  a.download = nombre; document.body.append(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+function imprimir(p) {
+  const e = ESTADOS[p.estado] || ESTADOS.borrador;
+  $('#impresion').innerHTML = `
+    <h1>${esc(p.nombre)}</h1>
+    <p class="meta">MLV Abogados · ${esc(p.area)} · Dueño: ${esc(p.dueno || 'sin asignar')} · ${e.t} · Revisado: ${fecha(p.revision?.ultima)}</p>
+    ${p.objetivo ? `<p><b>Para qué sirve.</b> ${esc(p.objetivo)}</p>` : ''}
+    ${p.gatillo ? `<p><b>Empieza cuando</b> ${esc(p.gatillo)}</p>` : ''}
+    ${p.termino ? `<p><b>Está terminado cuando</b> ${esc(p.termino)}</p>` : ''}
+    <h2>Pasos</h2>
+    ${(p.pasos || []).map((s, i) => `<div class="p"><h3>${i + 1}. ${esc(s.titulo || 'Paso sin nombre')}</h3>
+      <div>${[s.quien && `<b>Quién:</b> ${esc(s.quien)}`, s.plazo && `<b>Plazo:</b> ${esc(s.plazo)}`, s.entregable && `<b>Entrega:</b> ${esc(s.entregable)}`, s.plantilla && `<b>Plantilla:</b> ${esc(s.plantilla)}`].filter(Boolean).join(' · ')}</div>
+      ${lineas(s.checklist).length ? `<ul>${lineas(s.checklist).map((x) => `<li>☐ ${esc(x)}</li>`).join('')}</ul>` : ''}
+      ${s.claude?.puede?.trim() ? `<div><b>Claude:</b> ${esc(s.claude.puede)}${s.claude.revisa?.trim() ? ` <b>Revisa el abogado:</b> ${esc(s.claude.revisa)}` : ''}</div>` : ''}
+    </div>`).join('')}
+    ${lineas(p.errores).length ? `<h2>Lo que suele salir mal</h2><ul>${lineas(p.errores).map((x) => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}
+    ${p.documentos ? `<h2>Documentos y plantillas</h2><p>${esc(p.documentos)}</p>` : ''}
+    <p class="pie-i">Impreso el ${fecha(hoyISO())}.</p>`;
+  window.print();
+}
+$('#btn-respaldo').onclick = () => {
+  const limpio = JSON.parse(JSON.stringify(datos, (k, v) => (k === '_abierto' ? undefined : v)));
+  descargar(JSON.stringify(limpio, null, 2), `respaldo-sistema-trabajo-${hoyISO().replaceAll('-', '')}.json`, 'application/json');
+};
+$('#btn-importar').onclick = () => $('#archivo').click();
+$('#archivo').onchange = async (e) => {
+  const f = e.target.files[0]; e.target.value = ''; if (!f) return;
+  try {
+    const d = JSON.parse(await f.text());
+    if (!Array.isArray(d.procesos)) throw new Error();
+    if (!confirm(`Cargar ${d.procesos.length} procesos de «${f.name}»? Reemplaza lo que hay en este navegador.`)) return;
+    datos = { version: 1, demo: false, reglas: d.reglas || REGLAS_BASE, procesos: d.procesos };
+    guardar(); location.hash = '#/'; pintar(); avisar('Respaldo cargado');
+  } catch { alert('Ese archivo no es un respaldo de esta herramienta.'); }
+};
+
+$('#sin-ejemplos').onclick = () => {
+  if (!confirm('¿Borrar los procesos de ejemplo y empezar con el mapa vacío? Las reglas del estudio se mantienen.')) return;
+  datos.procesos = []; datos.demo = false; guardar(); location.hash = '#/'; pintar();
+};
+window.addEventListener('hashchange', pintar);
+guardar();
+pintar();
+</script>
+</body>
+</html>
