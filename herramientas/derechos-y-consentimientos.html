@@ -421,7 +421,8 @@ const PLAZO = 30, PRORROGA = 30, BLOQUEO_HABILES = 2, RECLAMO_HABILES = 30;   //
 
 const TITULARES = { trabajadores: 'Trabajadores', postulantes: 'Postulantes', clientes: 'Clientes', visitas: 'Visitas y público', proveedores: 'Proveedores', otros: 'Otros' };
 
-/* Las seis bases: el consentimiento (art. 12) y las otras cinco fuentes de licitud (art. 13). */
+/* Bases de licitud: el consentimiento (art. 12), las cinco fuentes del art. 13 y las causales de los arts. 16 y 16 bis,
+   que la propia ley extiende a los datos que no son sensibles (último inciso de ambos artículos). */
 const BASES = {
   consentimiento: { nombre: 'Consentimiento', art: 'art. 12', detalle: 'Versión del texto que se muestra al titular' },
   ley: { nombre: 'Obligación legal', art: 'art. 13 b', detalle: 'Qué ley obliga o autoriza' },
@@ -429,6 +430,7 @@ const BASES = {
   interes: { nombre: 'Interés legítimo', art: 'art. 13 d', detalle: 'Ponderación: qué interés y por qué no afecta los derechos del titular' },
   defensa: { nombre: 'Defensa ante tribunales u órganos públicos', art: 'art. 13 e', detalle: 'Qué derecho o reclamación' },
   economicos: { nombre: 'Datos económicos o comerciales (Título III)', art: 'art. 13 a', detalle: 'Qué obligación económica' },
+  causal16: { nombre: 'Otra causal de los arts. 16 y 16 bis', art: 'arts. 16 y 16 bis', detalle: 'Cuál: interés vital, ámbito laboral o de seguridad social conforme a la ley, mandato legal…' },
 };
 
 const TIPOS = {
@@ -587,6 +589,8 @@ function normalizarSol(s) {
     escalar: !!s.escalar,
     decision: s.decision in DECISIONES ? s.decision : '', fundamento: txt(s.fundamento, 2000), terceros: !!s.terceros,
     respuesta: esFecha(r.fecha) ? { fecha: r.fecha, medio: r.medio in MEDIOS_ENVIO ? r.medio : 'correo', texto: txt(r.texto, 12000) } : null,
+    // Respuestas ya enviadas antes de reabrir: son prueba de lo respondido (art. 11) y no se borran.
+    envios: (Array.isArray(s.envios) ? s.envios : []).filter((e) => e && esFecha(e.fecha)).map((e) => ({ fecha: e.fecha, medio: e.medio in MEDIOS_ENVIO ? e.medio : 'correo', texto: txt(e.texto, 12000) })),
   };
 }
 
@@ -647,11 +651,11 @@ function estadoSol(s) {
 /** Lo que conviene revisar en cada uso de datos. Nivel: rojo, ambar o info (info no cuenta como alerta). */
 function alertasUso(u) {
   const a = [];
-  if (!u.base) a.push(['rojo', '<b>Sin base legal.</b> Ningún uso de datos es lícito sin una de las seis bases de los arts. 12 y 13.']);
+  if (!u.base) a.push(['rojo', '<b>Sin base legal.</b> Ningún uso de datos es lícito sin una base: el consentimiento (art. 12), las del art. 13 o las causales de los arts. 16 y 16 bis, que la ley extiende a los datos comunes.']);
   if (u.base === 'consentimiento' && (u.titulares === 'trabajadores' || u.titulares === 'postulantes'))
     a.push(['ambar', '<b>Consentimiento de trabajadores.</b> Si se pide dentro del contrato para algo que no es necesario, la ley presume que no fue libre (art. 12). Revisa si la base correcta es el contrato o una obligación legal, o si este uso sobra.']);
   if (u.sensibles && u.base === 'consentimiento') a.push(['ambar', '<b>Datos sensibles:</b> el consentimiento tiene que ser expreso, por escrito, verbal o por un medio tecnológico equivalente (art. 16).']);
-  if (u.sensibles && u.base && u.base !== 'consentimiento') a.push(['info', 'Datos sensibles sin consentimiento: solo en los casos del art. 16 (y del art. 16 bis si son de salud). Verifica que este calce en uno.']);
+  if (u.sensibles && u.base && u.base !== 'consentimiento') a.push(['info', 'Datos sensibles sin consentimiento: solo en los casos del art. 16. Si son de salud, los del art. 16 bis. Si son biométricos, solo los del inciso segundo del art. 16 bis, y siempre informando antes el sistema, la finalidad, el período y cómo ejercer derechos (art. 16 ter). Verifica que este calce en uno.']);
   if (u.base === 'interes') {
     if (!u.baseDetalle) a.push(['ambar', '<b>Interés legítimo sin ponderación.</b> Hay que poder explicar qué interés es y por qué no pasa a llevar los derechos del titular; el titular puede exigir que se le informe (art. 13 d).']);
     a.push(['info', 'El titular puede oponerse a este uso en cualquier momento (art. 8 a).']);
@@ -752,7 +756,7 @@ function htmlInicio() {
     <div>
       <div class="caja"><h2>Cómo funciona</h2>
         <ol style="margin:0;padding-left:20px;font-size:14px;color:var(--tinta2);display:grid;gap:8px">
-          <li><b>Usos de datos.</b> Cada uso con su base legal. El consentimiento es solo una de seis bases; para los trabajadores casi nunca es la correcta.</li>
+          <li><b>Usos de datos.</b> Cada uso con su base legal. El consentimiento es solo una de las bases legales; para los trabajadores casi nunca es la correcta.</li>
           <li><b>Solicitudes.</b> El titular pide acceso, rectificación, supresión, oposición o portabilidad. Hay 30 días corridos para responder (prorrogables una vez) y 2 días hábiles si pide bloqueo temporal.</li>
           <li><b>Consentimientos.</b> Cuando la base es el consentimiento: quién, cuándo, cómo y con qué texto. Y su revocación.</li>
           <li><b>Historial.</b> Cada paso queda anotado con una huella que delata cualquier alteración posterior.</li>
@@ -902,7 +906,7 @@ function htmlSolicitud(s) {
     <p class="nota"><a href="#/historial">Ver el historial completo y su verificación</a></p></div>`;
 
   const cajaDatos = `<div class="caja"><h3>La solicitud</h3>
-    <dl class="datos"><dt>Folio</dt><dd>${esc(s.folio)}</dd><dt>Titular</dt><dd>${esc(s.titular)}</dd><dt>Relación</dt><dd>${esc(TITULARES[s.relacion])}</dd><dt>Responder a</dt><dd>${esc(s.contacto || '—')}</dd><dt>Llegó por</dt><dd>${s.origen === 'formulario' ? 'Formulario para titulares' : 'Registro manual'}</dd>${s.causal && s.tipo === 'supresion' ? `<dt>Causal</dt><dd>${esc(CAUSALES_SUP[s.causal] || '—')}</dd>` : ''}</dl>
+    <dl class="datos"><dt>Folio</dt><dd>${esc(s.folio)}</dd><dt>Titular</dt><dd>${esc(s.titular)}</dd><dt>Relación</dt><dd>${esc(TITULARES[s.relacion])}</dd><dt>Responder a</dt><dd>${esc(s.contacto || '—')}</dd><dt>Llegó por</dt><dd>${s.origen === 'formulario' ? 'Formulario para titulares' : 'Registro manual'}</dd>${s.causal && s.tipo === 'supresion' ? `<dt>Causal</dt><dd>${esc(CAUSALES_SUP[s.causal] || '—')}</dd>` : ''}${s.envios.length ? `<dt>Respuestas anteriores</dt><dd>${s.envios.map((e, i) => `<button class="btn-txt" data-accion="ver-anterior" data-i="${i}">${fmt(e.fecha)}</button>`).join(' · ')}</dd>` : ''}</dl>
     ${s.detalle ? `<p style="margin:12px 0 0;font-size:14px;white-space:pre-wrap;overflow-wrap:anywhere;color:var(--tinta2)">«${esc(s.detalle)}»</p>` : ''}
     <label class="marca" style="margin-top:14px"><input type="checkbox" data-campo="escalar"${s.escalar ? ' checked' : ''}> <span>Requiere revisión de MLV<small>Si el titular está en juicio con la empresa, hay una investigación Ley Karin, pide comunicaciones internas o menciona a la Agencia.</small></span></label>
     ${s.escalar && !cerrada ? '<p class="alerta"><b>No respondas sin revisarlo con MLV.</b> Lo que se entregue o se niegue puede usarse en el juicio o la investigación.</p>' : ''}
@@ -1008,11 +1012,11 @@ function htmlUsos() {
   const base = Object.keys(BASES).map((k) => datos.usos.filter((u) => u.base === k).length);
   const cons = datos.usos.filter((u) => u.base === 'consentimiento').length;
   return `<div class="sec-cab">
-      <div><h1>Usos de datos</h1><p>Para qué usa la empresa datos personales y con qué base legal. El consentimiento es una de seis bases: aquí van ${cons} de ${datos.usos.length} usos. Le toca a la empresa acreditar la base de cada uno (art. 13).</p></div>
+      <div><h1>Usos de datos</h1><p>Para qué usa la empresa datos personales y con qué base legal. El consentimiento es solo una de las bases: aquí van ${cons} de ${datos.usos.length} usos. Le toca a la empresa acreditar la base de cada uno (art. 13).</p></div>
       <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" data-accion="imprimir">Imprimir</button><button class="btn primario" data-accion="nuevo-uso">+ Nuevo uso de datos</button></div>
     </div>
     ${datos.usos.length ? `<table class="tabla resp"><thead><tr><th>Uso de datos</th><th>De quiénes</th><th>Base legal</th><th>Sensibles</th><th>Se guardan</th><th>Revisión</th></tr></thead><tbody>${filas}</tbody></table>` : '<div class="vacio">Aún no hay usos de datos. Empieza por los de trabajadores: remuneraciones, salud, control de asistencia y cámaras.</div>'}
-    <div class="caja" style="margin-top:18px"><h2>Las seis bases legales</h2>
+    <div class="caja" style="margin-top:18px"><h2>Las bases legales</h2>
       <div class="tres" style="font-size:13.5px;color:var(--tinta2)">${Object.entries(BASES).map(([k, b], i) => `<div><b style="color:var(--tinta)">${esc(b.nombre)}</b> <span class="mini" style="display:inline">${b.art}</span><br>${base[i]} ${base[i] === 1 ? 'uso' : 'usos'}</div>`).join('')}</div>
       <p class="nota" style="margin-top:12px">Con los trabajadores, la mayoría de los usos descansa en el contrato o en la ley. Pedirles consentimiento para algo que el contrato no necesita es arriesgado: la ley presume que no fue libre (art. 12).</p>
     </div>`;
@@ -1263,6 +1267,7 @@ document.addEventListener('click', async (e) => {
     case 'carta-prorroga': if (s) abrirCarta('Carta de prórroga', cartaProrroga(s)); break;
     case 'carta-respuesta': if (s) abrirCarta('Carta de respuesta', cartaRespuesta(s)); break;
     case 'ver-enviada': if (s && s.respuesta) abrirCarta(`Carta enviada el ${fmt(s.respuesta.fecha)}`, s.respuesta.texto); break;
+    case 'ver-anterior': { const e = s && s.envios[+b.dataset.i]; if (e) abrirCarta(`Respuesta anterior, enviada el ${fmt(e.fecha)}`, e.texto); break; }
     case 'carta-copiar': {
       const t = $('cartaTxt');
       try { await navigator.clipboard.writeText(t.value); avisar('Carta copiada. Pégala en tu correo.'); }
@@ -1291,8 +1296,8 @@ document.addEventListener('click', async (e) => {
       break;
     }
     case 'reabrir':
-      if (s && await confirmar('Reabrir solicitud', 'La solicitud vuelve a quedar abierta. La copia de la carta enviada se conserva en el historial.', 'Reabrir'))
-        cambiar(() => { s.respuesta = null; anotar('Solicitud reabierta.', s.id); });
+      if (s && await confirmar('Reabrir solicitud', 'La solicitud vuelve a quedar abierta. La carta ya enviada no se borra: queda en «Respuestas anteriores».', 'Reabrir'))
+        cambiar(() => { s.envios.push(s.respuesta); s.respuesta = null; anotar(`Solicitud reabierta. La respuesta del ${fmt(s.envios[s.envios.length - 1].fecha)} queda guardada.`, s.id); });
       break;
     case 'eliminar-sol':
       if (s && await confirmar('Eliminar solicitud', `Se eliminará la solicitud ${s.folio}. Su rastro queda en el historial.`, 'Eliminar')) {
