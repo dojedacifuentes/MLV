@@ -37,6 +37,7 @@
   .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 10px; }
   button.btn, label.btn { font: inherit; font-size: 14px; font-weight: 600; color: var(--text); background: #12203d; border: 1px solid #27406f; padding: 9px 14px; border-radius: 9px; cursor: pointer; }
   button.btn:hover, label.btn:hover { border-color: var(--blue); }
+  button.btn:disabled { opacity: .45; cursor: default; border-color: #27406f; }
   button.primary { background: var(--blue); border-color: var(--blue); color: #021022; }
   input[type=file] { display: none; }
   .msg { font-size: 14px; color: var(--soft); min-height: 1.4em; }
@@ -45,6 +46,12 @@
   .preview:empty::before { content: "Aquí verás el texto con los datos marcados."; color: var(--muted); }
   mark { color: var(--text); border-radius: 4px; padding: 0 2px; cursor: pointer; background: rgba(42,140,255,.28); box-shadow: inset 0 -2px 0 var(--c, var(--blue)); }
   mark.off { background: transparent; box-shadow: inset 0 -1px 0 var(--muted); color: var(--soft); text-decoration: line-through dotted var(--muted); }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 6px; }
+  .chip { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--soft); background: var(--panel2); border: 1px solid var(--line); border-left: 3px solid var(--c); padding: 4px 9px 4px 7px; border-radius: 8px; cursor: pointer; user-select: none; }
+  .chip input { margin: 0; width: 15px; height: 15px; accent-color: var(--blue); }
+  .chip:has(input:not(:checked)) { opacity: .55; text-decoration: line-through; }
+  .selbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 10px; }
+  .selbar .hint { margin: 0; flex: 1 1 220px; }
   .list { list-style: none; margin: 10px 0 0; padding: 0; max-height: 300px; overflow: auto; border-top: 1px solid var(--line); }
   .list li { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: center; padding: 8px 2px; border-bottom: 1px solid var(--line); font-size: 14px; }
   .list .val { overflow-wrap: anywhere; }
@@ -64,13 +71,13 @@
 <div class="wrap">
   <header>
     <div>
-      <div class="brand">ƎVΛ · ACADEMY</div>
+      <div class="brand">ƎVΛ · LAB</div>
       <h1>Tachar antes de pegar</h1>
     </div>
     <div class="badge">● SIN INTERNET · NADA SALE DE ESTE COMPUTADOR</div>
   </header>
 
-  <p class="lead">Pega un escrito o abre un Word. Esta página cambia nombres, RUT, direcciones y otros datos por etiquetas como <b>[PERSONA_1]</b>, para que puedas consultar a una IA sin entregarle quién es tu cliente. Cuando la IA responda, la pestaña «Devolver» pone los nombres de vuelta.</p>
+  <p class="lead">Pega un escrito o abre un Word. Esta página cambia nombres, RUT, direcciones, fechas, montos y otros datos por etiquetas como <b>[PERSONA_1]</b>, para que puedas consultar a una IA sin entregarle quién es tu cliente. Cuando la IA responda, la pestaña «Devolver» pone los datos de vuelta.</p>
 
   <div class="tabs" role="tablist">
     <button class="tab" role="tab" id="tab-tachar" aria-selected="true">1 · Tachar</button>
@@ -93,20 +100,27 @@
         <div class="msg" id="fileMsg"></div>
 
         <label class="lbl" for="personas">Personas que quieres tachar sí o sí</label>
-        <p class="hint">Una por línea. Si la misma persona aparece de varias formas, sepáralas con «/»: <i>Juan Pérez Soto / don Juan / el señor Pérez</i>.</p>
+        <p class="hint">Una por línea. Si la misma persona aparece de varias formas, sepáralas con «/»: <i>Juan Pérez Soto / don Juan / el Chino</i>.</p>
         <textarea id="personas" class="small" spellcheck="false"></textarea>
 
         <label class="lbl" for="otros">Otras cosas que quieres tachar</label>
-        <p class="hint">Empresas, lugares, nombres de proyectos, montos: lo que delate el caso. Una por línea.</p>
+        <p class="hint">Empresas, lugares, nombres de proyectos, cargos: lo que delate el caso. Una por línea.</p>
         <textarea id="otros" class="small" spellcheck="false"></textarea>
       </div>
 
       <div class="card">
         <span class="step">PASO 2</span>
         <h2>Revisa lo que encontré</h2>
-        <p class="hint">Busco patrones, no entiendo el texto. Toca un dato marcado para no tacharlo. <b>Lo que no está marcado no se tacha</b>: léelo entero.</p>
+        <p class="hint">Busco patrones y una lista de nombres y apellidos comunes en Chile; no entiendo el texto. Toca un dato marcado para no tacharlo. <b>Lo que no está marcado no se tacha</b>: léelo entero.</p>
+        <div class="chips" id="chips" aria-label="Qué tipos de dato tachar"></div>
+        <label class="check"><input type="checkbox" id="estricto"> <span><b>Modo estricto:</b> tachar también toda palabra con mayúscula que no reconozca (nombres raros, apodos, lugares). Marca más: revisa y desmarca lo que sobre.</span></label>
         <div class="msg" id="stats"></div>
         <div class="preview" id="preview"></div>
+        <div class="selbar">
+          <p class="hint" id="selHint">¿Se me pasó algo? Selecciónalo arriba con el mouse y elige:</p>
+          <button class="btn" id="selPersona" disabled>Tachar como persona</button>
+          <button class="btn" id="selOtro" disabled>Tachar como otro dato</button>
+        </div>
         <ul class="list" id="list"></ul>
       </div>
     </div>
@@ -140,7 +154,7 @@
       </div>
       <div class="card">
         <span class="step">PASO 5</span>
-        <h2>Con los nombres de vuelta</h2>
+        <h2>Con los datos de vuelta</h2>
         <textarea id="restored" readonly spellcheck="false"></textarea>
         <div class="row">
           <button class="btn primary" id="copiar2">Copiar</button>
@@ -155,14 +169,15 @@
     <ul>
       <li><b>Tachar no es anonimizar.</b> La Ley 21.719 llama anonimización a un procedimiento irreversible. Esto es seudonimización: con la llave se vuelve atrás, y para la ley siguen siendo datos personales.</li>
       <li><b>El contexto delata.</b> «La gerenta de la única farmacia de Puerto Williams» identifica a alguien sin decir su nombre. Tacha también lo que, junto, apunte a una persona.</li>
-      <li><b>No reconoce todo.</b> Las fechas, los montos, los cargos, los apodos y los nombres escritos sin mayúscula pasan sin marcar. Agrégalos en «Otras cosas».</li>
+      <li><b>No reconoce todo.</b> Reconoce los nombres y apellidos más comunes en Chile; un nombre poco común, un apodo o un nombre escrito sin mayúscula puede pasar. Usa el modo estricto o selecciónalo y pulsa «Tachar como persona».</li>
+      <li><b>Las fechas y los montos se tachan por defecto.</b> Si la IA los necesita (para calcular un plazo, por ejemplo), desmárcalos arriba del texto.</li>
       <li><b>Los hechos siguen siendo secretos.</b> El deber de confidencialidad cubre los asuntos del cliente, no sólo su nombre. Tachar baja el riesgo; no reemplaza un plan de empresa con contrato ni el consentimiento del cliente cuando hay riesgo.</li>
       <li><b>No guarda nada.</b> No usa internet ni memoria del navegador: al cerrar la página se borra todo. Para comprobarlo, apaga el wifi y úsala igual.</li>
       <li>De un Word sólo toma el texto: el resultado no conserva el formato.</li>
     </ul>
   </details>
 
-  <footer>EVA ACADEMY · Material educativo, no asesoría legal. Revisa siempre el resultado antes de pegarlo. EVA es un personaje.</footer>
+  <footer>EVA LAB · Herramienta educativa, no asesoría legal. Revisa siempre el resultado antes de pegarlo.</footer>
 </div>
 
 <script>
@@ -170,29 +185,143 @@
 
 /* ───────── Tipos de dato ───────── */
 const TYPES = {
-  PERSONA:   { label: 'Persona',     color: '#2a8cff' },
-  EMPRESA:   { label: 'Empresa',     color: '#a24dff' },
-  RUT:       { label: 'RUT',         color: '#ff5fa2' },
-  CORREO:    { label: 'Correo',      color: '#3ddc97' },
-  TELEFONO:  { label: 'Teléfono',    color: '#3ddc97' },
-  DIRECCION: { label: 'Dirección',   color: '#ffb547' },
-  CAUSA:     { label: 'Causa',       color: '#5a60ff' },
-  PATENTE:   { label: 'Patente',     color: '#ffb547' },
-  CUENTA:    { label: 'Cuenta',      color: '#ff5fa2' },
-  DATO:      { label: 'Dato',        color: '#a9b8d6' },
+  PERSONA:   { label: 'Personas',        color: '#2a8cff' },
+  EMPRESA:   { label: 'Empresas',        color: '#a24dff' },
+  RUT:       { label: 'RUT y documentos', color: '#ff5fa2' },
+  CORREO:    { label: 'Correos',         color: '#3ddc97' },
+  TELEFONO:  { label: 'Teléfonos',       color: '#3ddc97' },
+  DIRECCION: { label: 'Direcciones',     color: '#ffb547' },
+  LUGAR:     { label: 'Comunas y lugares', color: '#ffb547' },
+  CAUSA:     { label: 'Roles de causa',  color: '#5a60ff' },
+  FECHA:     { label: 'Fechas',          color: '#7fd1ff' },
+  MONTO:     { label: 'Montos',          color: '#ffd166' },
+  EDAD:      { label: 'Edades',          color: '#7fd1ff' },
+  PATENTE:   { label: 'Patentes',        color: '#ffb547' },
+  CUENTA:    { label: 'Cuentas y tarjetas', color: '#ff5fa2' },
+  NOMBRE:    { label: 'Otros nombres propios', color: '#8aa0ff' },
+  DATO:      { label: 'Lo que agregaste', color: '#a9b8d6' },
 };
+
+/* ───────── Nombres y apellidos comunes en Chile (sin tildes, en minúscula) ───────── */
+const set = (s) => new Set(s.trim().split(/\s+/));
+// Nombres que también son palabras o lugares: sólo cuentan si los sigue un apellido conocido.
+const AMBIGUOS = set(`rosa paz luz cruz mar sol alba fe gloria gracia esperanza consuelo blanca clara amparo victoria
+  concepcion rosario mercedes dolores pilar soledad santiago angeles trinidad asuncion remedios belen lourdes fatima
+  loreto estrella pura rocio aurora flor violeta jazmin iris luna domingo abril leal angel salvador reyes milagros
+  maximo augusto clemente ariel segundo`);
+const NOMBRES = set(`juan jose luis carlos jorge pedro pablo francisco manuel miguel antonio andres alejandro diego felipe
+  sebastian cristobal cristian christian rodrigo ricardo roberto sergio fernando eduardo gonzalo patricio mauricio claudio
+  marcelo hector hugo raul rene ramon rafael ruben oscar osvaldo nelson victor vicente benjamin matias nicolas tomas
+  ignacio joaquin agustin lucas martin maximiliano gabriel daniel david samuel alvaro arturo alberto alfredo alfonso
+  enrique ernesto esteban emilio fabian gaston gerardo guillermo gustavo ivan jaime javier jesus julio leonardo lorenzo
+  marco marcos mario mateo nestor orlando pascual renato reinaldo rolando saul simon teodoro ulises washington williams
+  wilson yerko boris branko zarko ivo milan dusan luka franco bruno santino thiago tiago gaspar emiliano bastian camilo
+  cesar dante elias fabricio federico german hernan horacio ismael isaac jonathan jonatan kevin brayan bryan byron
+  jeremias leon leandro lautaro luciano nahuel octavio omar rigoberto rodolfo waldo wladimir aldo adolfo armando augusto
+  aurelio benito edgardo edmundo efrain eliseo erwin eugenio fermin froilan gregorio heriberto humberto jacinto jeronimo
+  leopoldo maximo moises nibaldo pio raimundo remigio sandro silvio valentin walter abraham amaro anibal ariel baltazar
+  clemente dagoberto dario eloy elvis fidel florencio genaro gilberto hipolito mohammed mohamed ali jean pierre paolo
+  giovanni hans klaus peter john michael james robert george charles thomas william alexander alexis axel cristofer
+  christopher dylan erick eric franklin freddy jhon john jordan josue juanito pancho ruben tito tobias vladimir yonathan
+  maria ana isabel carmen patricia claudia carolina andrea paula francisca valentina camila javiera catalina constanza
+  fernanda daniela gabriela antonia josefa sofia isidora martina florencia agustina emilia maite macarena magdalena
+  marcela monica veronica ximena jimena alejandra cecilia cristina karina karen katherine catherine carla karla lorena
+  paola pamela priscila romina sandra silvia susana tamara teresa valeria vanessa vanesa viviana yasna yolanda zulema
+  adriana alicia angela antonieta beatriz berta bernardita denisse diana elena eliana elisa elizabeth estela eugenia
+  evelyn fabiola graciela gladys hilda ines irene ivonne jacqueline jessica johanna juana julia juliana laura leticia
+  lidia lilian liliana lucia luisa margarita maribel marisol marta miriam myriam nancy natalia nicole norma olga raquel
+  rebeca regina ruth sara sonia tatiana vania virginia yanina yessenia jennifer jenifer barbara amanda anais antonella
+  celeste delfina dominga emma ema renata julieta josefina ignacia millaray ayelen rayen anahi colomba guadalupe noemi
+  olivia pia rafaela salome zoe scarlett scarleth mariana marianela marina matilde nora oriana rosana rosalia ruth
+  sabina selena simona tania teresita vivian ximena yesenia yanet janet erika ericka francesca giovanna ingrid
+  ${[...AMBIGUOS].join(' ')}`);
+const APELLIDOS = set(`gonzalez munoz rojas diaz perez soto contreras silva martinez sepulveda morales rodriguez lopez
+  fuentes hernandez torres araya flores espinoza valenzuela castillo tapia reyes gutierrez castro pizarro alvarez vasquez
+  sanchez fernandez ramirez carrasco gomez cortes herrera nunez jara vergara rivera figueroa riquelme garcia miranda bravo
+  vera molina vega campos sandoval orellana zuniga olivares alarcon gallardo ortiz garrido salazar guzman henriquez
+  saavedra navarro aguilera parra romero aravena vidal mendoza caceres yanez leiva escobar ruiz valdes salinas mora
+  poblete lagos cardenas cerda donoso fuentealba toro medina pena venegas cabrera alvarado acuna ramos rios rivas zamora
+  mella moreno arancibia aguirre fuenzalida guerrero bustos osorio quezada palma carvajal paredes uribe ortega maldonado
+  lara correa marin vargas jimenez sotomayor santibanez ibarra navarrete hidalgo bustamante cisternas pino caro becerra
+  galvez meza ojeda faundez lillo ulloa cifuentes oyarzun barrera bello beltran cuevas cornejo ferrada godoy jorquera
+  lobos moya neira rubio salas serrano sierra solis tobar troncoso urrutia valdivia villalobos zapata alfaro aedo alegria
+  ahumada andrade aranda arriagada astudillo avila baeza barra barrientos benavides calderon canales cancino carmona
+  catalan cid concha cordero delgado duran escalona espinosa estay farias fierro fonseca gajardo gallegos gaete gatica
+  gil guerra guajardo hermosilla huerta inostroza jaramillo lazo letelier llanos lobo lorca madrid manriquez marambio
+  marchant mardones matus mejias melo mena mendez monsalve montecinos montenegro montero montes moraga moreira mujica
+  mancilla mansilla nash nieto novoa olguin opazo ossandon pacheco palacios pavez pereira pinilla pinto pina ponce prado
+  quiroz quintana quinteros retamal robles roman rozas saez salgado sanhueza santana segovia seguel tello toledo trujillo
+  urbina valencia valladares vallejos varas veliz villarroel acevedo aguilar alvear arias armijo avendano burgos cabello
+  cardoso carrillo chavez cortez dominguez esparza gallo garay ibanez lizama marquez maturana mercado munita olave orrego
+  osses oyarzo pastene rebolledo riffo rocha rubilar saldivar santander sobarzo tejeda ugarte valdebenito vallejo
+  velasquez vilches villagran villanueva yevenes zenteno zurita rosales rosas guevara acosta ayala cabezas cespedes
+  ceballos cuadra echeverria eyzaguirre gacitua galaz gamboa garces hormazabal ibaceta iturra labra lepe loyola luengo
+  medel merino millar mondaca mundaca olmos ormeno paez parada peralta quiroga riveros sagredo solar sotelo torrealba
+  veas zambrano zamorano oyarce moran escribano villagra latorre vial reinike quevedo elfernan camilli
+  huenchul huenchuman huentelaf painemal painequeo calfucura calfuqueo catrileo ancamil antiman nahuelpan curinao
+  huaiquimil huaiquimilla lienlaf llancaqueo marileo melinao millanao nancupil queupumil quilaqueo raipan tralma
+  huenchupan cayupan collipal coliqueo colipi lefian lincopi manquel millapan antilef caniulef huaiquil
+  edwards kast schmidt muller mueller fischer weber schneider hoffmann klein wagner becker matte larrain errazuriz ossa
+  walker yarur said abumohor hirmas chahuan dittborn bachelet allende frei pinera boric luksic ziliani negri cerasa
+  yaksic skarmeta mihovilovic petric kusanovic marinovic radic simunovic rossi ferrari bianchi rinaldi lucchini
+  quispe mamani huaman condori joseph`);
+// Palabras con mayúscula que no son nombres de persona: cortan la búsqueda.
+const STOP = set(`a al el la los las lo un una unos unas de del y e o u en con sin por para que se su sus mi mis tu
+  nuestro nuestra este esta ese esa aquel quien cual como cuando donde si no ni es son fue ha he hay
+  us ss excma excmo iltma iltmo ilustrisima ilustrisimo honorable senoria sjl
+  corte suprema apelaciones juzgado juzgados tribunal tribunales garantia oral penal civil letras familia trabajo
+  cobranza laboral policia local ministerio publico publica fiscalia defensoria republica estado fisco consejo defensa
+  gobierno municipalidad intendencia delegacion presidencial camara diputados senado congreso
+  ley leyes codigo constitucion politica articulo articulos art inciso numeral letra decreto supremo reglamento dfl dl
+  auto acordado acta agencia direccion contraloria superintendencia servicio impuestos internos tesoreria registro
+  identificacion conservador bienes raices comercio notaria notario receptor archivero
+  demanda demandante demandantes demandado demandada demandados querella querellante querellado imputado imputada victima
+  testigo testigos perito actor actora parte partes otrosi principal primer primero primera segundo segunda tercer tercero
+  tercera cuarto quinto sexto septimo octavo noveno decimo considerando considerandos vistos resolucion sentencia fallo
+  recurso recursos proteccion amparo nulidad casacion apelacion reposicion queja forma fondo hechos derecho derechos
+  peticion conclusion indemnizacion perjuicios dano danos moral emergente lucro cesante contrato contratos arrendamiento
+  compraventa despido injustificado cobro prestaciones laborales alimentos divorcio cuidado personal tutela juicio
+  ordinario sumario ejecutivo causa rol rit ruc materia procedimiento audiencia prueba documentos acompana exhorto
+  mandato patrocinio poder tengase autos expediente cuaderno foja fojas anexo anexos clausula clausulas
+  chile chileno chilena chilenos nacional internacional
+  lunes martes miercoles jueves viernes sabado enero febrero marzo mayo junio julio agosto septiembre setiembre
+  octubre noviembre diciembre
+  inmobiliaria constructora comercial sociedad inversiones transportes servicios agricola distribuidora importadora
+  exportadora clinica colegio fundacion corporacion empresa empresas consultora asesorias minera pesquera vina banco
+  restaurante farmacia laboratorio centro medico hospital universidad instituto liceo escuela compania cia spa ltda
+  limitada sa eirl holding grupo
+  calle avenida av avda pasaje psje camino callejon parcela villa poblacion condominio sector comuna ciudad region
+  provincia localidad departamento depto oficina piso block torre casa
+  senor senora senorita don dona sr sra srta dr dra ing lic prof abogado abogada
+  nota datos dato ejemplo cedula identidad rut run pasaporte numero total monto pesos dolares uf utm
+  mediante segun conforme asimismo ademas luego finalmente tanto pido ruego solicito sirvase tener presente
+  hola gracias saludos atentamente estimado estimada querido querida buenos buenas dias tardes noches asunto re fw cc
+  ia chatgpt claude gemini google microsoft word whatsapp gmail outlook`);
+
+const fold = (s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+const norm = (s) => fold(s).replace(/\s+/g, ' ').trim();
+const escHtml = (s) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const isPart = (w) => /^(?:de|del|la|las|los)$/i.test(w);
+
+/** Expresión que encuentra el texto con o sin tildes («Perez» encuentra «Pérez»). */
+const VOW = { a: 'aáàä', e: 'eéèë', i: 'iíìï', o: 'oóòö', u: 'uúùü', n: 'nñ' };
+function fuzzy(s) {
+  return [...s].map((ch) => {
+    const b = fold(ch);
+    if (VOW[b]) return `[${ch !== ch.toLowerCase() ? VOW[b].toUpperCase() : VOW[b]}]`;
+    if (/\s/.test(ch)) return '\\s+';
+    return ch.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }).join('');
+}
 
 const L = '[A-ZÁÉÍÓÚÑÜ]';          // inicial mayúscula
 const W = "[\\p{L}'’-]+";          // resto de la palabra
 const SP = '[ \\t]+';              // un nombre no cruza de línea
 const NAME = `${L}${W}(?:${SP}(?:de${SP}(?:la${SP}|las${SP}|los${SP})?|del${SP})?${L}${W}){0,4}`;
-const HONOR = "(?:[Dd]on|[Dd]oña|[Ss]eñora|[Ss]eñorita|[Ss]eñor|[Ss]rta\\.|[Ss]ra\\.|[Ss]r\\.)";
+const HONOR = "(?<![\\p{L}])(?:[Dd]on|[Dd]oña|DON|DOÑA|[Ss]eñora|[Ss]eñorita|[Ss]eñor|[Ss]rta\\.|[Ss]ra\\.|[Ss]r\\.|[Dd]ra\\.?|[Dd]r\\.|[Ii]ng\\.|[Pp]rof\\.|[Ll]ic\\.)";
+const MONTHS = '(?:enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|setiembre|octubre|noviembre|diciembre)';
 // Palabras que siguen a «señor» o «don» y no son nombres.
 const NOT_NAMES = new Set(['juez', 'jueza', 'ministro', 'ministra', 'presidente', 'presidenta', 'fiscal', 'notario', 'notaria', 'conservador', 'secretario', 'secretaria', 'tribunal', 'abogado', 'abogada', 'defensor', 'defensora', 'receptor', 'receptora', 'relator', 'relatora', 'director', 'directora', 'gerente', 'alcalde', 'alcaldesa', 'administrador', 'liquidador']);
-
-const norm = (s) => s.toLowerCase().normalize('NFC').replace(/\s+/g, ' ').trim();
-const escRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\s+/g, '\\s+');
-const escHtml = (s) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
 function rutOk(body, dv) {
   let s = 0, m = 2;
@@ -214,7 +343,8 @@ function scan(text, re, group = 0) {
   return out;
 }
 
-/* Detectores automáticos, en orden de prioridad (el primero gana si se pisan). */
+/* Detectores por patrón, en orden de prioridad (el primero gana si se pisan). */
+const CAPN = '[A-ZÁÉÍÓÚÑÜ0-9][\\p{L}\\p{N}&\'’.-]*';
 const DETECTORS = [
   { type: 'CORREO', rules: [[/[\w.+-]+@[\w-]+(?:\.[\w-]+)+/g]] },
   { type: 'CAUSA', rules: [
@@ -222,7 +352,10 @@ const DETECTORS = [
     [/(?<![\w-])[A-Z]{1,2}-\d{1,6}-\d{4}(?![\w-])/g],
     [/(?<![\d.])\d{10}-[\dkK](?!\w)/g],
   ] },
-  { type: 'RUT', rules: [[/(?<![\w.-])(?:\d{1,2}\.\d{3}\.\d{3}|\d{7,8})\s?-\s?[\dkK](?!\w)/g]] },
+  { type: 'RUT', rules: [
+    [/(?<![\w.-])(?:\d{1,2}\.\d{3}\.\d{3}|\d{7,8})\s?-\s?[\dkK](?!\w)/g],
+    [/(?<![\p{L}])(?:[Pp]asaporte|PASAPORTE|DNI|[Cc]édula de extranjería|[Dd]ocumento de identidad)\s*(?:N\s?[°º.]\s*|n\s?[°º.]\s*|número\s+)?:?\s*([A-Z0-9][A-Z0-9.-]{4,15})/gdu, 1],
+  ] },
   { type: 'CUENTA', rules: [
     [/(?:cuenta(?:\s+(?:corriente|vista|rut|de\s+ahorros?|bancaria))?|cta\.?\s*cte\.?|tarjeta(?:\s+de\s+(?:crédito|débito))?)\s*(?:n\s?[°º.]?|número|nro\.?)?\s*:?\s*(\d[\d\s-]{4,22}\d)/gdi, 1],
     [/(?<!\d)(?:\d{4}[\s-]){3}\d{4}(?!\d)/g],
@@ -234,23 +367,149 @@ const DETECTORS = [
     [/(?:tel[ée]fono|fono|celular|m[óo]vil|whatsapp)\s*(?:n\s?[°º.]\s*)?:?\s*(\+?\d[\d\s-]{6,16}\d)/gdi, 1],
   ] },
   { type: 'DIRECCION', rules: [
-    [/(?:domiciliad[oa]s?|con\s+domicilio|domicilio|residente|reside)\s+en\s+([^\n,;()]{2,60}?\s(?:n\s?[°º.]\s*)?\d{1,5}(?:\s*,?\s*(?:depto\.?|departamento|dpto\.?|oficina|of\.|casa|block|torre|piso)\s*[\w-]+)*)/gdi, 1],
+    [/(?:domiciliad[oa]s?|con\s+domicilio|domicilio|residente|reside|vive)\s+en\s+([^\n,;()]{2,60}?\s(?:n\s?[°º.]\s*)?\d{1,5}(?:\s*,?\s*(?:depto\.?|departamento|dpto\.?|oficina|of\.|casa|block|torre|piso)\s*[\w-]+)*)/gdi, 1],
     [/(?<![\p{L}])(?:calle|avenida|av\.|avda\.|pasaje|psje\.|camino|callejón|parcela)\s+[^\n,;()]{2,60}?\s(?:n\s?[°º.]\s*)?\d{1,5}(?:\s*,?\s*(?:depto\.?|departamento|dpto\.?|oficina|of\.|casa|block|torre|piso)\s*[\w-]+)*/giu],
   ] },
-  { type: 'EMPRESA', rules: [[new RegExp(`${L.replace(']', '0-9]')}[\\p{L}\\p{N}&'.-]*\\s+(?:(?:${L.replace(']', '0-9]')}[\\p{L}\\p{N}&'.-]*|de|del|la|las|los|y|e|&)\\s+){0,6}(?:S\\.\\s?A\\.|SpA|SPA|S\\.p\\.A\\.|Ltda\\.?|LTDA\\.?|Limitada|LIMITADA|E\\.I\\.R\\.L\\.?|EIRL|S\\.A(?![\\p{L}]))(?![\\p{L}])`, 'gu')]] },
+  { type: 'EMPRESA', rules: [
+    [new RegExp(`${CAPN}\\s+(?:(?:${CAPN}|de|del|la|las|los|y|e|&)\\s+){0,6}(?:S\\.\\s?A\\.|SpA|SPA|S\\.p\\.A\\.|Ltda\\.?|LTDA\\.?|Limitada|LIMITADA|E\\.I\\.R\\.L\\.?|EIRL|S\\.A(?![\\p{L}]))(?![\\p{L}])`, 'gu')],
+    // Sin sufijo legal: «Inmobiliaria Los Aromos», «Clínica Santa Elena».
+    [new RegExp(`(?<![\\p{L}])(?:Inmobiliaria|Constructora|Comercial|Sociedad|Inversiones|Transportes|Servicios|Agrícola|Distribuidora|Importadora|Exportadora|Clínica|Colegio|Fundación|Corporación|Consultora|Asesorías|Minera|Pesquera|Viña|Restaurante|Farmacia|Laboratorio|Centro Médico|Hospital|Instituto|Liceo|Escuela|Compañía|Holding|Grupo|Automotora|Ferretería|Supermercados?|Empresas?|Hotel|Panadería|Botillería|Almacén|Jardín Infantil)(?:[ \\t]+(?:(?:de|del|la|las|los|y|e|&)[ \\t]+)*[A-ZÁÉÍÓÚÑÜ0-9][\\p{L}\\p{N}&'’-]*){1,5}`, 'gu')],
+  ] },
+  { type: 'LUGAR', rules: [
+    [new RegExp(`(?<![\\p{L}])(?:[Cc]omuna|[Cc]iudad|[Ll]ocalidad|[Pp]rovincia|[Rr]egión|[Vv]illa|[Pp]oblación|[Ss]ector|[Cc]ondominio|[Pp]ueblo|[Cc]aleta|[Ii]sla|[Ll]oteo|[Cc]ampamento)${SP}(?:(?:de|del)${SP}(?:la${SP}|las${SP}|los${SP})?)?((?:${L}${W})(?:${SP}(?:(?:de|del|la|las|los)${SP})*${L}${W}){0,3})`, 'gdu'), 1],
+    // «En Santiago, a 3 de marzo de 2025» / «Temuco, 3 de marzo».
+    [new RegExp(`(?<![\\p{L}])(?:[Ee]n${SP})?(${L}${W}(?:${SP}${L}${W}){0,2}),${SP}(?:a${SP})?(?=\\d{1,2}${SP}de${SP}${MONTHS})`, 'gdu'), 1],
+  ] },
+  { type: 'FECHA', rules: [
+    [new RegExp(`(?<!\\d)\\d{1,2}(?:°|º)?${SP}de${SP}${MONTHS}(?:${SP}(?:de|del)${SP}\\d{4})?`, 'gi')],
+    [new RegExp(`(?<![\\p{L}])${MONTHS}${SP}(?:de|del)${SP}\\d{4}`, 'giu')],
+    [/(?<![\d.\/-])\d{1,2}[\/.-]\d{1,2}[\/.-](?:\d{4}|\d{2})(?![\d\/-]|\.\d)/g],
+    [/(?<![\d-])\d{4}-\d{2}-\d{2}(?![\d-])/g],
+  ] },
+  { type: 'MONTO', rules: [
+    [/(?:US\$|USD|CLP|\$)\s?\d{1,3}(?:[.,]\d{3})*(?:,\d+)?(?:\s?(?:millones|mil))?/g],
+    [/(?<![\d.,])\d{1,3}(?:[.,]\d{3})*(?:,\d+)?\s?(?:millones\s+de\s+pesos|UF|U\.F\.|UTM|pesos|dólares|USD|euros)(?![\p{L}])/gu],
+    [/(?<![\p{L}])(?:UF|UTM)\s?\d{1,3}(?:[.,]\d{3})*(?:,\d+)?/gu],
+  ] },
+  { type: 'EDAD', rules: [
+    [/(?<!\d)\d{1,3}\s+años\s+de\s+edad/gi],
+    [/(?<![\p{L}])edad\s+de\s+\d{1,3}\s+años/giu],
+    [/\(\d{1,3}\s+años\)/g],
+  ] },
   { type: 'PATENTE', rules: [[/(?<![\w-])(?:[B-DF-HJ-LPR-TV-Z]{4}[\s·.-]?\d{2}|[A-Z]{2}[\s·.-]?\d{2}[\s·.-]?\d{2})(?![\w-])/g]] },
 ];
 
-/* Personas detectadas solas: tras «don», «señora»…, en mayúsculas antes de «chileno», o tras un rol procesal. */
+/* Personas por contexto: tras «don», «Dra.»…, en mayúsculas antes de «chileno», o tras un rol. */
 const PERSON_RULES = [
-  [new RegExp(`(?<![\\p{L}])${HONOR}\\s+(${NAME})`, 'gdu'), 1],
+  [new RegExp(`${HONOR}\\s+(${NAME})`, 'gdu'), 1],
   [new RegExp(`(?<![\\p{L}])((?:[A-ZÁÉÍÓÚÑÜ]{2,}${SP}){1,4}[A-ZÁÉÍÓÚÑÜ]{2,})(?=\\s*,\\s*(?:[Cc]hilen|[Aa]rgentin|[Pp]eruan|[Vv]enezolan|[Cc]olombian|[Bb]olivian|[Hh]aitian|[Ee]xtranjer|[Cc]asad|[Ss]olter|[Dd]ivorciad|[Vv]iud|[Mm]ayor de edad|[Mm]enor de edad|[Aa]bogad|[Ii]ngenier|[Ee]mplead|[Cc]omerciante|[Pp]rofesor|[Ee]studiante|[Jj]ubilad|[Cc]édula|[Cc]\\.\\s?[Ii]\\.|RUT|RUN|[Rr]ut|[Nn]acionalidad|[Dd]omiciliad|[Dd]e profesión|[Dd]e oficio|[Mm]édic|[Cc]onductor|[Tt]écnic|[Dd]ueñ))`, 'gdu'), 1],
-  [new RegExp(`(?<![\\p{L}])(?:[Dd]emandante|[Dd]emandad[oa]|[Ii]mputad[oa]|[Qq]uerellante|[Qq]uerellad[oa]|[Vv]íctima|[Tt]rabajador(?:a)?|[Aa]rrendador(?:a)?|[Aa]rrendatari[oa]|[Tt]estigo|[Cc]ausante|[Hh]ereder[oa]|[Cc]ónyuge|[Ss]olicitante|[Rr]equirente|[Rr]equerid[oa]|[Cc]ontratante)\\s*,?\\s*(?:${HONOR}\\s+)?(${L}${W}(?:${SP}(?:de${SP}(?:la${SP}|los${SP})?|del${SP})?${L}${W}){1,4})`, 'gdu'), 1],
+  [new RegExp(`(?<![\\p{L}])(?:[Dd]emandante|[Dd]emandad[oa]|[Ii]mputad[oa]|[Qq]uerellante|[Qq]uerellad[oa]|[Vv]íctima|[Tt]rabajador(?:a)?|[Aa]rrendador(?:a)?|[Aa]rrendatari[oa]|[Tt]estigo|[Cc]ausante|[Hh]ereder[oa]|[Cc]ónyuge|[Ss]olicitante|[Rr]equirente|[Rr]equerid[oa]|[Cc]ontratante|[Aa]bogad[oa]|[Pp]aciente|[Cc]liente|[Ee]mpleador(?:a)?|[Rr]epresentante legal|[Mm]adre|[Pp]adre|[Hh]ij[oa]|[Mm]enor)\\s*,?\\s*(?:${HONOR}\\s+)?(${L}${W}(?:${SP}(?:de${SP}(?:la${SP}|los${SP})?|del${SP})?${L}${W}){1,4})`, 'gdu'), 1],
 ];
+
+/* ───────── Nombres sin contexto: tramos de palabras con mayúscula ───────── */
+const CAPW = "[A-ZÁÉÍÓÚÑÜ][\\p{L}'’]*(?:-[\\p{L}'’]+)*";
+const PARTW = '(?:de|del|la|las|los|DE|DEL|LA|LAS|LOS)';
+const RUN_RE = new RegExp(`(?<![\\p{L}\\p{N}])${CAPW}(?:[ \\t]+(?:${PARTW}[ \\t]+)*${CAPW})*`, 'gu');
+
+/** Tramos de palabras con mayúscula, cortados en cada palabra que no puede ser parte de un nombre. */
+function segments(text) {
+  const segs = [];
+  for (const run of scan(text, RUN_RE)) {
+    let cur = [];
+    const flush = () => { while (cur.length && cur.at(-1).part) cur.pop(); if (cur.length) segs.push(cur); cur = []; };
+    for (const m of run.text.matchAll(/[\p{L}'’-]+/gu)) {
+      const w = m[0], f = fold(w), start = run.start + m.index;
+      const tok = { w, f, start, end: start + w.length, part: false };
+      if (isPart(w)) { if (cur.length) cur.push({ ...tok, part: true }); continue; }
+      if (STOP.has(f) || w.length < 2) { flush(); continue; }
+      cur.push(tok);
+    }
+    flush();
+  }
+  return segs;
+}
+
+/** Personas por diccionario: nombre(s) conocido(s) + apellido(s), o dos apellidos conocidos seguidos. */
+function dictPersons(segs, text) {
+  const out = [];
+  const span = (a, b) => out.push({ start: a.start, end: b.end, text: text.slice(a.start, b.end) });
+  for (const seg of segs) {
+    let i = 0;
+    while (i < seg.length) {
+      const t = seg[i];
+      if (t.part) { i++; continue; }
+      const given = [];
+      let j = i;
+      while (j < seg.length && !seg[j].part && NOMBRES.has(seg[j].f)) given.push(seg[j++]);
+      if (given.length) {
+        const sur = [];
+        let k = j;
+        while (k < seg.length && sur.length < 3) { if (!seg[k].part) sur.push(seg[k]); k++; }
+        const amb = given.every((g) => AMBIGUOS.has(g.f));
+        if (sur.length && (!amb || APELLIDOS.has(sur[0].f))) { span(given[0], sur.at(-1)); i = k; continue; }
+        if (given.length >= 2 && !amb) { span(given[0], given.at(-1)); i = j; continue; }   // «María José»
+        if (seg.length === 1 && !amb) { span(t, t); i = j; continue; }                       // «Saludos, Felipe»
+        i = j; continue;
+      }
+      if (APELLIDOS.has(t.f)) {
+        const n = seg.findIndex((x, idx) => idx > i && !x.part);
+        if (n > 0 && APELLIDOS.has(seg[n].f)) { span(t, seg[n]); i = n + 1; continue; }
+      }
+      i++;
+    }
+  }
+  return out;
+}
+
+/** Modo estricto: todo tramo con mayúscula que quede, salvo la primera palabra de una oración y las siglas cortas. */
+function strictNames(segs, text) {
+  const out = [];
+  const initial = (start) => { const b = text.slice(0, start).replace(/[ \t]+$/, ''); return b === '' || /[.!?:;¿¡\n"“(•–—-]$/.test(b); };
+  for (const seg of segs) {
+    let toks = seg.filter((t) => !t.part && !(t.w === t.w.toUpperCase() && t.w.length <= 4));
+    if (!toks.length) continue;
+    if (initial(toks[0].start) && !NOMBRES.has(toks[0].f) && !APELLIDOS.has(toks[0].f)) toks = toks.slice(1);
+    if (!toks.length) continue;
+    out.push({ start: toks[0].start, end: toks.at(-1).end, text: text.slice(toks[0].start, toks.at(-1).end) });
+  }
+  return out;
+}
+
+/* ───────── Formas en que reaparece una persona ───────── */
+function splitName(name) {
+  const core = name.split(/\s+/).filter((w) => !isPart(w));
+  let g = 0;
+  while (g < core.length - 1 && NOMBRES.has(fold(core[g]))) g++;
+  if (g === 0) g = core.length >= 3 ? core.length - 2 : 1;
+  return { given: core.slice(0, g), sur: core.slice(g) };
+}
+const title = (w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase();
+
+/** Completo; apellidos; nombre + primer apellido; nombres; «señor Apellido»; y el apellido o el nombre solos, con mayúscula. */
+function nameVariants(name, shared) {
+  const v = [name];
+  const { given, sur } = splitName(name);
+  if (!sur.length) return v;
+  if (sur.length >= 2) v.push(sur.join(' '));
+  if (given.length) v.push(`${given.join(' ')} ${sur[0]}`, `${given[0]} ${sur[0]}`);
+  if (given.length >= 2) v.push(given.join(' '));
+  v.push({ honor: sur[0] });
+  if (sur[0].length >= 4 && !shared.has(fold(sur[0]))) v.push({ cap: title(sur[0]) });
+  if (given.length === 1 && given[0].length >= 3 && !AMBIGUOS.has(fold(given[0])) && !shared.has(fold(given[0]))) v.push({ cap: title(given[0]) });
+  return v;
+}
+
+function variantRe(v) {
+  const B = '(?<![\\p{L}\\p{N}])', A = '(?![\\p{L}\\p{N}])';
+  if (typeof v === 'string') return new RegExp(`${B}${fuzzy(v)}${A}`, 'giu');
+  if (v.honor) return new RegExp(`(?<=${HONOR}\\s+)${fuzzy(v.honor)}${A}`, 'giu');
+  return new RegExp(`${B}(?:${fuzzy(v.cap)}|${fuzzy(v.cap.toUpperCase())})${A}`, 'gu');
+}
 
 /* ───────── El motor ───────── */
 let lastMap = new Map();     // canon -> { type, token, value }
 let off = new Set();         // canon que el usuario decidió no tachar
+const offTypes = new Set();  // tipos que el usuario decidió no tachar
 
 function userEntries(raw, type, prefix) {
   return raw.split('\n').map((line, i) => ({
@@ -259,72 +518,66 @@ function userEntries(raw, type, prefix) {
   })).filter((e) => e.variants.length);
 }
 
-/** Formas en que reaparece un nombre: completo, sus apellidos, y «señor Apellido». */
-function nameVariants(name) {
-  const words = name.split(/\s+/).filter((w) => !/^(de|del|la|las|los)$/i.test(w));
-  const v = [name];
-  if (words.length >= 3) v.push(words.slice(-2).join(' '));
-  if (words.length >= 2) {
-    const first = words.length >= 3 ? words[words.length - 2] : words[1];
-    v.push({ honor: first });
-  }
-  return v;
-}
-
-function variantRe(v) {
-  if (typeof v === 'string') return new RegExp(`(?<![\\p{L}\\p{N}])${escRe(v)}(?![\\p{L}\\p{N}])`, 'giu');
-  return new RegExp(`(?<=${HONOR}\\s+)${escRe(v.honor)}(?![\\p{L}\\p{N}])`, 'giu');
-}
-
 function analyze(text) {
   const cands = [];
-  const add = (spans, type, canon, prio, display) => {
-    for (const s of spans) cands.push({ ...s, type, canon: canon ?? `${type}:${norm(s.text)}`, prio, display: display ?? s.text });
-  };
+  const strict = $('estricto').checked;
 
-  // 1) Lo que el usuario pidió.
-  const people = userEntries(document.getElementById('personas').value, 'PERSONA', 'u:p:');
-  const others = userEntries(document.getElementById('otros').value, 'DATO', 'u:o:');
-  for (const e of others) for (const v of e.variants) add(scan(text, variantRe(v)), 'DATO', e.canon, 1, e.variants[0]);
-
-  // 2) Personas detectadas solas; se agrupan con las del usuario si son parte del mismo nombre.
-  const known = people.map((e) => ({ canon: e.canon, display: e.variants[0], words: new Set(norm(e.variants.join(' ')).split(' ')) }));
-  for (const [re, g] of PERSON_RULES) {
-    for (const s of scan(text, re, g)) {
-      const first = norm(s.text).split(' ')[0];
-      if (NOT_NAMES.has(first)) continue;
-      const words = norm(s.text).split(' ').filter((w) => !/^(de|del|la|las|los)$/.test(w));
-      let k = known.find((n) => words.every((w) => n.words.has(w)));
-      if (!k) {
-        // Un nombre más largo que absorbe a uno ya visto («Salinas» → «Pedro Pablo Salinas Mora»).
-        const sub = known.find((n) => n.auto && [...n.words].every((w) => words.includes(w)));
-        if (sub) { sub.words = new Set(words); sub.display = s.text; k = sub; }
-      }
-      if (!k) { k = { canon: `p:${norm(s.text)}`, display: s.text, words: new Set(words), auto: true }; known.push(k); }
-    }
-  }
-  // Cada persona se busca en todas sus formas, con la prioridad más alta.
-  for (const k of known) {
-    const user = people.find((e) => e.canon === k.canon);
-    const forms = user ? user.variants.flatMap((v) => nameVariants(v)) : nameVariants(k.display);
-    if (!user) for (const n of known) if (n !== k && n.auto && [...n.words].every((w) => k.words.has(w))) forms.push(n.display);
-    for (const v of forms) add(scan(text, variantRe(v)), 'PERSONA', k.canon, 0, k.display);
-  }
-
-  // 3) Patrones.
+  // 1) Patrones. Empresas, direcciones y lugares mandan sobre los nombres que llevan dentro («calle Pedro de Valdivia 123»).
   DETECTORS.forEach((d, i) => {
     for (const [re, g] of d.rules) {
-      let spans = scan(text, re, g ?? 0);
-      if (d.type === 'RUT') spans = spans.map((s) => {
-        const c = s.text.replace(/[.\s]/g, '');
-        const [body, dv] = c.split('-');
-        return { ...s, canonText: c.toUpperCase(), weak: !rutOk(body, dv) };
-      });
-      for (const s of spans) cands.push({ ...s, type: d.type, canon: `${d.type}:${s.canonText ?? norm(s.text)}`, prio: 2 + i, display: s.text });
+      for (const s of scan(text, re, g ?? 0)) {
+        let canonText = norm(s.text), weak = false;
+        if (d.type === 'RUT' && /^[\d.\s]+-\s?[\dkK]$/.test(s.text)) {
+          canonText = s.text.replace(/[.\s]/g, '').toUpperCase();
+          const [body, dv] = canonText.split('-');
+          weak = !rutOk(body, dv);
+        }
+        cands.push({ ...s, type: d.type, canon: `${d.type}:${canonText}`, prio: 2 + i, display: s.text, weak });
+      }
     }
   });
+  const ctx = cands.filter((c) => c.type === 'EMPRESA' || c.type === 'DIRECCION' || c.type === 'LUGAR');
+  const inCtx = (s) => ctx.some((c) => s.start < c.end && c.start < s.end);
 
-  // 4) Si se pisan, gana la prioridad más alta y después el tramo más largo.
+  // 2) Lo que el usuario pidió.
+  const people = userEntries($('personas').value, 'PERSONA', 'u:p:');
+  const others = userEntries($('otros').value, 'DATO', 'u:o:');
+  for (const e of others) for (const v of e.variants) for (const s of scan(text, variantRe(v))) cands.push({ ...s, type: 'DATO', canon: e.canon, prio: 1, display: e.variants[0] });
+
+  // 3) Personas detectadas solas; se agrupan con las del usuario si son parte del mismo nombre.
+  const known = people.map((e) => ({ canon: e.canon, display: e.variants[0], words: new Set(norm(e.variants.join(' ')).split(' ').filter((w) => !isPart(w))) }));
+  const segs = segments(text);
+  const found = [];
+  for (const [re, g] of PERSON_RULES) for (const s of scan(text, re, g)) if (!inCtx(s)) found.push(s);
+  for (const s of dictPersons(segs, text)) if (!inCtx(s)) found.push(s);
+  found.sort((a, b) => (b.end - b.start) - (a.end - a.start));   // los nombres largos primero: los cortos se suman a ellos
+  for (const s of found) {
+    const words = norm(s.text).split(' ').filter((w) => !isPart(w));
+    if (NOT_NAMES.has(words[0])) continue;
+    let k = known.find((n) => words.every((w) => n.words.has(w)));
+    if (!k) {
+      const sub = known.find((n) => n.auto && [...n.words].every((w) => words.includes(w)));
+      if (sub) { sub.words = new Set(words); sub.display = s.text; k = sub; }
+    }
+    if (!k) known.push({ canon: `p:${norm(s.text)}`, display: s.text, words: new Set(words), auto: true });
+  }
+  // Apellidos y nombres que comparten dos personas no se buscan solos: no sabríamos de quién son.
+  const seen = new Map();
+  for (const k of known) {
+    const { given, sur } = splitName(k.display);
+    for (const w of new Set([given[0], sur[0]].filter(Boolean).map(fold))) seen.set(w, (seen.get(w) ?? 0) + 1);
+  }
+  const shared = new Set([...seen].filter(([, n]) => n > 1).map(([w]) => w));
+  for (const k of known) {
+    const user = people.find((e) => e.canon === k.canon);
+    const forms = user ? [...user.variants, ...user.variants.flatMap((v) => nameVariants(v, shared).slice(1))] : nameVariants(k.display, shared);
+    for (const v of forms) for (const s of scan(text, variantRe(v))) if (user || !inCtx(s)) cands.push({ ...s, type: 'PERSONA', canon: k.canon, prio: 0, display: k.display });
+  }
+
+  // 4) Modo estricto: lo que quede con mayúscula.
+  if (strict) for (const s of strictNames(segs, text)) if (!inCtx(s)) cands.push({ ...s, type: 'NOMBRE', canon: `NOMBRE:${norm(s.text)}`, prio: 90, display: s.text });
+
+  // 5) Si se pisan, gana la prioridad más alta y después el tramo más largo.
   cands.sort((a, b) => a.prio - b.prio || (b.end - b.start) - (a.end - a.start) || a.start - b.start);
   const taken = [];
   for (const c of cands) {
@@ -334,7 +587,7 @@ function analyze(text) {
   }
   taken.sort((a, b) => a.start - b.start);
 
-  // 5) Etiquetas en orden de aparición, una por dato distinto.
+  // 6) Etiquetas en orden de aparición, una por dato distinto.
   const map = new Map();
   const count = {};
   for (const t of taken) {
@@ -348,7 +601,16 @@ function analyze(text) {
 }
 
 /* ───────── Pantalla ───────── */
-const $ = (id) => document.getElementById(id);
+function $(id) { return document.getElementById(id); }
+const isOff = (canon, e) => off.has(canon) || offTypes.has(e.type);
+
+$('chips').innerHTML = Object.entries(TYPES).filter(([t]) => t !== 'NOMBRE' && t !== 'DATO').map(([t, v]) =>
+  `<label class="chip" style="--c:${v.color}"><input type="checkbox" data-type="${t}" checked> ${v.label}</label>`).join('');
+$('chips').addEventListener('change', (e) => {
+  const t = e.target.dataset.type; if (!t) return;
+  e.target.checked ? offTypes.delete(t) : offTypes.add(t);
+  render();
+});
 
 function render() {
   const text = $('src').value;
@@ -360,10 +622,10 @@ function render() {
   let html = '', out = '', pos = 0;
   for (const s of spans) {
     const e = map.get(s.canon);
-    const isOff = off.has(s.canon);
+    const no = isOff(s.canon, e);
     html += escHtml(text.slice(pos, s.start));
-    html += `<mark data-canon="${escHtml(s.canon)}" class="${isOff ? 'off' : ''}" style="--c:${TYPES[e.type].color}" title="${escHtml(e.token)} · ${TYPES[e.type].label}${isOff ? ' · no se tacha' : ''}">${escHtml(text.slice(s.start, s.end))}</mark>`;
-    out += text.slice(pos, s.start) + (isOff ? text.slice(s.start, s.end) : e.token);
+    html += `<mark data-canon="${escHtml(s.canon)}" class="${no ? 'off' : ''}" style="--c:${TYPES[e.type].color}" title="${escHtml(e.token)} · ${TYPES[e.type].label}${no ? ' · no se tacha' : ''}">${escHtml(text.slice(s.start, s.end))}</mark>`;
+    out += text.slice(pos, s.start) + (no ? text.slice(s.start, s.end) : e.token);
     pos = s.end;
   }
   html += escHtml(text.slice(pos));
@@ -373,14 +635,14 @@ function render() {
   // Lista de datos.
   $('list').innerHTML = [...map.entries()].map(([canon, e]) => `
     <li style="--c:${TYPES[e.type].color}">
-      <input type="checkbox" data-canon="${escHtml(canon)}" ${off.has(canon) ? '' : 'checked'} aria-label="Tachar ${escHtml(e.value)}">
+      <input type="checkbox" data-canon="${escHtml(canon)}" ${isOff(canon, e) ? '' : 'checked'} ${offTypes.has(e.type) ? 'disabled' : ''} aria-label="Tachar ${escHtml(e.value)}">
       <span class="val">${escHtml(e.value)}${e.weak ? ' <span class="hint">(el dígito verificador no cuadra: revisa)</span>' : ''}${e.n > 1 ? ` <span class="hint">×${e.n}</span>` : ''}</span>
       <span class="tok">${escHtml(e.token)}</span>
     </li>`).join('');
 
-  const active = [...map.keys()].filter((c) => !off.has(c)).length;
+  const active = [...map.entries()].filter(([c, e]) => !isOff(c, e)).length;
   $('stats').textContent = text
-    ? (map.size ? `Encontré ${spans.length} marcas de ${map.size} datos distintos. Se tachan ${active}.` : 'No encontré datos. Agrega a mano lo que quieras tachar.')
+    ? (map.size ? `Encontré ${spans.length} marcas de ${map.size} datos distintos. Se tachan ${active}.` : 'No encontré datos. Agrega a mano lo que quieras tachar, o prueba el modo estricto.')
     : '';
   $('stats').className = 'msg' + (text && !map.size ? ' warn' : '');
 
@@ -393,10 +655,38 @@ let timer;
 const later = () => { clearTimeout(timer); timer = setTimeout(render, 120); };
 ['src', 'personas', 'otros'].forEach((id) => $(id).addEventListener('input', later));
 $('aviso').addEventListener('change', render);
+$('estricto').addEventListener('change', render);
 
 function toggle(canon) { off.has(canon) ? off.delete(canon) : off.add(canon); render(); }
-$('preview').addEventListener('click', (e) => { const m = e.target.closest('mark'); if (m) toggle(m.dataset.canon); });
+$('preview').addEventListener('click', (e) => {
+  if (String(window.getSelection())) return;   // estaba seleccionando, no marcando
+  const m = e.target.closest('mark'); if (m) toggle(m.dataset.canon);
+});
 $('list').addEventListener('change', (e) => { if (e.target.dataset.canon) toggle(e.target.dataset.canon); });
+
+/* Seleccionar en la vista algo que no marqué y tacharlo en todo el texto. */
+let picked = '';
+document.addEventListener('selectionchange', () => {
+  const sel = window.getSelection();
+  const inside = sel.rangeCount && $('preview').contains(sel.getRangeAt(0).commonAncestorContainer);
+  picked = inside ? String(sel).replace(/\s+/g, ' ').trim() : '';
+  const ok = picked.length >= 2 && picked.length <= 80;
+  $('selPersona').disabled = $('selOtro').disabled = !ok;
+  $('selHint').textContent = ok ? `Seleccionaste «${picked}». Tacharlo en todo el texto como:` : '¿Se me pasó algo? Selecciónalo arriba con el mouse y elige:';
+});
+function addPicked(id) {
+  if (!picked) return;
+  const box = $(id);
+  const lines = box.value.split('\n').map((l) => l.trim()).filter(Boolean);
+  if (!lines.some((l) => l.split('/').some((v) => norm(v) === norm(picked)))) lines.push(picked);
+  box.value = lines.join('\n');
+  window.getSelection().removeAllRanges();
+  render();
+}
+for (const [btn, box] of [['selPersona', 'personas'], ['selOtro', 'otros']]) {
+  $(btn).addEventListener('mousedown', (e) => e.preventDefault());   // que el clic no borre la selección
+  $(btn).addEventListener('click', () => addPicked(box));
+}
 
 /* Copiar y guardar: todo local. */
 async function copy(text, msgEl) {
@@ -410,7 +700,7 @@ $('copiar2').addEventListener('click', () => copy($('restored').value, $('restMs
 
 function keyObject() {
   const llave = {};
-  for (const [canon, e] of lastMap) if (!off.has(canon)) llave[e.token] = e.value;
+  for (const [canon, e] of lastMap) if (!isOff(canon, e)) llave[e.token] = e.value;
   return llave;
 }
 $('bajarLlave').addEventListener('click', () => {
@@ -428,13 +718,14 @@ $('bajarLlave').addEventListener('click', () => {
 
 /* ───────── Devolver ───────── */
 let loadedKey = null;
+const TOKEN_RE = new RegExp(`\\[?\\b(${Object.keys(TYPES).join('|')})_(\\d+)\\b\\]?`, 'g');
 function restore() {
   const llave = loadedKey ?? keyObject();
   const text = $('resp').value;
   let n = 0;
   const unknown = new Set();
   // Acepta [PERSONA_1] y también PERSONA_1 si la IA quitó los corchetes.
-  const out = text.replace(/\[?\b(PERSONA|EMPRESA|RUT|CORREO|TELEFONO|DIRECCION|CAUSA|PATENTE|CUENTA|DATO)_(\d+)\b\]?/g, (m, t, i) => {
+  const out = text.replace(TOKEN_RE, (m, t, i) => {
     const k = `[${t}_${i}]`;
     if (k in llave) { n++; return llave[k]; }
     unknown.add(k); return m;
@@ -513,7 +804,9 @@ MARÍA JOSÉ FUENTEALBA ROJAS, chilena, ingeniera comercial, cédula nacional de
 
 Que vengo en deducir demanda en contra de Inmobiliaria Los Aromos SpA, RUT 76.000.000-0, representada por don Pedro Pablo Salinas Mora, cédula 22.222.222-2, ambos domiciliados en avenida Providencia 1550, oficina 801, comuna de Providencia.
 
-El 3 de marzo de 2025, el vehículo patente BCDF·12, conducido por el señor Salinas, dañó el inmueble de la Sra. Fuentealba. Mi representada pagó $1.250.000 en reparaciones desde su cuenta corriente N° 00-123-45678-09. Existe una causa previa entre las mismas partes, Rol C-9999-2024.
+El 3 de marzo de 2025, el vehículo patente BCDF·12, conducido por Salinas, dañó el inmueble de la Sra. Fuentealba. Lo presenció la vecina Carolina Andrea Muñoz Tapia, de 67 años de edad, quien llamó a Jorge Valdés para avisarle. Mi representada pagó $1.250.000 en reparaciones desde su cuenta corriente N° 00-123-45678-09, más 35 UF por el arriendo de una bodega en la Clínica Santa Elena. Existe una causa previa entre las mismas partes, Rol C-9999-2024.
+
+En Santiago, a 14 de abril de 2025.
 
 (Datos ficticios: el ejemplo es para probar la herramienta.)`;
 $('ejemplo').addEventListener('click', () => { $('src').value = EJEMPLO; off.clear(); render(); });
