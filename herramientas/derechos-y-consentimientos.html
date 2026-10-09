@@ -1483,29 +1483,29 @@ function ejemplo() {
     { id: 'u-bdc', nombre: 'Base de datos comprada para campañas', titulares: 'clientes', base: '', baseDetalle: '', datos: 'nombre, correo, comuna', finalidad: 'Captar clientes nuevos', sistema: 'Planilla de marketing', conservacion: '', encargados: '', sensibles: false },
   ];
   const cons = [
-    ['Camila Rojas Medina', 'c.rojas@correo.cl', -210, { fecha: -4, medio: 'electronico' }],
-    ['Javiera Soto Pérez', 'jsoto@correo.cl', -180], ['Matías González Vera', 'mgonzalez@correo.cl', -150],
-    ['Fernanda Muñoz Lagos', 'fmunoz@correo.cl', -120], ['Ignacio Herrera Silva', 'iherrera@correo.cl', -95, { fecha: -60, medio: 'electronico' }],
-    ['Valentina Díaz Torres', 'vdiaz@correo.cl', -70], ['Tomás Castro Núñez', 'tcastro@correo.cl', -40], ['Antonia Reyes Fuentes', 'areyes@correo.cl', -12],
+    ['Camila Rojas Medina', 'c.rojas@ejemplo.cl', -210, { fecha: -4, medio: 'electronico' }],
+    ['Javiera Soto Pérez', 'jsoto@ejemplo.cl', -180], ['Matías González Vera', 'mgonzalez@ejemplo.cl', -150],
+    ['Fernanda Muñoz Lagos', 'fmunoz@ejemplo.cl', -120], ['Ignacio Herrera Silva', 'iherrera@ejemplo.cl', -95, { fecha: -60, medio: 'electronico' }],
+    ['Valentina Díaz Torres', 'vdiaz@ejemplo.cl', -70], ['Tomás Castro Núñez', 'tcastro@ejemplo.cl', -40], ['Antonia Reyes Fuentes', 'areyes@ejemplo.cl', -12],
   ].map(([titular, contacto, f, rv], i) => ({ id: 'c-' + i, usoId: 'u-pun', titular, contacto, fecha: D(f), medio: 'electronico', texto: 'Aviso del programa de puntos, versión 2 (marzo 2026)', evidencia: 'Casilla marcada en el registro web, con fecha y hora', revocado: rv ? { fecha: D(rv.fecha), medio: rv.medio } : null }));
   cons.push({ id: 'c-h1', usoId: 'u-hue', titular: 'Pedro Alarcón Ríos', contacto: 'Ficha T-118', fecha: D(-400), medio: 'escrito', texto: 'Anexo de contrato «Uso de huella digital»', evidencia: 'Anexo firmado en la carpeta de personal', revocado: null });
 
   const sol = [
-    { id: 's-1', folio: 'S-0001', recepcion: D(-48), tipo: 'portabilidad', titular: 'Ignacio Herrera Silva', relacion: 'clientes', contacto: 'iherrera@correo.cl', detalle: 'Quiero mis datos de compras para llevarlos a otra tienda.', origen: 'formulario',
+    { id: 's-1', folio: 'S-0001', recepcion: D(-48), tipo: 'portabilidad', titular: 'Ignacio Herrera Silva', relacion: 'clientes', contacto: 'iherrera@ejemplo.cl', detalle: 'Quiero mis datos de compras para llevarlos a otra tienda.', origen: 'formulario',
       checks: { acuse: D(-48), identidad: D(-46), contacto: true, datos: true }, busqueda: { 'u-ven': 'si', 'u-pun': 'si', 'u-bdc': 'no' }, decision: 'acoge' },
-    { id: 's-2', folio: 'S-0002', recepcion: D(-40), tipo: 'acceso', titular: 'Rodrigo Fuentes Aravena', relacion: 'trabajadores', contacto: 'rfuentes@correo.cl', detalle: 'Ex trabajador. Pido copia de todos mis datos, incluidas las grabaciones y los correos internos donde se me menciona.', origen: 'manual',
+    { id: 's-2', folio: 'S-0002', recepcion: D(-40), tipo: 'acceso', titular: 'Rodrigo Fuentes Aravena', relacion: 'trabajadores', contacto: 'rfuentes@ejemplo.cl', detalle: 'Ex trabajador. Pido copia de todos mis datos, incluidas las grabaciones y los correos internos donde se me menciona.', origen: 'manual',
       checks: { acuse: D(-39), identidad: D(-37), contacto: true, datos: true }, busqueda: { 'u-rem': 'si', 'u-lic': 'si', 'u-hue': 'si' }, prorroga: { fecha: D(-12), motivo: 'El volumen de información y la revisión de comunicaciones internas requieren más tiempo.' }, escalar: true },
-    { id: 's-3', folio: 'S-0003', recepcion: D(-33), tipo: 'rectificacion', titular: 'Daniela Pizarro Contreras', relacion: 'trabajadores', contacto: 'dpizarro@correo.cl', detalle: 'Mi segundo apellido aparece mal escrito en las liquidaciones: es Contreras, no Contrera.', origen: 'manual',
+    { id: 's-3', folio: 'S-0003', recepcion: D(-33), tipo: 'rectificacion', titular: 'Daniela Pizarro Contreras', relacion: 'trabajadores', contacto: 'dpizarro@ejemplo.cl', detalle: 'Mi segundo apellido aparece mal escrito en las liquidaciones: es Contreras, no Contrera.', origen: 'manual',
       checks: { acuse: D(-33), identidad: '', contacto: true, datos: true, contenido: true }, busqueda: {} },
-    { id: 's-4', folio: 'S-0004', recepcion: D(-26), tipo: 'oposicion', titular: 'Sebastián Morales Pino', relacion: 'clientes', contacto: 'smorales@correo.cl', detalle: 'No quiero recibir más publicidad. Nunca me inscribí.', causal: 'b', origen: 'formulario',
+    { id: 's-4', folio: 'S-0004', recepcion: D(-26), tipo: 'oposicion', titular: 'Sebastián Morales Pino', relacion: 'clientes', contacto: 'smorales@ejemplo.cl', detalle: 'No quiero recibir más publicidad. Nunca me inscribí.', causal: 'b', origen: 'formulario',
       checks: { acuse: D(-26), identidad: D(-25), contacto: true, datos: true }, busqueda: { 'u-ven': 'no', 'u-pun': 'no', 'u-bdc': 'si' } },
-    { id: 's-5', folio: 'S-0005', recepcion: D(-4), tipo: 'supresion', titular: 'Camila Rojas Medina', relacion: 'clientes', contacto: 'c.rojas@correo.cl', detalle: 'Me di de baja del programa de puntos. Quiero que borren todos mis datos.', causal: 'b', origen: 'formulario',
+    { id: 's-5', folio: 'S-0005', recepcion: D(-4), tipo: 'supresion', titular: 'Camila Rojas Medina', relacion: 'clientes', contacto: 'c.rojas@ejemplo.cl', detalle: 'Me di de baja del programa de puntos. Quiero que borren todos mis datos.', causal: 'b', origen: 'formulario',
       checks: { acuse: D(-4), identidad: '', contacto: true, datos: true }, busqueda: { 'u-pun': 'si', 'u-ven': 'si' } },
-    { id: 's-6', folio: 'S-0006', recepcion: D(-1), tipo: 'oposicion', titular: 'Luis Bravo Cárdenas', relacion: 'visitas', contacto: 'lbravo@correo.cl', detalle: 'Me opongo a que me graben las cámaras de la tienda de mi barrio, que apuntan a la vereda.', causal: 'a', origen: 'formulario',
+    { id: 's-6', folio: 'S-0006', recepcion: D(-1), tipo: 'oposicion', titular: 'Luis Bravo Cárdenas', relacion: 'visitas', contacto: 'lbravo@ejemplo.cl', detalle: 'Me opongo a que me graben las cámaras de la tienda de mi barrio, que apuntan a la vereda.', causal: 'a', origen: 'formulario',
       checks: { acuse: '', identidad: '', contacto: true, datos: true }, busqueda: {}, bloqueo: { pedido: D(-1), decision: 'pendiente' } },
   ];
 
-  const d = normalizar({ empresa: { nombre: 'Comercial Pehuén SpA', rut: '76.543.210-3', ciudad: 'Santiago', correo: 'privacidad@pehuen.cl', responsable: 'María José Cifuentes, encargada de datos' }, usos, consentimientos: cons, solicitudes: sol, folio: 6, ejemplo: true });
+  const d = normalizar({ empresa: { nombre: 'Comercial Pehuén SpA', rut: '', ciudad: 'Santiago', correo: 'privacidad@pehuen-ejemplo.cl', responsable: 'Andrea Molina, encargada de datos' }, usos, consentimientos: cons, solicitudes: sol, folio: 6, ejemplo: true });
 
   // La respuesta ya enviada de S-0001 se guarda con su carta, como en la vida real.
   datos = d;
