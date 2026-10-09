@@ -9,7 +9,7 @@
 <style>
   :root {
     --fondo: #f6f5f1; --papel: #ffffff; --papel2: #fbfaf7; --hundido: #efede6;
-    --tinta: #1a2636; --tinta2: #3b4859; --suave: #69737f; --linea: #dddbd2; --linea2: #ebe9e2;
+    --tinta: #1a2636; --tinta2: #3b4859; --suave: #5f6873; --linea: #dddbd2; --linea2: #ebe9e2; --campo: #8e8a82;
     --acento: #0d5c68; --acento-osc: #094650; --acento-claro: #e3eef0; --acento-borde: #c3dbde;
     --verde: #2b7549; --verde-f: #e4f0e8; --verde-b: #bcd8c6;
     --ambar: #94600f; --ambar-f: #f9eed8; --ambar-b: #ead2a2;
@@ -26,6 +26,8 @@
   h1, h2, h3 { font-family: var(--serif); font-weight: 600; color: var(--tinta); }
   :focus-visible { outline: 2px solid var(--acento); outline-offset: 2px; }
   [hidden] { display: none !important; }
+  .sr { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+  h1[tabindex="-1"]:focus { outline: none; }
 
   /* Cabecera */
   .cabecera { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px 24px; padding: 26px 0 20px; border-bottom: 1px solid var(--linea); }
@@ -42,11 +44,15 @@
   .btn.primario:hover { background: var(--acento-osc); color: #fff; }
   .btn.peligro { color: var(--rojo); }
   .btn.peligro:hover { border-color: var(--rojo); }
+  .btn.peligro.lleno { background: var(--rojo); border-color: var(--rojo); color: #fff; }
+  .btn.peligro.lleno:hover { background: #7d231f; border-color: #7d231f; color: #fff; }
   .btn.chico { font-size: 13px; padding: 5px 10px; }
   .btn-txt { font: inherit; font-size: 13px; background: none; border: 0; color: var(--suave); cursor: pointer; padding: 4px 6px; text-decoration: underline; text-underline-offset: 2px; }
   .btn-txt:hover { color: var(--rojo); }
-  input, select, textarea { font: inherit; font-size: 14px; color: var(--tinta); background: var(--papel); border: 1px solid var(--linea); border-radius: 7px; padding: 7px 10px; min-width: 0; max-width: 100%; }
-  input:focus, select:focus, textarea:focus { border-color: var(--acento); outline: none; box-shadow: 0 0 0 3px var(--acento-claro); }
+  input, select, textarea { font: inherit; font-size: 14px; color: var(--tinta); background: var(--papel); border: 1px solid var(--campo); border-radius: 7px; padding: 7px 10px; min-width: 0; max-width: 100%; }
+  input:focus, select:focus, textarea:focus { border-color: var(--acento); box-shadow: 0 0 0 3px var(--acento-claro); }
+  input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px solid var(--acento); outline-offset: 1px; }
+  [aria-invalid="true"] { border-color: var(--rojo); }
   input[type=checkbox] { width: 17px; height: 17px; accent-color: var(--acento); margin: 0; }
   textarea { resize: vertical; min-height: 80px; }
   label.campo { display: flex; flex-direction: column; gap: 4px; font-size: 12.5px; color: var(--suave); min-width: 0; }
@@ -81,6 +87,10 @@
   .filtros { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 14px; }
   .filtros input[type=search] { flex: 1 1 280px; }
   .conteo { font-size: 13px; color: var(--suave); margin-left: auto; }
+  @media (max-width: 600px) {
+    .vistas { display: grid; grid-template-columns: 1fr 1fr; width: 100%; gap: 0; }
+    .vistas a { display: flex; align-items: center; justify-content: center; text-align: center; min-height: 44px; }
+  }
 
   /* Tablas */
   .tabla { width: 100%; border-collapse: separate; border-spacing: 0; background: var(--papel); border: 1px solid var(--linea); border-radius: var(--radio); font-variant-numeric: tabular-nums; }
@@ -100,6 +110,12 @@
   .prox { max-width: 250px; }
   .vencida { color: var(--rojo); font-weight: 600; }
   .vacio { padding: 40px 20px; text-align: center; color: var(--suave); background: var(--papel); border: 1px dashed var(--linea); border-radius: var(--radio); }
+  .vacio p { margin: 0 0 14px; }
+  .vacio .btn { margin: 4px; }
+  .estado-c { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
+  .motivo { max-width: 210px; line-height: 1.35; }
+  .chip.ej { font: 500 12px/1.5 var(--sans); padding: 1px 8px; margin-left: 6px; vertical-align: 3px; letter-spacing: 0; }
+  .solo-cel { display: none; }
 
   /* Avance, semáforo y plazos */
   .av { display: flex; align-items: center; gap: 10px; min-width: 130px; }
@@ -130,6 +146,10 @@
     .tabla.resp td.cab::before { display: none; }
     .tabla.resp .av { flex: 0 1 60%; min-width: 0; }
     .tabla.resp .prox { max-width: 65%; }
+    .tabla.resp td.solo-pc { display: none; }
+    .tabla.resp .solo-cel { display: block; }
+    .tabla.resp .estado-c { align-items: flex-end; }
+    .tabla.resp .motivo { max-width: 100%; }
     .filtros select { flex: 1 1 40%; }
     .conteo { margin-left: 0; }
   }
@@ -137,16 +157,20 @@
   /* Vista por etapas */
   .kanban { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; align-items: start; }
   .col { background: var(--hundido); border-radius: var(--radio); padding: 12px; min-width: 0; }
-  .col h3 { font-size: 15.5px; margin: 2px 2px 12px; display: flex; justify-content: space-between; gap: 8px; }
-  .col h3 span { font: 500 13px/1.6 var(--sans); color: var(--suave); }
+  .col h2 { font-size: 15.5px; margin: 2px 2px 12px; display: flex; justify-content: space-between; gap: 8px; }
+  .col h2 > span { font: 500 13px/1.6 var(--sans); color: var(--suave); }
   .col .nada { font-size: 13px; color: var(--suave); padding: 4px 2px 8px; }
   .tarjeta { background: var(--papel); border: 1px solid var(--linea); border-radius: 8px; padding: 12px; margin-bottom: 10px; }
-  .tarjeta .nombre { display: block; line-height: 1.3; }
+  .tarjeta .nombre { display: inline; line-height: 1.3; }
+  .tarjeta .chip.ej { margin-left: 4px; }
   .tarjeta .av { min-width: 0; margin: 10px 0 8px; }
-  .tarjeta .pie-t { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
-  .tarjeta select { font-size: 13px; padding: 4px 6px; }
+  .tarjeta .pie-t { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; margin-top: 8px; }
   .tarjeta .mini + .mini { margin-top: 2px; }
+  .tarjeta .mover-t { display: flex; gap: 8px; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--linea2); }
+  .tarjeta .mover-t [data-mover="1"] { margin-left: auto; }
+  .tarjeta:focus-visible { outline: 2px solid var(--acento); outline-offset: 2px; }
   .kanban .tarjeta[draggable="true"] { cursor: grab; }
+  .kanban .tarjeta a, .kanban .tarjeta button { cursor: pointer; }
   .kanban .tarjeta.arrastrando { opacity: .45; }
   .col.destino { outline: 2px dashed var(--acento); outline-offset: -2px; }
   .ayuda-kanban { font-size: 13px; color: var(--suave); margin: -4px 0 10px; }
@@ -160,8 +184,8 @@
   .ficha-cab .meta { color: var(--tinta2); font-size: 14px; margin: 0; }
   .ficha-acc { display: flex; flex-wrap: wrap; gap: 8px; }
   .caja { background: var(--papel); border: 1px solid var(--linea); border-radius: var(--radio); padding: 18px 20px; min-width: 0; }
-  .caja h3 { font-size: 17px; margin: 0 0 10px; }
-  .caja h3 + .nota { margin-top: -4px; }
+  .caja h2 { font-size: 17px; margin: 0 0 10px; }
+  .caja h2 + .nota { margin-top: -4px; }
   .caja + .caja { margin-top: 14px; }
   .estado-ficha { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr); gap: 14px; margin: 20px 0 22px; }
   .estado-ficha .caja + .caja { margin-top: 0; }
@@ -179,7 +203,7 @@
   .pasos li { position: relative; text-align: center; }
   .pasos li + li::before { content: ""; position: absolute; top: 15px; right: 50%; width: 100%; height: 2px; background: var(--linea); }
   .pasos li.hecho::before, .pasos li.actual::before { background: var(--acento); }
-  .pasos button { position: relative; z-index: 1; font: inherit; background: none; border: 0; padding: 0 4px; cursor: pointer; color: var(--suave); display: flex; flex-direction: column; align-items: center; gap: 6px; width: 100%; }
+  .pasos button { position: relative; z-index: 1; font: inherit; background: none; border: 0; padding: 0 4px; cursor: pointer; color: var(--suave); display: flex; flex-direction: column; align-items: center; gap: 6px; width: 100%; min-height: 44px; }
   .pasos .bola { width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; background: var(--papel); border: 2px solid var(--linea); font: 600 14px/1 var(--sans); color: var(--suave); }
   .pasos .txt { font-size: 13px; line-height: 1.25; }
   .pasos li.hecho .bola { background: var(--acento); border-color: var(--acento); color: #fff; }
@@ -202,7 +226,10 @@
   .subpest .cuenta-p { display: inline-block; min-width: 20px; padding: 0 6px; margin-left: 4px; border-radius: 999px; background: var(--hundido); color: var(--tinta2); font-size: 12px; text-align: center; }
   .subpest .cuenta-p.rojo { background: var(--rojo-f); color: var(--rojo); }
   .subpest .cuenta-p.ambar { background: var(--ambar-f); color: var(--ambar); }
-  @media (max-width: 600px) { .subpest { gap: 0; } .subpest a { padding: 8px 9px; font-size: 13.5px; } }
+  @media (max-width: 600px) {
+    .subpest { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; }
+    .subpest a { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; text-align: center; min-height: 44px; padding: 6px 4px; font-size: 13.5px; line-height: 1.25; }
+  }
 
   .dos { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; align-items: start; }
   .dos > div > .caja + .caja { margin-top: 14px; }
@@ -223,7 +250,7 @@
   /* Obligaciones */
   .grupo { background: var(--papel); border: 1px solid var(--linea); border-radius: var(--radio); padding: 6px 20px 10px; margin-bottom: 14px; }
   .grupo > header { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 10px 0 8px; }
-  .grupo > header h3 { font-size: 17px; margin: 0; }
+  .grupo > header h2 { font-size: 17px; margin: 0; }
   .grupo > header span { font-size: 13px; color: var(--suave); white-space: nowrap; }
   .item { display: grid; grid-template-columns: minmax(0, 1.5fr) 128px minmax(0, .8fr) minmax(0, 1fr); gap: 10px; align-items: center; padding: 9px 0; border-top: 1px solid var(--linea2); }
   .item-nom { font-size: 14.5px; }
@@ -263,7 +290,7 @@
   .tabla.chica select { font-size: 13px; padding: 4px 6px; }
 
   /* Diálogos y avisos */
-  dialog { border: 1px solid var(--linea); border-radius: 12px; padding: 0; width: min(680px, calc(100vw - 32px)); max-height: calc(100vh - 32px); color: var(--tinta); background: var(--papel); box-shadow: 0 24px 60px rgba(20, 30, 45, .25); }
+  dialog { border: 1px solid var(--linea); border-radius: 12px; padding: 0; width: min(680px, calc(100vw - 32px)); max-height: calc(100vh - 32px); max-height: calc(100dvh - 32px); overflow: auto; color: var(--tinta); background: var(--papel); box-shadow: 0 24px 60px rgba(20, 30, 45, .25); }
   dialog::backdrop { background: rgba(26, 38, 54, .42); }
   .dlg-cab { padding: 20px 22px 0; }
   .dlg-cab h2 { margin: 0; font-size: 21px; }
@@ -271,11 +298,29 @@
   .dlg-cuerpo .ancho { grid-column: 1 / -1; }
   .dlg-cuerpo p { margin: 0; color: var(--tinta2); }
   .dlg-pie { padding: 16px 22px 20px; display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 8px; }
+  .dlg-pie .izq { margin-right: auto; }
   .ayuda { font-size: 12px; color: var(--suave); }
   .error-campo { font-size: 12.5px; color: var(--rojo); }
-  @media (max-width: 560px) { .dlg-cuerpo { grid-template-columns: 1fr; } }
+  .error-campo:empty { display: none; }
+  @media (max-width: 560px) {
+    .dlg-cuerpo { grid-template-columns: 1fr; }
+    .dlg-pie { position: sticky; bottom: 0; background: var(--papel); border-top: 1px solid var(--linea2); padding: 12px 22px 14px; }
+  }
   .aviso { position: fixed; left: 50%; bottom: 22px; transform: translate(-50%, 16px); background: var(--tinta); color: #fff; padding: 10px 16px; border-radius: 8px; font-size: 14px; opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; width: max-content; max-width: calc(100vw - 32px); z-index: 10; }
   .aviso.ver { opacity: 1; transform: translate(-50%, 0); }
+  @media (max-width: 600px) {
+    .aviso { left: 16px; right: 16px; width: auto; max-width: none; transform: translate(0, 16px); }
+    .aviso.ver { transform: none; }
+  }
+
+  /* Celular y pantallas táctiles: objetivos de 44 px y sin zoom de iOS al escribir */
+  @media (pointer: coarse) {
+    .btn, .btn.chico, select, input:not([type=checkbox]):not([type=radio]) { min-height: 44px; }
+    .btn-txt { min-height: 44px; }
+    label.marca { min-height: 44px; }
+    .marca-sola { padding: 10px; margin: -10px; }
+  }
+  @media (max-width: 760px) { input, select, textarea { font-size: 16px; } }   /* iOS no hace zoom */
 
   .pie { margin-top: 40px; padding-top: 14px; border-top: 1px solid var(--linea); font-size: 13px; color: var(--suave); }
 
@@ -300,12 +345,36 @@
   .inf .pista { height: 7px; max-width: 360px; }
   .inf .pie-inf { margin-top: 24px; font-size: 8.5pt; color: #555; border-top: 1px solid #ccc; padding-top: 6px; }
 
+
+  /* Común a las herramientas del estudio: vuelta a la portada, botón de ayuda y guía de primer uso */
+  .ico { width: 1.15em; height: 1.15em; flex: none; vertical-align: -.2em; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .portada { display: inline-flex; align-items: center; gap: 5px; margin-bottom: 8px; font-size: 13px; color: var(--suave); text-decoration: none; }
+  .portada:hover { color: var(--acento); text-decoration: underline; text-underline-offset: 3px; }
+  .btn.ayuda { display: inline-flex; align-items: center; gap: 6px; }
+  .guia-capa { position: fixed; inset: 0; z-index: 40; background: rgba(26, 38, 54, .5); }
+  .guia-capa.con-foco { background: transparent; }
+  .guia-foco { position: fixed; z-index: 41; border-radius: 10px; box-shadow: 0 0 0 4px var(--acento), 0 0 0 9999px rgba(26, 38, 54, .5); pointer-events: none; transition: top .2s, left .2s, width .2s, height .2s; }
+  .guia-globo { position: fixed; z-index: 42; width: min(380px, calc(100vw - 24px)); background: var(--papel); color: var(--tinta); border-radius: 12px; padding: 18px 20px 16px; box-shadow: 0 18px 50px rgba(20, 30, 45, .3); font: 15px/1.5 var(--sans); }
+  .guia-globo:focus { outline: none; }
+  .guia-globo .guia-n { margin: 0 0 4px; font-size: 12.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--suave); }
+  .guia-globo h2 { margin: 0 0 6px; font: 600 19px/1.25 var(--serif); }
+  .guia-globo p.guia-txt { margin: 0; color: var(--tinta2); }
+  .guia-pie { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+  .guia-pie .guia-saltar { margin-right: auto; font: inherit; font-size: 14px; background: none; border: 0; padding: 10px 2px; color: var(--suave); cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
+  .guia-pie .guia-saltar:hover { color: var(--tinta); }
+  .guia-puntos { display: flex; gap: 5px; margin-top: 14px; }
+  .guia-puntos i { width: 7px; height: 7px; border-radius: 50%; background: var(--linea); }
+  .guia-puntos i.on { background: var(--acento); }
+  @media (max-width: 600px) { .guia-globo { left: 12px !important; right: 12px; bottom: 12px; top: auto !important; width: auto; } }
+  @media (prefers-reduced-motion: reduce) { .guia-foco { transition: none; } }
+  @media print { .guia-capa, .guia-foco, .guia-globo, .portada, .btn.ayuda { display: none !important; } }
+
   @media print {
     @page { margin: 15mm; }
     * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     body { background: #fff; font-size: 10.5pt; }
     .app { max-width: none; padding: 0; }
-    .acciones-cab, .franja, .herr, .filtros, .ficha-acc, .subpest, .form-linea, .btn-txt, .vistas, .aviso, dialog { display: none !important; }
+    .acciones-cab, .franja, .herr, .filtros, .ficha-acc, .subpest, .form-linea, .btn-txt, .vistas, .aviso, dialog, .mover-t, .ayuda-kanban { display: none !important; }
     .barra { border: 0; margin: 0; }
     .kpi, .caja, .grupo, .tarjeta, tr, .incidente { break-inside: avoid; }
     .kpi.cuenta { background: #fff; color: var(--tinta); border-color: var(--linea); }
@@ -320,15 +389,17 @@
 <div class="app">
   <header class="cabecera">
     <div>
+      <a class="portada" href="../index.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg> Herramientas del estudio</a><br>
       <a class="firma" href="#/clientes">MLV Abogados</a>
       <div class="sub">Panel de adecuación · Ley 21.719</div>
     </div>
     <div class="acciones-cab">
       <span class="guardado" id="guardado" role="status"></span>
-      <button class="btn primario" data-accion="nuevo">+ Nuevo cliente</button>
+      <button class="btn ayuda" data-guia-abrir><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg> Cómo se usa</button>
+      <button class="btn primario" data-accion="nuevo"><span aria-hidden="true">+</span> Nuevo cliente</button>
     </div>
   </header>
-  <div class="franja" id="franja" hidden>Estás viendo datos de ejemplo · <button data-accion="blanco">Empezar en blanco</button></div>
+  <div class="franja" id="franja" role="region" aria-label="Aviso sobre los datos del panel" hidden></div>
   <main id="vista"></main>
   <footer class="pie">Demo · Los datos se guardan solo en este navegador. No reemplaza la revisión de la ley vigente.</footer>
 </div>
@@ -339,8 +410,8 @@
   <form id="formCliente" novalidate>
     <div class="dlg-cab"><h2 id="dlgClienteTit">Nuevo cliente</h2></div>
     <div class="dlg-cuerpo">
-      <label class="campo ancho"><span>Razón social *</span><input name="razon" required maxlength="140" autocomplete="off"></label>
-      <label class="campo"><span>RUT</span><input name="rut" placeholder="76.123.456-7" maxlength="14" autocomplete="off"><span class="error-campo" id="errRut"></span></label>
+      <label class="campo ancho"><span>Razón social (obligatorio)</span><input name="razon" required maxlength="140" autocomplete="off" aria-describedby="errRazon"><span class="error-campo" id="errRazon" role="alert"></span></label>
+      <label class="campo"><span>RUT</span><input name="rut" placeholder="76.123.456-7" maxlength="14" autocomplete="off" aria-describedby="errRut"><span class="error-campo" id="errRut" role="alert"></span></label>
       <label class="campo"><span>Rubro</span><input name="rubro" list="rubros" maxlength="80" autocomplete="off"></label>
       <label class="campo"><span>Tamaño</span><select name="tamano"><option>Pyme</option><option>Grande</option></select><span class="ayuda">Importa para calcular las multas.</span></label>
       <label class="campo"><span>Abogado MLV a cargo</span><input name="abogado" list="abogados" maxlength="80" autocomplete="off"></label>
@@ -352,6 +423,7 @@
       <label class="campo ancho"><span>Notas</span><textarea name="notas" rows="3" maxlength="2000"></textarea></label>
     </div>
     <div class="dlg-pie">
+      <button type="button" class="btn peligro izq" data-accion="eliminar" id="dlgEliminar" hidden>Eliminar cliente</button>
       <button type="button" class="btn" data-accion="cerrar-dlg">Cancelar</button>
       <button type="submit" class="btn primario" id="dlgClienteOk">Crear cliente</button>
     </div>
@@ -485,13 +557,19 @@ function normalizarRut(v) {   // devuelve el RUT con puntos, '' si viene vacío,
 /* ───────── Datos y guardado ───────── */
 let datos = { clientes: [] };
 let sinGuardar = false;   // true si el navegador no deja guardar: se trabaja en memoria
+let danado = false;       // true si lo guardado no se pudo leer: se dejó aparte y se avisa en la franja
 
 function leerGuardado() {
   let crudo;
   try { crudo = localStorage.getItem(CLAVE); } catch { sinGuardar = true; return null; }
   if (crudo === null) return null;
-  try { return JSON.parse(crudo); }
-  catch { try { localStorage.setItem(CLAVE + '-danado', crudo); } catch { /* nada */ } return null; }
+  try {
+    const obj = JSON.parse(crudo);
+    if (obj && Array.isArray(obj.clientes)) return obj;
+  } catch { /* se trata abajo */ }
+  danado = true;
+  try { localStorage.setItem(CLAVE + '-danado', crudo); } catch { /* nada */ }
+  return null;
 }
 function guardar() {
   try { localStorage.setItem(CLAVE, JSON.stringify(datos)); sinGuardar = false; }
@@ -580,6 +658,9 @@ function semaforo(c) {
 
 const semHTML = (color) => `<span class="sem ${color}"><i></i>${SEM[color].label}</span>`;
 const barraHTML = (pct) => `<span class="av"><span class="pista"><i style="width:${pct}%"></i></span><b>${pct}&nbsp;%</b></span>`;
+/** El semáforo con su motivo a la vista (el primero, y cuántos más hay). */
+const estadoHTML = (sem) => `<span class="estado-c">${semHTML(sem.color)}${sem.motivos.length ? `<span class="mini motivo">${esc(sem.motivos[0])}${sem.motivos.length > 1 ? ` (+${sem.motivos.length - 1} más)` : ''}</span>` : ''}</span>`;
+const chipEj = (c) => (c.ejemplo ? '<span class="chip gris ej">Ejemplo</span>' : '');
 
 /* ───────── Estado de la pantalla ───────── */
 const ui = { q: '', etapa: '', sem: '', orden: 'sem', dir: 1 };
@@ -621,24 +702,24 @@ function htmlIndicadores() {
 function htmlTablero(vista) {
   const opEtapa = ETAPAS.map((e, i) => `<option value="${i}"${ui.etapa === String(i) ? ' selected' : ''}>${i + 1}. ${e}</option>`).join('');
   const opSem = Object.entries(SEM).map(([k, v]) => `<option value="${k}"${ui.sem === k ? ' selected' : ''}>${v.label}</option>`).join('');
-  return `${htmlIndicadores()}
+  const etapas = vista === 'etapas';
+  return `<h1 class="sr" tabindex="-1">${etapas ? 'Clientes por etapa' : 'Panel de clientes'}</h1>${htmlIndicadores()}
   <div class="barra">
     <nav class="vistas" aria-label="Vistas">
       <a href="#/clientes"${vista === 'clientes' ? ' aria-current="page"' : ''}>Clientes</a>
-      <a href="#/etapas"${vista === 'etapas' ? ' aria-current="page"' : ''}>Por etapa</a>
+      <a href="#/etapas"${etapas ? ' aria-current="page"' : ''}>Por etapa</a>
     </nav>
     <div class="herr">
-      <button class="btn chico" data-accion="exportar">Exportar respaldo (.json)</button>
-      <button class="btn chico" data-accion="importar">Importar respaldo</button>
-      <button class="btn chico" data-accion="ejemplo">Cargar ejemplo</button>
-      <button class="btn chico" data-accion="imprimir">Imprimir</button>
+      <button class="btn chico" data-accion="imprimir">${etapas ? 'Imprimir tablero' : 'Imprimir lista'}</button>
+      <button class="btn chico" data-accion="exportar">Descargar respaldo</button>
+      <button class="btn chico" data-accion="importar">Restaurar respaldo</button>
     </div>
   </div>
   <div class="filtros">
-    <input type="search" id="buscar" placeholder="Buscar por cliente, RUT, rubro o abogado" value="${esc(ui.q)}" aria-label="Buscar">
-    <select id="fEtapa" aria-label="Filtrar por etapa"><option value="">Todas las etapas</option>${opEtapa}</select>
+    <input type="search" id="buscar" placeholder="Buscar por cliente, RUT, rubro o abogado" value="${esc(ui.q)}" aria-label="Buscar cliente">
+    ${etapas ? '' : `<select id="fEtapa" aria-label="Filtrar por etapa"><option value="">Todas las etapas</option>${opEtapa}</select>`}
     <select id="fSem" aria-label="Filtrar por semáforo"><option value="">Todos los estados</option>${opSem}</select>
-    <span class="conteo" id="conteo"></span>
+    <span class="conteo" id="conteo" aria-live="polite"></span>
   </div>
   <div id="lista"></div>`;
 }
@@ -647,7 +728,7 @@ function filasFiltradas() {
   const q = sinTildes(ui.q.trim());
   return datos.clientes.map((c) => ({ c, av: avance(c).pct, sem: semaforo(c), prox: proximaAccion(c) }))
     .filter((f) => !q || sinTildes([f.c.razon, f.c.rut, f.c.rubro, f.c.abogado, f.c.contacto.nombre].join(' ')).includes(q))
-    .filter((f) => ui.etapa === '' || String(f.c.etapa) === ui.etapa)
+    .filter((f) => ui.etapa === '' || ruta().vista === 'etapas' || String(f.c.etapa) === ui.etapa)
     .filter((f) => ui.sem === '' || f.sem.color === ui.sem);
 }
 
@@ -675,24 +756,28 @@ function pintarLista() {
   $('conteo').textContent = total ? (filas.length === total ? `${total} ${total === 1 ? 'cliente' : 'clientes'}` : `${filas.length} de ${total} clientes`) : '';
   const cont = $('lista');
   if (!total) {
-    cont.innerHTML = '<div class="vacio">Aún no hay clientes. Crea el primero con «Nuevo cliente», o mira cómo se ve el panel con «Cargar ejemplo».</div>';
+    cont.innerHTML = `<div class="vacio"><p>Aún no hay clientes en el panel.</p>
+      <button class="btn primario" data-accion="nuevo"><span aria-hidden="true">+</span> Nuevo cliente</button>
+      <button class="btn" data-accion="ejemplo">Ver con datos de ejemplo</button></div>`;
     return;
   }
-  if (ruta().vista === 'etapas') { cont.innerHTML = htmlKanban(filas); return; }
-  if (!filas.length) { cont.innerHTML = '<div class="vacio">Ningún cliente coincide con la búsqueda o los filtros.</div>'; return; }
+  const hayFiltro = ui.q.trim() || ui.sem || (ui.etapa && ruta().vista !== 'etapas');
+  const sinResultados = `<div class="vacio"><p>Ningún cliente coincide con la búsqueda o los filtros.</p><button class="btn chico" data-accion="limpiar">Limpiar filtros</button></div>`;
+  if (ruta().vista === 'etapas') { cont.innerHTML = (!filas.length && hayFiltro) ? sinResultados : htmlKanban(filas); return; }
+  if (!filas.length) { cont.innerHTML = sinResultados; return; }
   const col = COLS.find((x) => x.k === ui.orden) || COLS[5];
   filas.sort((a, b) => col.cmp(a, b) * ui.dir || a.c.razon.localeCompare(b.c.razon, 'es'));
   const th = COLS.map((x) => {
     const act = x.k === ui.orden;
-    return `<th scope="col"${act ? ` aria-sort="${ui.dir > 0 ? 'ascending' : 'descending'}"` : ''}><button class="orden${act ? ' activo' : ''}" data-accion="ordenar" data-col="${x.k}">${x.t} <span class="flecha">${act ? (ui.dir > 0 ? '↑' : '↓') : ''}</span></button></th>`;
+    return `<th scope="col"${act ? ` aria-sort="${ui.dir > 0 ? 'ascending' : 'descending'}"` : ''}><button class="orden${act ? ' activo' : ''}" data-accion="ordenar" data-col="${x.k}" data-foco="orden-${x.k}">${x.t} <span class="flecha" aria-hidden="true">${act ? (ui.dir > 0 ? '↑' : '↓') : ''}</span></button></th>`;
   }).join('');
   const tr = filas.map(({ c, av, sem, prox }) => `<tr class="fila" data-id="${esc(c.id)}">
-      <td class="cab" data-et="Cliente"><a class="nombre" href="${enlaceFicha(c)}">${esc(c.razon)}</a><span class="mini">${esc(c.rut || 'RUT sin registrar')}</span></td>
-      <td data-et="Rubro">${esc(c.rubro || '—')}</td>
-      <td data-et="Tamaño">${esc(c.tamano)}</td>
+      <td class="cab" data-et="Cliente"><a class="nombre" href="${enlaceFicha(c)}">${esc(c.razon)}</a>${chipEj(c)}<span class="mini">${esc(c.rut || 'RUT sin registrar')}</span><span class="mini solo-cel">${esc([c.rubro, c.tamano].filter(Boolean).join(' · '))}</span></td>
+      <td class="solo-pc" data-et="Rubro">${esc(c.rubro || '—')}</td>
+      <td class="solo-pc" data-et="Tamaño">${esc(c.tamano)}</td>
       <td data-et="Etapa"><span>${esc(ETAPAS[c.etapa])} <span class="etapa-n">${c.etapa + 1}/5</span></span></td>
       <td data-et="Avance">${barraHTML(av)}</td>
-      <td data-et="Estado"><span title="${esc(sem.motivos.join(' · ') || 'Sin alertas')}">${semHTML(sem.color)}</span></td>
+      <td data-et="Estado">${estadoHTML(sem)}</td>
       <td data-et="Próxima acción"><div class="prox">${htmlProx(prox)}</div></td>
       <td data-et="Abogado">${esc(c.abogado || '—')}</td>
     </tr>`).join('');
@@ -700,19 +785,20 @@ function pintarLista() {
 }
 
 function htmlKanban(filas) {
-  return `<p class="ayuda-kanban">Arrastra una tarjeta a otra columna para cambiar la etapa (o usa el selector de la tarjeta).</p><div class="kanban">${ETAPAS.map((nombre, i) => {
+  return `<p class="ayuda-kanban">Usa «Avanzar» o «Volver» en cada tarjeta. En el computador también puedes arrastrarla.</p><div class="kanban">${ETAPAS.map((nombre, i) => {
     const en = filas.filter((f) => f.c.etapa === i).sort((a, b) => SEM[a.sem.color].orden - SEM[b.sem.color].orden);
-    const tarjetas = en.map(({ c, av, sem, prox }) => `<article class="tarjeta" draggable="true" data-arrastre="${esc(c.id)}">
-        <a class="nombre" href="${enlaceFicha(c)}">${esc(c.razon)}</a>
+    const tarjetas = en.map(({ c, av, sem, prox }) => `<article class="tarjeta" draggable="true" tabindex="-1" data-arrastre="${esc(c.id)}" aria-label="${esc(c.razon)}">
+        <a class="nombre" href="${enlaceFicha(c)}">${esc(c.razon)}</a>${chipEj(c)}
         <span class="mini">${esc([c.rubro, c.tamano].filter(Boolean).join(' · '))}</span>
         ${barraHTML(av)}
         <span class="mini">${prox ? 'Próximo: ' + esc(prox.texto) + (prox.fecha ? ` · <span class="nw">${fmt(prox.fecha)}</span>` : '') : 'Sin tareas pendientes'}</span>
-        <div class="pie-t">
-          <span title="${esc(sem.motivos.join(' · ') || 'Sin alertas')}">${semHTML(sem.color)}</span>
-          <select data-mover="${esc(c.id)}" data-foco="mover-${esc(c.id)}" aria-label="Cambiar etapa de ${esc(c.razon)}">${ETAPAS.map((e, j) => `<option value="${j}"${j === c.etapa ? ' selected' : ''}>${j + 1}. ${e}</option>`).join('')}</select>
+        <div class="pie-t">${estadoHTML(sem)}</div>
+        <div class="mover-t">
+          ${i > 0 ? `<button class="btn chico" data-accion="mover" data-id="${esc(c.id)}" data-mover="-1" aria-label="Volver: mover «${esc(c.razon)}» a «${ETAPAS[i - 1]}»">← Volver</button>` : ''}
+          ${i < ETAPAS.length - 1 ? `<button class="btn chico" data-accion="mover" data-id="${esc(c.id)}" data-mover="1" aria-label="Avanzar: mover «${esc(c.razon)}» a «${ETAPAS[i + 1]}»">Avanzar →</button>` : ''}
         </div>
       </article>`).join('');
-    return `<section class="col" data-etapa="${i}"><h3>${i + 1}. ${nombre}<span>${en.length}</span></h3>${tarjetas || '<div class="nada">Sin clientes en esta etapa.</div>'}</section>`;
+    return `<section class="col" data-etapa="${i}"><h2>${i + 1}. ${nombre}<span>${en.length}<span class="sr"> ${en.length === 1 ? 'cliente' : 'clientes'}</span></span></h2>${tarjetas || '<div class="nada">Sin clientes en esta etapa.</div>'}</section>`;
   }).join('')}</div>`;
 }
 
@@ -725,23 +811,22 @@ function htmlFicha(c, pest) {
   const incAb = c.incidentes.filter((i) => i.estado === 'abierto').length;
   const tPend = c.tareas.filter((t) => !t.hecha);
   const tColor = tPend.some((t) => t.fecha && diasHasta(t.fecha) < 0) ? 'rojo' : tPend.some((t) => t.fecha && diasHasta(t.fecha) <= 5) ? 'ambar' : '';
-  const cuenta = { solicitudes: [solAb.length, solColor], incidentes: [incAb, incAb ? 'rojo' : ''], tareas: [tPend.length, tColor] };
+  const cuenta = { solicitudes: [solAb.length, solColor, 'abiertas'], incidentes: [incAb, incAb ? 'rojo' : '', incAb === 1 ? 'abierto' : 'abiertos'], tareas: [tPend.length, tColor, tPend.length === 1 ? 'pendiente' : 'pendientes'] };
   const subpest = Object.entries(PESTANAS).map(([k, t]) => {
     const n = cuenta[k];
-    return `<a href="${enlaceFicha(c, k)}"${k === pest ? ' aria-current="page"' : ''}>${t}${n && n[0] ? ` <span class="cuenta-p ${n[1]}">${n[0]}</span>` : ''}</a>`;
+    return `<a href="${enlaceFicha(c, k)}" data-foco="pest-${k}"${k === pest ? ' aria-current="page"' : ''}>${t}${n && n[0] ? ` <span class="cuenta-p ${n[1]}">${n[0]}<span class="sr"> ${n[0] === 1 && k === 'solicitudes' ? 'abierta' : n[2]}</span></span>` : ''}</a>`;
   }).join('');
-  const pasos = ETAPAS.map((e, i) => `<li class="${i < c.etapa ? 'hecho' : i === c.etapa ? 'actual' : ''}"><button data-accion="etapa" data-n="${i}" title="Mover a «${e}»"${i === c.etapa ? ' aria-current="step"' : ''}><span class="bola">${i < c.etapa ? '✓' : i + 1}</span><span class="txt">${e}</span></button></li>`).join('');
+  const pasos = ETAPAS.map((e, i) => `<li class="${i < c.etapa ? 'hecho' : i === c.etapa ? 'actual' : ''}"><button data-accion="etapa" data-n="${i}" data-foco="paso-${i}" title="Mover a «${e}»"${i === c.etapa ? ' aria-current="step"' : ''}><span class="bola">${i < c.etapa ? '✓' : i + 1}</span><span class="txt">${e}</span></button></li>`).join('');
   const cuerpo = { resumen: htmlResumen, obligaciones: htmlObligaciones, solicitudes: htmlSolicitudes, incidentes: htmlIncidentes, tareas: htmlTareas }[pest](c);
   return `<nav class="miga"><a href="#/clientes">← Volver al panel</a></nav>
   <header class="ficha-cab">
     <div>
-      <h1>${esc(c.razon)}</h1>
+      <h1 tabindex="-1">${esc(c.razon)}${chipEj(c)}</h1>
       <p class="meta">${esc([c.rut || 'RUT sin registrar', c.rubro, c.tamano].filter(Boolean).join(' · '))}${c.abogado ? ' · A cargo de ' + esc(c.abogado) : ''}</p>
     </div>
     <div class="ficha-acc">
-      <button class="btn primario" data-accion="informe">Informe para el cliente</button>
-      <button class="btn" data-accion="editar">Editar datos</button>
-      <button class="btn peligro" data-accion="eliminar">Eliminar</button>
+      <button class="btn primario" data-accion="informe">Imprimir informe para el cliente</button>
+      <button class="btn" data-accion="editar" data-foco="editar">Editar datos</button>
     </div>
   </header>
   <div class="estado-ficha">
@@ -757,7 +842,7 @@ function htmlFicha(c, pest) {
       ${sem.motivos.length ? `<ul class="motivos">${sem.motivos.map((m) => `<li>${esc(m)}</li>`).join('')}</ul>` : '<p class="det">Sin alertas: nada vencido ni por vencer en los próximos 5 días.</p>'}
     </div>
   </div>
-  <ol class="pasos" aria-label="Etapa del proceso (toca una para cambiarla)">${pasos}</ol>
+  <ol class="pasos" aria-label="Etapa del proceso. Elige una para cambiarla.">${pasos}</ol>
   <p class="paso-actual">Etapa ${c.etapa + 1} de 5 · <b>${ETAPAS[c.etapa]}</b> · toca un círculo para cambiarla</p>
   <nav class="subpest" aria-label="Secciones de la ficha">${subpest}</nav>
   <div>${cuerpo}</div>`;
@@ -772,16 +857,16 @@ function htmlResumen(c) {
   const prox = tareasPendientes(c).slice(0, 4);
   return `<div class="dos">
     <div class="caja">
-      <h3>Datos de la empresa</h3>
+      <h2>Datos de la empresa</h2>
       ${dl([['Razón social', c.razon], ['RUT', c.rut], ['Rubro', c.rubro], ['Tamaño', c.tamano], ['Abogado MLV', c.abogado], ['Inicio', fmt(c.inicio)]])}
-      <h3>Contacto</h3>
+      <h2>Contacto</h2>
       ${dl([['Nombre', c.contacto.nombre], ['Correo', c.contacto.correo], ['Teléfono', c.contacto.telefono]])}
-      <h3>Notas</h3>
+      <h2>Notas</h2>
       <p class="texto-notas">${esc(c.notas || 'Sin notas.')}</p>
     </div>
     <div>
-      <div class="caja"><h3>Avance por área</h3>${areas}</div>
-      <div class="caja"><h3>Próximas tareas</h3>${prox.length ? `<ul class="lista-simple">${prox.map((t) => `<li><span>${esc(t.texto)}${t.responsable ? `<span class="mini">${esc(t.responsable)}</span>` : ''}</span>${t.fecha ? `<span class="chip ${colorDias(diasHasta(t.fecha))}">${fmt(t.fecha)}</span>` : ''}</li>`).join('')}</ul>` : '<p class="nota">No hay tareas pendientes.</p>'}</div>
+      <div class="caja"><h2>Avance por área</h2>${areas}</div>
+      <div class="caja"><h2>Próximas tareas</h2>${prox.length ? `<ul class="lista-simple">${prox.map((t) => `<li><span>${esc(t.texto)}${t.responsable ? `<span class="mini">${esc(t.responsable)}</span>` : ''}</span>${t.fecha ? `<span class="chip ${colorDias(diasHasta(t.fecha))}">${fmt(t.fecha)}</span>` : ''}</li>`).join('')}</ul>` : '<p class="nota">No hay tareas pendientes.</p>'}</div>
     </div>
   </div>`;
 }
@@ -798,7 +883,7 @@ function htmlObligaciones(c) {
         <input type="text" class="nota-in" data-obl-campo="nota" data-obl="${it.id}" value="${esc(o.nota)}" placeholder="Nota" maxlength="300" aria-label="Nota: ${esc(it.nombre)}">
       </div>`;
     }).join('');
-    return `<section class="grupo"><header><h3>${esc(g.nombre)}</h3><span>${a.aplica ? `${a.listos} de ${a.aplica} listas` : 'No aplica'}</span></header>${items}</section>`;
+    return `<section class="grupo"><header><h2>${esc(g.nombre)}</h2><span>${a.aplica ? `${a.listos} de ${a.aplica} listas` : 'No aplica'}</span></header>${items}</section>`;
   }).join('');
   return `<p class="nota">El avance cuenta las obligaciones en «Listo» sobre las que aplican; las marcadas «No aplica» no cuentan. Los cambios se guardan solos.</p>${grupos}`;
 }
@@ -807,29 +892,30 @@ function htmlSolicitudes(c) {
   const filas = [...c.solicitudes].sort((a, b) => (solAbierta(b) - solAbierta(a)) || b.recepcion.localeCompare(a.recepcion)).map((s) => {
     const p = plazo(s);
     const chip = solAbierta(s) ? `<span class="chip ${colorDias(p.dias)}">${mayus(cuandoVence(p.dias))}</span>` : '<span class="chip gris">Cerrada</span>';
+    const cual = `solicitud de ${TIPOS_SOL[s.tipo].toLowerCase()} del ${fmt(s.recepcion)}`;
     return `<tr>
       <td data-et="Recibida">${fmt(s.recepcion)}</td>
       <td data-et="Tipo">${TIPOS_SOL[s.tipo]}</td>
       <td data-et="Solicitante">${esc(s.solicitante || '—')}</td>
       <td data-et="Vence">${fmt(p.vence)}</td>
       <td data-et="Plazo">${chip}</td>
-      <td data-et="Prórroga">${s.tipo === 'bloqueo' ? '<span class="mini">No corresponde</span>' : `<label class="marca"><input type="checkbox" data-sol="${esc(s.id)}" data-campo="prorroga" data-foco="sol-p-${esc(s.id)}"${s.prorroga ? ' checked' : ''} aria-label="Con prórroga"></label>`}</td>
-      <td data-et="Estado"><select data-sol="${esc(s.id)}" data-campo="estado" data-foco="sol-e-${esc(s.id)}" aria-label="Estado de la solicitud">${Object.entries(ESTADOS_SOL).map(([k, v]) => `<option value="${k}"${k === s.estado ? ' selected' : ''}>${v}</option>`).join('')}</select></td>
-      <td data-et=""><button class="btn-txt" data-accion="quitar" data-lista="solicitudes" data-item="${esc(s.id)}">Quitar</button></td>
+      <td data-et="Prórroga">${s.tipo === 'bloqueo' ? '<span class="mini">No corresponde</span>' : `<label class="marca marca-sola"><input type="checkbox" data-sol="${esc(s.id)}" data-campo="prorroga" data-foco="sol-p-${esc(s.id)}"${s.prorroga ? ' checked' : ''} aria-label="Con prórroga: ${cual}"></label>`}</td>
+      <td data-et="Estado"><select data-sol="${esc(s.id)}" data-campo="estado" data-foco="sol-e-${esc(s.id)}" aria-label="Estado: ${cual}">${Object.entries(ESTADOS_SOL).map(([k, v]) => `<option value="${k}"${k === s.estado ? ' selected' : ''}>${v}</option>`).join('')}</select></td>
+      <td data-et=""><button class="btn-txt" data-accion="quitar" data-lista="solicitudes" data-item="${esc(s.id)}" aria-label="Quitar ${cual}">Quitar</button></td>
     </tr>`;
   }).join('');
   return `<div class="caja">
-    <h3>Solicitudes de titulares</h3>
+    <h2>Solicitudes de titulares</h2>
     <p class="nota">Plazo para responder: 30 días corridos desde la recepción, prorrogables una vez por 30 más. El bloqueo temporal se resuelve en 2 días hábiles (lunes a viernes; aquí no se descuentan los feriados: revísalos a mano).</p>
-    <form class="form-linea" id="formSol">
+    <form class="form-linea" id="formSol" novalidate>
       <label class="campo"><span>Recibida el</span><input type="date" name="recepcion" value="${hoyISO()}" required></label>
       <label class="campo"><span>Tipo</span><select name="tipo">${Object.entries(TIPOS_SOL).map(([k, v]) => `<option value="${k}">${v}</option>`).join('')}</select></label>
-      <label class="campo crece"><span>Solicitante (puede ser una referencia)</span><input name="solicitante" maxlength="120" placeholder="Ej.: cliente ref. 1043" autocomplete="off"></label>
+      <label class="campo crece"><span>Solicitante (puede ser una referencia)</span><input name="solicitante" maxlength="120" placeholder="Ej.: cliente ref. 1043" autocomplete="off" data-foco="nueva-sol"></label>
       <label class="marca"><input type="checkbox" name="prorroga"> Con prórroga</label>
-      <button class="btn primario" type="submit">Agregar solicitud</button>
+      <button class="btn primario" type="submit" data-foco="nueva-sol-btn">Agregar solicitud</button>
     </form>
   </div>
-  ${filas ? `<table class="tabla resp chica" style="margin-top:14px"><thead><tr><th>Recibida</th><th>Tipo</th><th>Solicitante</th><th>Vence</th><th>Plazo</th><th>Prórroga</th><th>Estado</th><th></th></tr></thead><tbody>${filas}</tbody></table>` : '<div class="vacio" style="margin-top:14px">No hay solicitudes registradas.</div>'}`;
+  ${filas ? `<table class="tabla resp chica" style="margin-top:14px"><thead><tr><th scope="col">Recibida</th><th scope="col">Tipo</th><th scope="col">Solicitante</th><th scope="col">Vence</th><th scope="col">Plazo</th><th scope="col">Prórroga</th><th scope="col">Estado</th><th scope="col"><span class="sr">Acciones</span></th></tr></thead><tbody>${filas}</tbody></table>` : '<div class="vacio" style="margin-top:14px">No hay solicitudes registradas.</div>'}`;
 }
 
 function htmlIncidentes(c) {
@@ -838,27 +924,27 @@ function htmlIncidentes(c) {
     return `<article class="incidente${i.estado === 'abierto' ? ' abierto' : ''}">
       <header>
         <strong>Detectado el ${fmt(i.deteccion)}${i.estado === 'abierto' ? ` <span class="mini" style="display:inline">· hace ${hace === 1 ? '1 día' : hace + ' días'}</span>` : ''}</strong>
-        <select data-inc="${esc(i.id)}" data-campo="estado" data-foco="inc-e-${esc(i.id)}" aria-label="Estado del incidente"><option value="abierto"${i.estado === 'abierto' ? ' selected' : ''}>Abierto</option><option value="cerrado"${i.estado === 'cerrado' ? ' selected' : ''}>Cerrado</option></select>
+        <select data-inc="${esc(i.id)}" data-campo="estado" data-foco="inc-e-${esc(i.id)}" aria-label="Estado del incidente del ${fmt(i.deteccion)}"><option value="abierto"${i.estado === 'abierto' ? ' selected' : ''}>Abierto</option><option value="cerrado"${i.estado === 'cerrado' ? ' selected' : ''}>Cerrado</option></select>
       </header>
       <p>${esc(i.descripcion || 'Sin descripción.')}</p>
       ${i.sensibles ? '<p class="alerta">Afecta datos sensibles, de menores o financieros: probablemente hay que avisar también a los afectados.</p>' : ''}
       <div class="fila-aviso">
-        <label class="marca"><input type="checkbox" data-inc="${esc(i.id)}" data-campo="avisoAgencia" data-foco="inc-a-${esc(i.id)}"${i.avisoAgencia ? ' checked' : ''}> Se avisó a la Agencia</label>
+        <label class="marca"><input type="checkbox" data-inc="${esc(i.id)}" data-campo="avisoAgencia" data-foco="inc-a-${esc(i.id)}"${i.avisoAgencia ? ' checked' : ''}> Se avisó a la Agencia<span class="sr"> (incidente del ${fmt(i.deteccion)})</span></label>
         ${i.avisoAgencia ? `<label class="marca">el <input type="date" data-inc="${esc(i.id)}" data-campo="fechaAviso" data-foco="inc-f-${esc(i.id)}" value="${esc(i.fechaAviso)}" aria-label="Fecha del aviso a la Agencia"></label>` : ''}
         <span style="flex:1"></span>
-        <button class="btn-txt" data-accion="quitar" data-lista="incidentes" data-item="${esc(i.id)}">Quitar</button>
+        <button class="btn-txt" data-accion="quitar" data-lista="incidentes" data-item="${esc(i.id)}" aria-label="Quitar el incidente del ${fmt(i.deteccion)}">Quitar</button>
       </div>
       ${i.estado === 'abierto' && !i.avisoAgencia ? '<p class="alerta roja">Aún sin aviso a la Agencia. La ley pide avisar sin dilaciones indebidas.</p>' : ''}
     </article>`;
   }).join('');
   return `<div class="caja">
-    <h3>Incidentes y brechas de seguridad</h3>
+    <h2>Incidentes y brechas de seguridad</h2>
     <p class="nota">La ley pide avisar a la Agencia de Protección de Datos Personales «sin dilaciones indebidas». Avisar dentro de 72 horas es una buena práctica, no un plazo legal.</p>
-    <form class="form-linea" id="formInc">
+    <form class="form-linea" id="formInc" novalidate>
       <label class="campo"><span>Detectado el</span><input type="date" name="deteccion" value="${hoyISO()}" required></label>
-      <label class="campo crece"><span>Qué pasó</span><input name="descripcion" maxlength="400" placeholder="Ej.: correo con planilla de clientes enviado a un tercero" autocomplete="off" required></label>
+      <label class="campo crece"><span>Qué pasó</span><input name="descripcion" maxlength="400" placeholder="Ej.: correo con planilla de clientes enviado a un tercero" autocomplete="off" required data-foco="nuevo-inc"></label>
       <label class="marca"><input type="checkbox" name="sensibles"> Afecta datos sensibles, de menores o financieros</label>
-      <button class="btn primario" type="submit">Registrar incidente</button>
+      <button class="btn primario" type="submit" data-foco="nuevo-inc-btn">Registrar incidente</button>
     </form>
     ${lista || '<p class="nota" style="margin-top:14px">No hay incidentes registrados.</p>'}
   </div>`;
@@ -872,31 +958,31 @@ function htmlTareas(c) {
       <input type="checkbox" data-tarea="${esc(t.id)}" data-foco="t-${esc(t.id)}"${t.hecha ? ' checked' : ''} aria-label="Marcar como hecha: ${esc(t.texto)}">
       <span class="t-txt">${esc(t.texto)}<span class="t-meta">${[t.fecha ? fmt(t.fecha) : 'Sin fecha', t.responsable].filter(Boolean).map(esc).join(' · ')}</span></span>
       ${!t.hecha && d !== null && d <= 5 ? `<span class="chip ${colorDias(d)}">${d < 0 ? 'Vencida' : mayus(cuandoVence(d))}</span>` : ''}
-      <button class="btn-txt" data-accion="quitar" data-lista="tareas" data-item="${esc(t.id)}">Quitar</button>
+      <button class="btn-txt" data-accion="quitar" data-lista="tareas" data-item="${esc(t.id)}" aria-label="Quitar la tarea: ${esc(t.texto)}">Quitar</button>
     </li>`;
   }).join('');
   const bit = c.bitacora.map((b, i) => ({ b, i })).sort((x, y) => y.b.fecha.localeCompare(x.b.fecha) || y.i - x.i).map(({ b }) => `<li>
       <span class="fecha">${fmt(b.fecha)}</span>
       <span class="${b.auto ? 'auto' : ''}">${esc(b.texto)}</span>
-      ${b.auto ? '<span></span>' : `<button class="btn-txt" data-accion="quitar" data-lista="bitacora" data-item="${esc(b.id)}">Quitar</button>`}
+      ${b.auto ? '<span></span>' : `<button class="btn-txt" data-accion="quitar" data-lista="bitacora" data-item="${esc(b.id)}" aria-label="Quitar la anotación del ${fmt(b.fecha)}">Quitar</button>`}
     </li>`).join('');
   return `<div class="dos">
     <div class="caja">
-      <h3>Tareas</h3>
-      <form class="form-linea" id="formTarea">
-        <label class="campo crece"><span>Tarea</span><input name="texto" maxlength="300" required autocomplete="off" placeholder="Ej.: enviar borrador de política"></label>
+      <h2>Tareas</h2>
+      <form class="form-linea" id="formTarea" novalidate>
+        <label class="campo crece"><span>Tarea</span><input name="texto" maxlength="300" required autocomplete="off" placeholder="Ej.: enviar borrador de política" data-foco="nueva-tarea"></label>
         <label class="campo"><span>Fecha</span><input type="date" name="fecha"></label>
         <label class="campo"><span>Responsable</span><input name="responsable" maxlength="80" list="abogados" autocomplete="off" style="width:150px"></label>
-        <button class="btn primario" type="submit">Agregar</button>
+        <button class="btn primario" type="submit" data-foco="nueva-tarea-btn">Agregar tarea</button>
       </form>
       ${tareas ? `<ul class="lista-simple tareas" style="margin-top:8px">${tareas}</ul>` : '<p class="nota">No hay tareas.</p>'}
     </div>
     <div class="caja">
-      <h3>Bitácora</h3>
-      <form class="form-linea" id="formBit">
+      <h2>Bitácora</h2>
+      <form class="form-linea" id="formBit" novalidate>
         <label class="campo"><span>Fecha</span><input type="date" name="fecha" value="${hoyISO()}" required></label>
-        <label class="campo crece"><span>Qué pasó</span><input name="texto" maxlength="600" required autocomplete="off" placeholder="Ej.: reunión con gerencia"></label>
-        <button class="btn primario" type="submit">Anotar</button>
+        <label class="campo crece"><span>Qué pasó</span><input name="texto" maxlength="600" required autocomplete="off" placeholder="Ej.: reunión con gerencia" data-foco="nueva-bit"></label>
+        <button class="btn primario" type="submit" data-foco="nueva-bit-btn">Anotar</button>
       </form>
       ${bit ? `<ul class="lista-simple bitacora" style="margin-top:8px">${bit}</ul>` : '<p class="nota">Sin anotaciones.</p>'}
       <p class="nota">Los cambios de etapa se anotan solos.</p>
@@ -952,15 +1038,34 @@ function pintar() {
   } else {
     vista.innerHTML = htmlTablero(r.vista);
     pintarLista();
-    document.title = 'Panel de clientes · MLV Abogados';
+    document.title = (r.vista === 'etapas' ? 'Clientes por etapa' : 'Panel de clientes') + ' · MLV Abogados';
   }
-  $('franja').hidden = !datos.clientes.some((c) => c.ejemplo);
+  pintarFranja();
   if (misma) {
     window.scrollTo(0, y);
     const el = foco && vista.querySelector(`[data-foco="${CSS.escape(foco)}"]`);
     if (el) el.focus({ preventScroll: true });
-  } else window.scrollTo(0, 0);
+  } else {
+    window.scrollTo(0, 0);
+    // Al cambiar de pantalla (no en la primera carga), el foco va al título, para que el lector de pantalla parta ahí.
+    if (rutaPrevia) vista.querySelector('h1')?.focus({ preventScroll: true });
+  }
   rutaPrevia = clave;
+}
+
+/** La franja de arriba: avisa si lo guardado no se pudo leer, o si hay clientes de ejemplo (ficticios). */
+function pintarFranja() {
+  const fr = $('franja');
+  const ej = datos.clientes.filter((c) => c.ejemplo).length;
+  const propios = datos.clientes.length - ej;
+  if (danado && !datos.clientes.length) {
+    fr.innerHTML = 'No pude leer los datos guardados en este navegador. Los dejé aparte, sin borrarlos. Recupera tu último respaldo con <button data-accion="importar">Restaurar respaldo</button>.';
+  } else if (ej && !propios) {
+    fr.innerHTML = 'Estás viendo clientes de ejemplo, con datos ficticios · <button data-accion="blanco">Empezar en blanco</button>';
+  } else if (ej) {
+    fr.innerHTML = `Hay ${ej} ${ej === 1 ? 'cliente' : 'clientes'} de ejemplo (${ej === 1 ? 'ficticio' : 'ficticios'}) junto a los tuyos · <button data-accion="blanco">Quitar los de ejemplo</button>`;
+  } else { fr.hidden = true; fr.innerHTML = ''; return; }
+  fr.hidden = false;
 }
 window.addEventListener('hashchange', pintar);
 
@@ -974,22 +1079,57 @@ function cambiarEtapa(c, n) {
   c.etapa = n;
 }
 
+/** Mueve un cliente de etapa desde el tablero (botones o arrastre): avisa y deja el foco en su tarjeta, ya en la nueva columna. */
+function moverEnTablero(k, n) {
+  if (!k || n < 0 || n >= ETAPAS.length || n === k.etapa) return;
+  cambiar(() => cambiarEtapa(k, n));
+  avisar(`«${k.razon}» pasó a «${ETAPAS[k.etapa]}».`);
+  const t = document.querySelector(`.kanban [data-arrastre="${CSS.escape(k.id)}"]`);
+  if (t) t.focus();
+}
+
 let avisoTimer;
 function avisar(texto) {
   const el = $('aviso');
   el.textContent = texto;
   el.classList.add('ver');
   clearTimeout(avisoTimer);
-  avisoTimer = setTimeout(() => el.classList.remove('ver'), 3800);
+  avisoTimer = setTimeout(() => el.classList.remove('ver'), texto.length > 60 ? 6000 : 5000);
 }
 
-/* Confirmación propia (no la del navegador), para que se vea igual que el resto. */
-function confirmar(titulo, texto, boton) {
+/** Error de un campo: el texto queda junto al campo (y se anuncia), el campo se marca y recibe el foco. */
+function errorCampo(campo, texto) {
+  const lab = campo.closest('label');
+  let e = campo.getAttribute('aria-describedby') && document.getElementById(campo.getAttribute('aria-describedby'));
+  if (!e && lab) {
+    e = document.createElement('span');
+    e.className = 'error-campo';
+    e.id = 'err-' + uid();
+    e.setAttribute('role', 'alert');
+    lab.append(e);
+    campo.setAttribute('aria-describedby', e.id);
+  }
+  if (e) e.textContent = texto;
+  campo.setAttribute('aria-invalid', 'true');
+  campo.focus();
+}
+function limpiarError(campo) {
+  if (campo.getAttribute('aria-invalid') !== 'true') return;
+  campo.removeAttribute('aria-invalid');
+  const e = campo.getAttribute('aria-describedby') && document.getElementById(campo.getAttribute('aria-describedby'));
+  if (e) e.textContent = '';
+}
+
+/* Confirmación propia (no la del navegador), para que se vea igual que el resto.
+   Con peligro = true el botón «sí» va en rojo y el foco parte en «Cancelar». */
+function confirmar(titulo, texto, boton, peligro = false) {
   const d = $('dlgConfirmar');
   $('dlgConfTit').textContent = titulo;
   $('dlgConfTxt').textContent = texto;
   $('dlgConfSi').textContent = boton;
+  $('dlgConfSi').className = peligro ? 'btn peligro lleno' : 'btn primario';
   d.showModal();
+  $('dlgConfNo').focus();
   return new Promise((resolver) => {
     const fin = (v) => { d.close(); $('dlgConfSi').onclick = $('dlgConfNo').onclick = d.oncancel = null; resolver(v); };
     $('dlgConfSi').onclick = () => fin(true);
@@ -1004,7 +1144,9 @@ function abrirFormCliente(c) {
   editando = c || null;
   const f = $('formCliente');
   f.reset();
-  $('errRut').textContent = '';
+  limpiarError(f.razon); limpiarError(f.rut);
+  $('errRazon').textContent = $('errRut').textContent = '';
+  $('dlgEliminar').hidden = !c;
   $('dlgClienteTit').textContent = c ? 'Editar datos del cliente' : 'Nuevo cliente';
   $('dlgClienteOk').textContent = c ? 'Guardar cambios' : 'Crear cliente';
   f.etapa.innerHTML = ETAPAS.map((e, i) => `<option value="${i}">${i + 1}. ${e}</option>`).join('');
@@ -1022,9 +1164,9 @@ function abrirFormCliente(c) {
 $('formCliente').addEventListener('submit', (e) => {
   e.preventDefault();
   const f = e.target;
-  if (!f.razon.value.trim()) { f.razon.focus(); f.razon.setCustomValidity('Escribe la razón social.'); f.razon.reportValidity(); f.razon.setCustomValidity(''); return; }
+  if (!f.razon.value.trim()) { errorCampo(f.razon, 'Escribe la razón social.'); return; }
   const rut = normalizarRut(f.rut.value);
-  if (rut === null) { $('errRut').textContent = 'El RUT no cuadra con su dígito verificador. Revísalo o déjalo en blanco.'; f.rut.focus(); return; }
+  if (rut === null) { errorCampo(f.rut, 'Este RUT no es válido: el dígito verificador no corresponde. Revísalo o déjalo en blanco.'); return; }
   const campos = {
     razon: f.razon.value, rut, rubro: f.rubro.value, tamano: f.tamano.value, abogado: f.abogado.value,
     inicio: f.inicio.value, notas: f.notas.value,
@@ -1053,7 +1195,7 @@ function exportar() {
   a.download = `respaldo-panel-${hoyISO().replaceAll('-', '')}.json`;
   document.body.append(a); a.click(); a.remove();
   setTimeout(() => URL.revokeObjectURL(a.href), 4000);
-  avisar('Respaldo guardado en tu carpeta de descargas. Tiene datos de clientes: guárdalo en un lugar seguro.');
+  avisar('Respaldo descargado. Contiene datos de clientes: guárdalo en una carpeta segura del estudio.');
 }
 
 $('archivo').addEventListener('change', async (e) => {
@@ -1065,14 +1207,15 @@ $('archivo').addEventListener('change', async (e) => {
     const obj = JSON.parse(await f.text());
     lista = Array.isArray(obj) ? obj : obj && Array.isArray(obj.clientes) ? obj.clientes : null;
   } catch { lista = null; }
-  if (!lista || !lista.every((c) => c && typeof c === 'object')) { avisar('Ese archivo no es un respaldo de este panel.'); return; }
+  if (!lista || !lista.every((c) => c && typeof c === 'object')) { avisar('Ese archivo no es un respaldo de este panel. Elige un archivo «respaldo-panel-….json» descargado con «Descargar respaldo».'); return; }
   const n = datos.clientes.length;
-  if (n && !(await confirmar('Importar respaldo', `Esto reemplaza los ${n} clientes que hay ahora en el panel por los ${lista.length} del respaldo «${f.name}».`, 'Reemplazar'))) return;
+  if (n && !(await confirmar('Restaurar respaldo', `Esto reemplaza los ${n} ${n === 1 ? 'cliente' : 'clientes'} que hay ahora en el panel por los ${lista.length} del respaldo «${f.name}». Los actuales se pierden, salvo que antes hayas descargado un respaldo.`, 'Reemplazar todo', true))) return;
   datos.clientes = lista.map(normalizar);
+  danado = false;
   guardar();
   location.hash = '#/clientes';
   pintar();
-  avisar(`Importé ${lista.length} ${lista.length === 1 ? 'cliente' : 'clientes'}.`);
+  avisar(`Restauré ${lista.length} ${lista.length === 1 ? 'cliente' : 'clientes'} desde el respaldo.`);
 });
 
 /* ───────── Eventos ───────── */
@@ -1089,44 +1232,84 @@ document.addEventListener('click', async (e) => {
     case 'nuevo': abrirFormCliente(null); break;
     case 'editar': if (c) abrirFormCliente(c); break;
     case 'cerrar-dlg': b.closest('dialog').close(); break;
-    case 'eliminar':
-      if (c && await confirmar('Eliminar cliente', `Se borrará «${c.razon}» con sus obligaciones, solicitudes, incidentes, tareas y bitácora. No se puede deshacer, salvo que tengas un respaldo.`, 'Eliminar')) {
-        datos.clientes = datos.clientes.filter((x) => x !== c);
+    case 'eliminar': {   // desde el diálogo «Editar datos del cliente»
+      const k = editando || c;
+      if (k && await confirmar('Eliminar cliente', `Se borrará «${k.razon}» con sus obligaciones, solicitudes, incidentes, tareas y bitácora. No se puede deshacer, salvo que tengas un respaldo.`, 'Eliminar el cliente', true)) {
+        $('dlgCliente').close();
+        datos.clientes = datos.clientes.filter((x) => x !== k);
         guardar();
         location.hash = '#/clientes';
-        avisar(`Eliminé «${c.razon}».`);
+        avisar(`Eliminé «${k.razon}».`);
       }
       break;
+    }
     case 'informe':
       if (c) { $('informe').innerHTML = htmlInforme(c); document.body.classList.add('modo-informe'); window.print(); }
       break;
     case 'imprimir': window.print(); break;
     case 'exportar': exportar(); break;
     case 'importar': $('archivo').click(); break;
-    case 'ejemplo':
-      datos.clientes = [...datos.clientes.filter((x) => !x.ejemplo), ...ejemplo()];
+    case 'ejemplo': {
+      const n = ejemplo();
+      datos.clientes = [...datos.clientes.filter((x) => !x.ejemplo), ...n];
       guardar();
       if (ruta().vista === 'ficha') location.hash = '#/clientes'; else pintar();
-      avisar('Cargué 6 clientes ficticios. Puedes quitarlos con «Empezar en blanco».');
+      avisar(`Cargué ${n.length} clientes ficticios, marcados «Ejemplo». Puedes quitarlos desde la franja de arriba.`);
       break;
-    case 'blanco':
+    }
+    case 'blanco': {
+      const ej = datos.clientes.filter((x) => x.ejemplo).length;
+      const propios = datos.clientes.length - ej;
+      const cuales = ej === 1 ? 'Se quitará el cliente de ejemplo (ficticio) y todo lo anotado en él.' : `Se quitarán los ${ej} clientes de ejemplo (ficticios) y todo lo anotado en ellos.`;
+      const texto = `${cuales} ${propios ? (propios === 1 ? 'Tu cliente propio no se toca.' : `Tus ${propios} clientes propios no se tocan.`) : 'El panel queda vacío, listo para tus clientes.'}`;
+      if (!(await confirmar('Quitar los clientes de ejemplo', texto, 'Quitar los ejemplos', true))) break;
       datos.clientes = datos.clientes.filter((x) => !x.ejemplo);
       guardar();
       if (ruta().vista === 'ficha' && !clienteActual()) location.hash = '#/clientes'; else pintar();
-      avisar('Quité los datos de ejemplo. El panel queda listo para tus clientes.');
+      avisar('Quité los clientes de ejemplo. El panel queda listo para tus clientes.');
+      break;
+    }
+    case 'limpiar':
+      ui.q = ''; ui.etapa = ''; ui.sem = '';
+      pintar();
+      $('buscar')?.focus();
       break;
     case 'ordenar':
       if (ui.orden === b.dataset.col) ui.dir = -ui.dir; else { ui.orden = b.dataset.col; ui.dir = 1; }
       pintarLista();
+      document.querySelector(`[data-foco="orden-${CSS.escape(b.dataset.col)}"]`)?.focus();
       break;
-    case 'etapa': if (c) cambiar(() => cambiarEtapa(c, +b.dataset.n)); break;
-    case 'quitar':
-      if (c) cambiar(() => { c[b.dataset.lista] = c[b.dataset.lista].filter((x) => x.id !== b.dataset.item); });
+    case 'mover': {
+      const k = buscarCliente(b.dataset.id);
+      if (k) moverEnTablero(k, k.etapa + Number(b.dataset.mover));
       break;
+    }
+    case 'etapa':
+      if (c && +b.dataset.n !== c.etapa) {
+        cambiar(() => cambiarEtapa(c, +b.dataset.n));
+        avisar(`Etapa cambiada a «${ETAPAS[c.etapa]}». Quedó anotado en la bitácora.`);
+      }
+      break;
+    case 'quitar': {
+      if (!c) break;
+      const lista = b.dataset.lista, id = b.dataset.item;
+      if (lista === 'solicitudes') {
+        const s = c.solicitudes.find((x) => x.id === id);
+        if (!s || !(await confirmar('Quitar solicitud', `Se quitará la solicitud de ${TIPOS_SOL[s.tipo].toLowerCase()} recibida el ${fmt(s.recepcion)}. No se puede deshacer, salvo que tengas un respaldo.`, 'Quitar la solicitud', true))) break;
+      } else if (lista === 'incidentes') {
+        const i = c.incidentes.find((x) => x.id === id);
+        if (!i || !(await confirmar('Quitar incidente', `Se quitará el incidente detectado el ${fmt(i.deteccion)}. No se puede deshacer, salvo que tengas un respaldo.`, 'Quitar el incidente', true))) break;
+      }
+      cambiar(() => { c[lista] = c[lista].filter((x) => x.id !== id); });
+      // El elemento ya no existe: el foco pasa al campo para agregar uno nuevo en la misma sección.
+      const destino = { solicitudes: 'nueva-sol', incidentes: 'nuevo-inc', tareas: 'nueva-tarea', bitacora: 'nueva-bit' }[lista];
+      document.querySelector(`[data-foco="${destino}"]`)?.focus();
+      break;
+    }
   }
 });
 
-/* Arrastrar tarjetas entre columnas (con mouse; en el celular queda el selector de la tarjeta). */
+/* Arrastrar tarjetas entre columnas: atajo con mouse en el computador. En el celular y con teclado están los botones «Volver» y «Avanzar» de cada tarjeta. */
 let arrastrado = null;
 const limpiarDestino = () => document.querySelectorAll('.col.destino').forEach((x) => x.classList.remove('destino'));
 document.addEventListener('dragstart', (e) => {
@@ -1154,7 +1337,7 @@ document.addEventListener('drop', (e) => {
   e.preventDefault();
   const k = buscarCliente(arrastrado), n = +col.dataset.etapa;
   arrastrado = null; limpiarDestino();
-  if (k && n !== k.etapa) { cambiar(() => cambiarEtapa(k, n)); avisar(`«${k.razon}» pasó a «${ETAPAS[k.etapa]}».`); }
+  moverEnTablero(k, n);
 });
 
 document.addEventListener('change', (e) => {
@@ -1162,11 +1345,6 @@ document.addEventListener('change', (e) => {
   const c = clienteActual();
   if (t.id === 'fEtapa') { ui.etapa = t.value; pintarLista(); return; }
   if (t.id === 'fSem') { ui.sem = t.value; pintarLista(); return; }
-  if (t.dataset.mover) {
-    const k = buscarCliente(t.dataset.mover);
-    if (k) { cambiar(() => cambiarEtapa(k, +t.value)); avisar(`«${k.razon}» pasó a «${ETAPAS[k.etapa]}».`); }
-    return;
-  }
   if (!c) return;
   if (t.dataset.oblCampo) {   // texto libre: se guarda sin repintar, para no perder el foco
     c.obligaciones[t.dataset.obl][t.dataset.oblCampo] = txt(t.value, t.dataset.oblCampo === 'nota' ? 300 : 80);
@@ -1196,7 +1374,10 @@ document.addEventListener('change', (e) => {
   }
 });
 
-document.addEventListener('input', (e) => { if (e.target.id === 'buscar') { ui.q = e.target.value; pintarLista(); } });
+document.addEventListener('input', (e) => {
+  if (e.target.getAttribute && e.target.getAttribute('aria-invalid') === 'true') limpiarError(e.target);
+  if (e.target.id === 'buscar') { ui.q = e.target.value; pintarLista(); }
+});
 
 // Formularios de la ficha: nunca se envían a ningún lado; sólo agregan datos aquí.
 document.addEventListener('submit', (e) => {
@@ -1206,22 +1387,25 @@ document.addEventListener('submit', (e) => {
   const c = clienteActual();
   if (!c) return;
   if (f.id === 'formSol') {
-    if (!esFecha(f.recepcion.value)) { f.recepcion.focus(); return; }
+    if (!esFecha(f.recepcion.value)) { errorCampo(f.recepcion, 'Escribe la fecha en que llegó la solicitud.'); return; }
     cambiar(() => c.solicitudes.push(normalizar({ solicitudes: [{ recepcion: f.recepcion.value, tipo: f.tipo.value, solicitante: f.solicitante.value, prorroga: f.prorroga.checked, estado: 'recibida' }] }).solicitudes[0]));
     avisar('Solicitud agregada. El plazo se calcula solo.');
   } else if (f.id === 'formInc') {
-    if (!f.descripcion.value.trim()) { f.descripcion.focus(); return; }
+    if (!esFecha(f.deteccion.value)) { errorCampo(f.deteccion, 'Escribe la fecha en que se detectó.'); return; }
+    if (!f.descripcion.value.trim()) { errorCampo(f.descripcion, 'Escribe qué pasó.'); return; }
     cambiar(() => {
       c.incidentes.push(normalizar({ incidentes: [{ deteccion: f.deteccion.value, descripcion: f.descripcion.value, sensibles: f.sensibles.checked }] }).incidentes[0]);
       c.bitacora.push({ id: uid(), fecha: hoyISO(), texto: `Incidente registrado (detectado el ${fmt(f.deteccion.value)}).`, auto: true });
     });
     avisar('Incidente registrado.');
   } else if (f.id === 'formTarea') {
-    if (!f.texto.value.trim()) { f.texto.focus(); return; }
+    if (!f.texto.value.trim()) { errorCampo(f.texto, 'Escribe la tarea.'); return; }
     cambiar(() => c.tareas.push({ id: uid(), texto: txt(f.texto.value, 300), fecha: esFecha(f.fecha.value) ? f.fecha.value : '', responsable: txt(f.responsable.value, 80), hecha: false }));
+    avisar('Tarea agregada.');
   } else if (f.id === 'formBit') {
-    if (!f.texto.value.trim()) { f.texto.focus(); return; }
+    if (!f.texto.value.trim()) { errorCampo(f.texto, 'Escribe qué pasó.'); return; }
     cambiar(() => c.bitacora.push({ id: uid(), fecha: esFecha(f.fecha.value) ? f.fecha.value : hoyISO(), texto: txt(f.texto.value), auto: false }));
+    avisar('Anotado en la bitácora.');
   }
 });
 
@@ -1331,16 +1515,158 @@ function ejemplo() {
   return lista.map((c) => normalizar({ ...c, ejemplo: true }));
 }
 
+/* ───────── Guía de primer uso (la misma en todas las herramientas del estudio) ─────────
+   Cada paso: { titulo, texto, el: selector que se destaca (opcional), ir: ruta '#/…' o función que prepara la pantalla (opcional) }.
+   Se abre sola la primera vez y después con el botón «Cómo se usa». No guarda nada más que «ya la vi». */
+const Guia = (() => {
+  let pasos = [], i = 0, capa, foco, globo, antes = null, rutaInicial = '';
+  const vista = (clave) => { try { return localStorage.getItem(clave) === '1'; } catch { return true; } };
+  const enfocables = () => [...globo.querySelectorAll('button')];
+
+  function construir() {
+    capa = document.createElement('div');
+    capa.className = 'guia-capa';
+    foco = document.createElement('div');
+    foco.className = 'guia-foco';
+    globo = document.createElement('div');
+    globo.className = 'guia-globo';
+    globo.tabIndex = -1;
+    globo.setAttribute('role', 'dialog');
+    globo.setAttribute('aria-modal', 'true');
+    globo.setAttribute('aria-labelledby', 'guiaTit');
+    globo.setAttribute('aria-describedby', 'guiaTxt');
+    globo.innerHTML = `<p class="guia-n" id="guiaN"></p><h2 id="guiaTit"></h2><p class="guia-txt" id="guiaTxt"></p>
+      <div class="guia-puntos" aria-hidden="true"></div>
+      <div class="guia-pie"><button type="button" class="guia-saltar" data-tour-cerrar>Saltar la guía</button>
+        <button type="button" class="btn" data-guia="atras">Anterior</button><button type="button" class="btn primario" data-guia="sig">Siguiente</button></div>`;
+    globo.addEventListener('click', (e) => {
+      const b = e.target.closest('button');
+      if (!b) return;
+      if (b.hasAttribute('data-tour-cerrar')) cerrar();
+      else if (b.dataset.guia === 'atras') ir(i - 1);
+      else if (b.dataset.guia === 'sig') ir(i + 1);
+    });
+    document.body.append(capa, foco, globo);
+  }
+
+  function teclas(e) {
+    if (e.key === 'Escape') { e.preventDefault(); cerrar(); return; }
+    if (e.key === 'ArrowRight' && !e.altKey) { e.preventDefault(); ir(i + 1); return; }
+    if (e.key === 'ArrowLeft' && !e.altKey) { e.preventDefault(); ir(i - 1); return; }
+    if (e.key === 'Tab') {   // el foco no sale del globo mientras la guía está abierta
+      const b = enfocables(), primero = b[0], ultimo = b[b.length - 1];
+      if (e.shiftKey && document.activeElement === primero) { e.preventDefault(); ultimo.focus(); }
+      else if (!e.shiftKey && document.activeElement === ultimo) { e.preventDefault(); primero.focus(); }
+      else if (!globo.contains(document.activeElement)) { e.preventDefault(); primero.focus(); }
+    }
+  }
+
+  function ubicar() {
+    if (!globo || globo.hidden) return;
+    const p = pasos[i];
+    const el = p.el && document.querySelector(p.el);
+    const r = el && el.getBoundingClientRect();
+    const visible = r && r.width > 0 && r.height > 0;
+    capa.classList.toggle('con-foco', !!visible);
+    foco.hidden = !visible;
+    const W = window.innerWidth, H = window.innerHeight, m = 8;
+    const gw = globo.offsetWidth, gh = globo.offsetHeight;
+    if (!visible) {   // sin elemento: el globo va al centro
+      globo.style.left = Math.max(12, (W - gw) / 2) + 'px';
+      globo.style.top = Math.max(12, (H - gh) / 2) + 'px';
+      return;
+    }
+    Object.assign(foco.style, { left: r.left - m + 'px', top: r.top - m + 'px', width: r.width + 2 * m + 'px', height: r.height + 2 * m + 'px' });
+    let top = r.bottom + m + 12;
+    if (top + gh > H - 12) top = r.top - m - 12 - gh;   // no cabe abajo: arriba
+    if (top < 12) top = Math.min(H - gh - 12, Math.max(12, r.top + 12));   // tampoco arriba: encima del elemento
+    const left = Math.min(W - gw - 12, Math.max(12, r.left));
+    globo.style.left = left + 'px';
+    globo.style.top = top + 'px';
+  }
+
+  function ir(n) {
+    if (n < 0) return;
+    if (n >= pasos.length) { cerrar(); return; }
+    i = n;
+    const p = pasos[i];
+    if (typeof p.ir === 'function') p.ir();
+    else if (p.ir && location.hash !== p.ir) location.hash = p.ir;
+    globo.querySelector('#guiaN').textContent = `Paso ${i + 1} de ${pasos.length}`;
+    globo.querySelector('#guiaTit').textContent = p.titulo;
+    globo.querySelector('#guiaTxt').textContent = p.texto;
+    globo.querySelector('.guia-puntos').innerHTML = pasos.map((_, k) => `<i${k === i ? ' class="on"' : ''}></i>`).join('');
+    globo.querySelector('[data-guia="atras"]').hidden = i === 0;
+    globo.querySelector('[data-guia="sig"]').textContent = i === pasos.length - 1 ? 'Terminar' : 'Siguiente';
+    // Se espera a que la pantalla se pinte (cambio de ruta) antes de buscar el elemento.
+    setTimeout(() => {
+      const el = p.el && document.querySelector(p.el);
+      if (el) {
+        const chico = window.innerWidth <= 600;
+        el.scrollIntoView({ block: chico ? 'start' : 'center', behavior: 'instant' });
+        if (chico) window.scrollBy(0, -16);
+      }
+      ubicar();
+      globo.querySelector('[data-guia="sig"]').focus();
+    }, 60);
+  }
+
+  function abrir(lista, clave) {
+    if (!lista || !lista.length) return;
+    pasos = lista;
+    antes = document.activeElement;
+    rutaInicial = location.hash;
+    try { localStorage.setItem(clave, '1'); } catch { /* sin almacenamiento: igual se muestra */ }
+    if (!globo) construir();
+    capa.hidden = foco.hidden = globo.hidden = false;
+    document.addEventListener('keydown', teclas, true);
+    window.addEventListener('resize', ubicar);
+    window.addEventListener('scroll', ubicar, { passive: true });
+    ir(0);
+  }
+
+  function cerrar() {
+    if (!globo || globo.hidden) return;
+    capa.hidden = foco.hidden = globo.hidden = true;
+    document.removeEventListener('keydown', teclas, true);
+    window.removeEventListener('resize', ubicar);
+    window.removeEventListener('scroll', ubicar);
+    if (location.hash !== rutaInicial) location.hash = rutaInicial || '#/';
+    // Si se abrió sola, el foco vuelve al botón «Cómo se usa», que es donde se reabre.
+    const volver = antes && antes !== document.body && document.contains(antes) ? antes : document.querySelector('[data-guia-abrir]');
+    if (volver) volver.focus();
+  }
+
+  return { abrir, cerrar, vista };
+})();
+
+/* Los pasos de la guía de esta herramienta. */
+const CLAVE_GUIA = 'mlv-panel-guia-v1';
+const GUIA = [
+  { titulo: 'Para qué sirve', texto: 'Sigue la adecuación de cada empresa cliente a la Ley 21.719: en qué etapa va, cuánto avanzó y qué plazos corren. Ahora ves clientes de ejemplo con datos ficticios: puedes tocar todo sin miedo.' },
+  { ir: '#/clientes', el: '.resumen', titulo: 'Los indicadores', texto: 'Cuántos días faltan para que rija la ley, el avance promedio y lo que está abierto o vencido, sumando todos los clientes.' },
+  { ir: '#/clientes', el: '#lista tr.fila', titulo: 'La lista y el semáforo', texto: 'Cada fila es un cliente. «Urgente» es que algo venció o hay un incidente abierto; «Atención», que algo vence en 5 días o el avance es bajo. Bajo el semáforo ves el motivo.' },
+  { ir: '#/etapas', el: '.kanban .mover-t', titulo: 'La vista por etapa', texto: 'Cada columna es una etapa del proceso. Usa «Avanzar» o «Volver» en la tarjeta para cambiar al cliente de etapa; en el computador también puedes arrastrarla.' },
+  { ir: () => { const c = datos.clientes[0]; location.hash = c ? enlaceFicha(c) : '#/clientes'; }, el: '.subpest', titulo: 'La ficha de un cliente', texto: 'Toca un cliente para abrir su ficha. En estas pestañas marcas las obligaciones y anotas solicitudes con su plazo, incidentes y tareas. Arriba está «Imprimir informe para el cliente».' },
+  { ir: '#/clientes', el: '.herr', titulo: 'El respaldo', texto: 'Los datos quedan solo en este navegador. Usa «Descargar respaldo» seguido y guarda el archivo en una carpeta segura del estudio; con «Restaurar respaldo» lo recuperas.' },
+  { ir: '#/clientes', el: '#franja', titulo: 'Para empezar con tus clientes', texto: 'Quita los clientes de ejemplo con el botón de esta franja y crea los tuyos con «Nuevo cliente». Esta guía se vuelve a abrir con «Cómo se usa».' },
+];
+
 /* ───────── Arranque ───────── */
 const guardado = leerGuardado();
-if (guardado && Array.isArray(guardado.clientes)) {
+if (guardado) {
   datos.clientes = guardado.clientes.map(normalizar);
+  pintarGuardado();
+} else if (danado) {
+  datos.clientes = [];   // lo guardado no se pudo leer: quedó aparte y la franja lo avisa; no se carga el ejemplo encima
   pintarGuardado();
 } else {
   datos.clientes = ejemplo();   // primera vez: se muestra el ejemplo
   guardar();
 }
 pintar();
+document.addEventListener('click', (e) => { if (e.target.closest('[data-guia-abrir]')) Guia.abrir(GUIA, CLAVE_GUIA); });
+if (!Guia.vista(CLAVE_GUIA)) setTimeout(() => Guia.abrir(GUIA, CLAVE_GUIA), 500);
 </script>
 </body>
 </html>

@@ -1,205 +1,343 @@
 <!doctype html>
-<html lang="es">
+<html lang="es-CL">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <!-- La página no puede conectarse a nada: el navegador bloquea cualquier envío. Así se puede prometer que los datos no salen del computador. -->
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; connect-src 'none'; form-action 'none'; base-uri 'none'">
-<title>Tachar antes de pegar · EVA</title>
+<title>Tachar antes de pegar · MLV Abogados</title>
 <style>
   :root {
-    --bg: #03050d; --panel: #0a0f1e; --panel2: #0e1528; --line: #1c2742;
-    --text: #e8f3ff; --soft: #a9b8d6; --muted: #6f7fa3;
-    --blue: #2a8cff; --indigo: #5a60ff; --violet: #a24dff; --ok: #3ddc97; --warn: #ffb547;
+    --fondo: #f6f5f1; --papel: #ffffff; --papel2: #fbfaf7; --hundido: #efede6;
+    --tinta: #1a2636; --tinta2: #3b4859; --suave: #5f6873; --linea: #dddbd2; --linea2: #ebe9e2; --campo: #8e8a82;
+    --acento: #0d5c68; --acento-osc: #094650; --acento-claro: #e3eef0; --acento-borde: #c3dbde;
+    --verde: #2b7549; --verde-f: #e4f0e8; --verde-b: #bcd8c6;
+    --ambar: #94600f; --ambar-f: #f9eed8; --ambar-b: #ead2a2;
+    --rojo: #a12f2a; --rojo-f: #f7e2e0; --rojo-b: #e6bdb9;
+    --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", serif;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --mono: ui-monospace, "Cascadia Mono", Consolas, "Courier New", monospace;
+    --radio: 10px;
   }
   * { box-sizing: border-box; }
-  html, body { margin: 0; background: var(--bg); color: var(--text); }
-  body { font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; padding: 0 16px 64px; }
-  .wrap { max-width: 1180px; margin: 0 auto; }
-  header { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; padding: 22px 0 18px; border-bottom: 1px solid var(--line); }
-  .brand { font: 600 13px/1 ui-monospace, "Cascadia Mono", Consolas, monospace; letter-spacing: .18em; color: var(--blue); }
-  h1 { margin: 0; font-size: 26px; line-height: 1.15; }
-  .badge { margin-left: auto; font: 600 12px/1.3 ui-monospace, Consolas, monospace; letter-spacing: .06em; color: var(--ok); border: 1px solid #1f5f48; background: #06201a; padding: 8px 12px; border-radius: 8px; }
-  .lead { color: var(--soft); max-width: 820px; margin: 16px 0 6px; }
-  .tabs { display: flex; gap: 8px; margin: 22px 0 18px; }
-  .tab { font: inherit; font-weight: 600; color: var(--soft); background: var(--panel); border: 1px solid var(--line); padding: 10px 18px; border-radius: 10px; cursor: pointer; }
-  .tab[aria-selected="true"] { color: var(--text); border-color: var(--blue); background: #0b1a33; }
-  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
-  @media (max-width: 860px) { .grid { grid-template-columns: 1fr; } .badge { margin-left: 0; } }
-  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 18px; min-width: 0; }
-  .card h2 { margin: 0 0 4px; font-size: 17px; }
-  .step { font: 600 12px/1 ui-monospace, Consolas, monospace; color: var(--blue); letter-spacing: .12em; margin-bottom: 8px; display: block; }
-  .hint { color: var(--muted); font-size: 14px; margin: 4px 0 10px; }
-  textarea { width: 100%; min-height: 190px; resize: vertical; font: 15px/1.5 ui-monospace, Consolas, monospace; color: var(--text); background: var(--panel2); border: 1px solid var(--line); border-radius: 10px; padding: 12px; }
-  textarea:focus { outline: 2px solid var(--blue); outline-offset: 1px; }
-  textarea.small { min-height: 90px; }
-  label.lbl { display: block; font-weight: 600; font-size: 14px; margin: 14px 0 4px; }
-  .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 10px; }
-  button.btn, label.btn { font: inherit; font-size: 14px; font-weight: 600; color: var(--text); background: #12203d; border: 1px solid #27406f; padding: 9px 14px; border-radius: 9px; cursor: pointer; }
-  button.btn:hover, label.btn:hover { border-color: var(--blue); }
-  button.btn:disabled { opacity: .45; cursor: default; border-color: #27406f; }
-  button.primary { background: var(--blue); border-color: var(--blue); color: #021022; }
-  input[type=file] { display: none; }
-  .msg { font-size: 14px; color: var(--soft); min-height: 1.4em; }
-  .msg.warn { color: var(--warn); }
-  .preview { white-space: pre-wrap; word-wrap: break-word; font: 15px/1.6 ui-monospace, Consolas, monospace; background: var(--panel2); border: 1px solid var(--line); border-radius: 10px; padding: 12px; max-height: 420px; overflow: auto; }
-  .preview:empty::before { content: "Aquí verás el texto con los datos marcados."; color: var(--muted); }
-  mark { color: var(--text); border-radius: 4px; padding: 0 2px; cursor: pointer; background: rgba(42,140,255,.28); box-shadow: inset 0 -2px 0 var(--c, var(--blue)); }
-  mark.off { background: transparent; box-shadow: inset 0 -1px 0 var(--muted); color: var(--soft); text-decoration: line-through dotted var(--muted); }
-  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 6px; }
-  .chip { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--soft); background: var(--panel2); border: 1px solid var(--line); border-left: 3px solid var(--c); padding: 4px 9px 4px 7px; border-radius: 8px; cursor: pointer; user-select: none; }
-  .chip input { margin: 0; width: 15px; height: 15px; accent-color: var(--blue); }
-  .chip:has(input:not(:checked)) { opacity: .55; text-decoration: line-through; }
-  .selbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 10px; }
-  .selbar .hint { margin: 0; flex: 1 1 220px; }
-  .list { list-style: none; margin: 10px 0 0; padding: 0; max-height: 300px; overflow: auto; border-top: 1px solid var(--line); }
-  .list li { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: center; padding: 8px 2px; border-bottom: 1px solid var(--line); font-size: 14px; }
-  .list .val { overflow-wrap: anywhere; }
-  .tok { font: 600 12px/1.2 ui-monospace, Consolas, monospace; color: var(--c, var(--blue)); white-space: nowrap; }
-  .list input { width: 18px; height: 18px; accent-color: var(--blue); }
-  details { margin-top: 18px; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 14px 18px; }
-  summary { cursor: pointer; font-weight: 700; }
-  details ul { color: var(--soft); padding-left: 20px; }
-  details li { margin: 6px 0; }
-  .check { display: flex; gap: 8px; align-items: flex-start; font-size: 14px; color: var(--soft); margin-top: 10px; }
-  .check input { margin-top: 3px; accent-color: var(--blue); }
-  footer { margin-top: 28px; color: var(--muted); font-size: 13px; border-top: 1px solid var(--line); padding-top: 14px; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; background: var(--fondo); color: var(--tinta); font: 15px/1.5 var(--sans); }
+  .app { max-width: 1280px; margin: 0 auto; padding: 0 28px 36px; }
+  a { color: var(--acento); }
+  h1, h2, h3 { font-family: var(--serif); font-weight: 600; color: var(--tinta); }
+  :focus-visible { outline: 2px solid var(--acento); outline-offset: 2px; }
   [hidden] { display: none !important; }
+  .sr { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+
+  /* Cabecera */
+  .cabecera { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px 24px; padding: 26px 0 18px; }
+  .firma { font: 600 25px/1.1 var(--serif); letter-spacing: .01em; color: var(--tinta); text-decoration: none; }
+  .sub { color: var(--suave); font-size: 12.5px; letter-spacing: .1em; text-transform: uppercase; margin-top: 6px; }
+  .acciones-cab { display: flex; align-items: center; flex-wrap: wrap; gap: 10px 16px; }
+
+  /* Título y pestañas */
+  .sec-cab { display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 10px 20px; margin: 4px 0 0; }
+  .sec-cab h1 { font-size: 27px; line-height: 1.15; margin: 0; }
+  .sec-cab h1:focus { outline: none; }
+  .lead { margin: 10px 0 0; color: var(--tinta2); max-width: 820px; }
+  .chip { display: inline-flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 500; padding: 4px 11px; border-radius: 999px; border: 1px solid transparent; }
+  .chip.verde { background: var(--verde-f); color: var(--verde); border-color: var(--verde-b); }
+  .chip.verde i { width: 8px; height: 8px; border-radius: 50%; background: var(--verde); flex: none; }
+  .vistas { display: flex; flex-wrap: wrap; gap: 2px; border-bottom: 1px solid var(--linea); margin: 20px 0 22px; }
+  .vistas [role=tab] { font: inherit; font-size: 14.5px; font-weight: 500; padding: 10px 13px; color: var(--tinta2); background: none; border: 0; border-bottom: 2px solid transparent; margin-bottom: -1px; cursor: pointer; }
+  .vistas [role=tab]:hover { color: var(--acento); }
+  .vistas [role=tab][aria-selected="true"] { color: var(--tinta); border-color: var(--acento); }
+
+  /* Botones y campos */
+  .btn { font: inherit; font-size: 14px; font-weight: 500; line-height: 1.3; color: var(--tinta); background: var(--papel); border: 1px solid var(--linea); border-radius: 8px; padding: 8px 14px; cursor: pointer; text-decoration: none; display: inline-block; }
+  .btn:hover { border-color: var(--acento); color: var(--acento); }
+  .btn.primario { background: var(--acento); border-color: var(--acento); color: #fff; }
+  .btn.primario:hover { background: var(--acento-osc); color: #fff; }
+  .btn.peligro { color: var(--rojo); }
+  .btn.peligro:hover { border-color: var(--rojo); }
+  .btn.peligro.lleno { background: var(--rojo); border-color: var(--rojo); color: #fff; }
+  .btn.peligro.lleno:hover { background: #7d231f; border-color: #7d231f; color: #fff; }
+  .btn.chico { font-size: 13px; padding: 5px 10px; }
+  .btn:disabled, .btn:disabled:hover { color: var(--suave); background: var(--hundido); border-color: var(--linea); cursor: not-allowed; }
+  .btn-txt { font: inherit; font-size: 13px; background: none; border: 0; color: var(--acento); cursor: pointer; padding: 2px 0; text-decoration: underline; text-underline-offset: 2px; }
+  input, select, textarea { font: inherit; font-size: 14px; color: var(--tinta); background: var(--papel); border: 1px solid var(--campo); border-radius: 7px; padding: 7px 10px; min-width: 0; max-width: 100%; }
+  input:focus, select:focus, textarea:focus { border-color: var(--acento); outline: none; box-shadow: 0 0 0 3px var(--acento-claro); }
+  input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px solid var(--acento); outline-offset: 1px; }
+  input[type=checkbox], input[type=radio] { width: 17px; height: 17px; accent-color: var(--acento); margin: 0; flex: none; }
+  textarea { resize: vertical; width: 100%; min-height: 190px; font: 15px/1.55 var(--sans); padding: 10px 12px; }
+  textarea.small { min-height: 90px; }
+  textarea[readonly] { background: var(--papel2); }
+  label.lbl { display: block; font-weight: 600; font-size: 14px; margin: 14px 0 2px; }
+  label.marca { display: flex; align-items: flex-start; gap: 9px; font-size: 14px; color: var(--tinta2); cursor: pointer; line-height: 1.45; margin: 10px 0 0; }
+  label.marca input { margin-top: 2px; }
+
+  /* Cajas y pasos */
+  .dos { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+  @media (max-width: 900px) { .dos { grid-template-columns: 1fr; } }
+  .caja { background: var(--papel); border: 1px solid var(--linea); border-radius: var(--radio); padding: 18px 20px; min-width: 0; }
+  .dos + .caja { margin-top: 16px; }
+  .caja h2 { font-size: 19px; margin: 0 0 6px; }
+  .caja h2 .paso-n { display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--acento); color: #fff; font: 600 13px/1 var(--sans); margin-right: 9px; vertical-align: 2px; }
+  .nota { font-size: 13.5px; color: var(--suave); margin: 4px 0 10px; }
+  .fila-acc { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 12px; }
+  .msg { font-size: 13.5px; color: var(--tinta2); min-height: 1.4em; margin: 8px 0 0; }
+  .msg.warn { color: var(--ambar); font-weight: 500; }
+  .alerta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; border-left: 3px solid var(--ambar); background: var(--ambar-f); color: #6d4708; padding: 10px 12px; border-radius: 0 6px 6px 0; font-size: 14px; margin: 12px 0 0; }
+  .alerta p { margin: 0; flex: 1 1 280px; }
+  .alerta b { font-weight: 600; }
+  .siguiente { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--linea2); display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; }
+  .siguiente p { margin: 0; color: var(--tinta2); font-size: 14px; }
+
+  /* Tipos de dato y vista con marcas */
+  .tipos { border: 0; padding: 0; margin: 6px 0 4px; min-width: 0; }
+  .tipos legend { padding: 0; margin-bottom: 6px; font-size: 13px; font-weight: 500; color: var(--suave); }
+  .tipos-lista { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tipo { display: inline-flex; align-items: center; gap: 7px; font-size: 13px; color: var(--tinta); background: var(--papel); border: 1px solid var(--linea); border-left: 4px solid var(--c); padding: 4px 10px 4px 8px; border-radius: 7px; cursor: pointer; user-select: none; }
+  .tipo input { width: 15px; height: 15px; }
+  .tipo:has(input:not(:checked)) { color: var(--suave); background: var(--papel2); border-left-color: var(--linea); }
+  .preview { white-space: pre-wrap; overflow-wrap: anywhere; font: 15px/1.75 var(--sans); background: var(--papel2); border: 1px solid var(--linea); border-radius: 8px; padding: 12px 14px; max-height: 440px; overflow: auto; margin-top: 10px; }
+  .preview:empty::before { content: "Aquí verás el texto con los datos marcados."; color: var(--suave); }
+  mark { color: var(--tinta); background: var(--f, var(--acento-claro)); box-shadow: inset 0 -2px 0 var(--c, var(--acento)); border-radius: 3px; padding: 1px 2px; cursor: pointer; }
+  mark:hover { box-shadow: inset 0 -3px 0 var(--c, var(--acento)); }
+  mark.off { background: none; box-shadow: none; outline: 1px dashed var(--campo); outline-offset: -1px; color: var(--tinta2); }
+  .selbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 10px; }
+  .selbar .nota { margin: 0; flex: 1 1 260px; }
+  .list { list-style: none; margin: 4px 0 0; padding: 0; max-height: 320px; overflow: auto; border-top: 1px solid var(--linea2); }
+  .list:empty { border-top: 0; }
+  .list li { border-bottom: 1px solid var(--linea2); }
+  .list label { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 8px 2px; font-size: 14px; cursor: pointer; }
+  .list .val { overflow-wrap: anywhere; }
+  .list .val small { color: var(--suave); font-size: 12.5px; }
+  .list li.apagado .val { color: var(--suave); }
+  .tok { font: 600 12.5px/1.2 var(--mono); color: var(--c, var(--acento)); white-space: nowrap; }
+  .agregar { margin-top: 14px; border-top: 1px solid var(--linea2); padding-top: 10px; }
+  .agregar summary { cursor: pointer; font-weight: 600; font-size: 14px; color: var(--acento); padding: 4px 0; }
+
+  details.caja summary { cursor: pointer; font: 600 17px/1.3 var(--serif); }
+  details.caja ul { color: var(--tinta2); padding-left: 20px; margin: 12px 0 0; }
+  details.caja li { margin: 6px 0; }
+
+  .pie { margin-top: 40px; padding-top: 14px; border-top: 1px solid var(--linea); font-size: 13px; color: var(--suave); }
+  .pie p { margin: 4px 0; }
+
+  /* Diálogo de confirmación */
+  dialog { border: 1px solid var(--linea); border-radius: 12px; padding: 0; width: min(560px, calc(100vw - 32px)); max-height: calc(100dvh - 32px); color: var(--tinta); background: var(--papel); box-shadow: 0 24px 60px rgba(20, 30, 45, .25); }
+  dialog::backdrop { background: rgba(26, 38, 54, .42); }
+  .dlg-cab { padding: 20px 22px 0; }
+  .dlg-cab h2 { margin: 0; font-size: 21px; }
+  .dlg-cuerpo { padding: 12px 22px 4px; }
+  .dlg-cuerpo p { margin: 0; color: var(--tinta2); }
+  .dlg-pie { padding: 16px 22px 20px; display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 8px; position: sticky; bottom: 0; background: var(--papel); }
+
+  /* Celular y táctil */
+  @media (pointer: coarse) {
+    .btn, .btn.chico, select, input:not([type=checkbox]):not([type=radio]) { min-height: 44px; }
+    .btn-txt { min-height: 44px; }
+    .tipo { min-height: 44px; }
+    .vistas [role=tab] { min-height: 44px; }
+    .agregar summary { padding: 10px 0; }
+  }
+  @media (max-width: 760px) {
+    .app { padding: 0 16px 28px; }
+    input, select, textarea { font-size: 16px; }
+    .caja { padding: 16px; }
+  }
+  @media (max-width: 700px) {
+    .vistas { display: grid; grid-template-columns: 1fr 1fr; }
+    .vistas [role=tab] { min-height: 44px; text-align: center; padding: 8px 6px; font-size: 14px; }
+  }
+
+
+  /* Común a las herramientas del estudio: vuelta a la portada, botón de ayuda y guía de primer uso */
+  .ico { width: 1.15em; height: 1.15em; flex: none; vertical-align: -.2em; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .portada { display: inline-flex; align-items: center; gap: 5px; margin-bottom: 8px; font-size: 13px; color: var(--suave); text-decoration: none; }
+  .portada:hover { color: var(--acento); text-decoration: underline; text-underline-offset: 3px; }
+  .btn.ayuda { display: inline-flex; align-items: center; gap: 6px; }
+  .guia-capa { position: fixed; inset: 0; z-index: 40; background: rgba(26, 38, 54, .5); }
+  .guia-capa.con-foco { background: transparent; }
+  .guia-foco { position: fixed; z-index: 41; border-radius: 10px; box-shadow: 0 0 0 4px var(--acento), 0 0 0 9999px rgba(26, 38, 54, .5); pointer-events: none; transition: top .2s, left .2s, width .2s, height .2s; }
+  .guia-globo { position: fixed; z-index: 42; width: min(380px, calc(100vw - 24px)); background: var(--papel); color: var(--tinta); border-radius: 12px; padding: 18px 20px 16px; box-shadow: 0 18px 50px rgba(20, 30, 45, .3); font: 15px/1.5 var(--sans); }
+  .guia-globo:focus { outline: none; }
+  .guia-globo .guia-n { margin: 0 0 4px; font-size: 12.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--suave); }
+  .guia-globo h2 { margin: 0 0 6px; font: 600 19px/1.25 var(--serif); }
+  .guia-globo p.guia-txt { margin: 0; color: var(--tinta2); }
+  .guia-pie { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+  .guia-pie .guia-saltar { margin-right: auto; font: inherit; font-size: 14px; background: none; border: 0; padding: 10px 2px; color: var(--suave); cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
+  .guia-pie .guia-saltar:hover { color: var(--tinta); }
+  .guia-puntos { display: flex; gap: 5px; margin-top: 14px; }
+  .guia-puntos i { width: 7px; height: 7px; border-radius: 50%; background: var(--linea); }
+  .guia-puntos i.on { background: var(--acento); }
+  @media (max-width: 600px) { .guia-globo { left: 12px !important; right: 12px; bottom: 12px; top: auto !important; width: auto; } }
+  @media (prefers-reduced-motion: reduce) { .guia-foco { transition: none; } }
+  @media print { .guia-capa, .guia-foco, .guia-globo, .portada, .btn.ayuda { display: none !important; } }
 </style>
 </head>
 <body>
-<div class="wrap">
-  <header>
+<div class="app">
+  <header class="cabecera">
     <div>
-      <div class="brand">ƎVΛ · LAB</div>
-      <h1>Tachar antes de pegar</h1>
+      <a class="portada" href="../index.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg> Herramientas del estudio</a><br>
+      <span class="firma">MLV Abogados</span>
+      <div class="sub">Tachar antes de pegar · Herramientas del estudio</div>
     </div>
-    <div class="badge">● SIN INTERNET · NADA SALE DE ESTE COMPUTADOR</div>
+    <div class="acciones-cab">
+      <button class="btn ayuda" data-guia-abrir><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg> Cómo se usa</button>
+    </div>
   </header>
 
-  <p class="lead">Pega un escrito o abre un Word. Esta página cambia nombres, RUT, direcciones, fechas, montos y otros datos por etiquetas como <b>[PERSONA_1]</b>, para que puedas consultar a una IA sin entregarle quién es tu cliente. Cuando la IA responda, la pestaña «Devolver» pone los datos de vuelta.</p>
+  <main>
+    <div class="sec-cab">
+      <h1 id="titulo" tabindex="-1">Tachar antes de pegar</h1>
+      <span class="chip verde"><i aria-hidden="true"></i>Funciona sin internet: nada sale de este computador</span>
+    </div>
+    <p class="lead">Pega un escrito o abre un Word. Esta página cambia nombres, RUT, direcciones, fechas, montos y otros datos por etiquetas como <b>[PERSONA_1]</b>, para que puedas consultar a una IA sin entregarle quién es tu cliente. Cuando la IA responda, la pestaña «Después de la IA» pone los datos de vuelta.</p>
 
-  <div class="tabs" role="tablist">
-    <button class="tab" role="tab" id="tab-tachar" aria-selected="true">1 · Tachar</button>
-    <button class="tab" role="tab" id="tab-devolver" aria-selected="false">2 · Devolver</button>
-  </div>
-
-  <section id="panel-tachar">
-    <div class="grid">
-      <div class="card">
-        <span class="step">PASO 1</span>
-        <h2>Tu texto</h2>
-        <p class="hint">Pega el texto, o abre un archivo .docx o .txt. Si es un PDF, copia su texto y pégalo aquí.</p>
-        <textarea id="src" spellcheck="false" placeholder="Pega aquí el escrito, el contrato o el correo…"></textarea>
-        <div class="row">
-          <label class="btn" for="file">Abrir Word o .txt</label>
-          <input type="file" id="file" accept=".docx,.txt,text/plain">
-          <button class="btn" id="ejemplo">Probar con un ejemplo</button>
-          <button class="btn" id="limpiar">Borrar todo</button>
-        </div>
-        <div class="msg" id="fileMsg"></div>
-
-        <label class="lbl" for="personas">Personas que quieres tachar sí o sí</label>
-        <p class="hint">Una por línea. Si la misma persona aparece de varias formas, sepáralas con «/»: <i>Juan Pérez Soto / don Juan / el Chino</i>.</p>
-        <textarea id="personas" class="small" spellcheck="false"></textarea>
-
-        <label class="lbl" for="otros">Otras cosas que quieres tachar</label>
-        <p class="hint">Empresas, lugares, nombres de proyectos, cargos: lo que delate el caso. Una por línea.</p>
-        <textarea id="otros" class="small" spellcheck="false"></textarea>
-      </div>
-
-      <div class="card">
-        <span class="step">PASO 2</span>
-        <h2>Revisa lo que encontré</h2>
-        <p class="hint">Busco patrones y una lista de nombres y apellidos comunes en Chile; no entiendo el texto. Toca un dato marcado para no tacharlo. <b>Lo que no está marcado no se tacha</b>: léelo entero.</p>
-        <div class="chips" id="chips" aria-label="Qué tipos de dato tachar"></div>
-        <label class="check"><input type="checkbox" id="estricto"> <span><b>Modo estricto:</b> tachar también toda palabra con mayúscula que no reconozca (nombres raros, apodos, lugares). Marca más: revisa y desmarca lo que sobre.</span></label>
-        <div class="msg" id="stats"></div>
-        <div class="preview" id="preview"></div>
-        <div class="selbar">
-          <p class="hint" id="selHint">¿Se me pasó algo? Selecciónalo arriba con el mouse y elige:</p>
-          <button class="btn" id="selPersona" disabled>Tachar como persona</button>
-          <button class="btn" id="selOtro" disabled>Tachar como otro dato</button>
-        </div>
-        <ul class="list" id="list"></ul>
-      </div>
+    <div class="vistas" role="tablist" aria-label="Antes y después de consultar a la IA">
+      <button type="button" role="tab" id="tab-tachar" aria-controls="panel-tachar" aria-selected="true" tabindex="0">Antes de la IA: tachar</button>
+      <button type="button" role="tab" id="tab-devolver" aria-controls="panel-devolver" aria-selected="false" tabindex="-1">Después de la IA: devolver</button>
     </div>
 
-    <div class="card" style="margin-top:18px">
-      <span class="step">PASO 3</span>
-      <h2>Texto tachado, listo para la IA</h2>
-      <label class="check"><input type="checkbox" id="aviso" checked> Agregar al inicio una nota para que la IA respete las etiquetas</label>
-      <textarea id="out" readonly spellcheck="false"></textarea>
-      <div class="row">
-        <button class="btn primary" id="copiar">Copiar texto tachado</button>
-        <button class="btn" id="bajarLlave">Guardar la llave (.json)</button>
-        <span class="msg" id="outMsg"></span>
-      </div>
-      <p class="hint">La llave es la lista de qué etiqueta corresponde a qué dato real. Queda sólo en este computador: guárdala con el expediente y <b>no la subas a ninguna IA</b>. Si cierras esta página sin guardarla, se pierde.</p>
-    </div>
-  </section>
+    <section id="panel-tachar" role="tabpanel" aria-labelledby="tab-tachar">
+      <div class="dos">
+        <div class="caja" id="caja1">
+          <h2 id="h-src"><span class="paso-n" aria-hidden="true">1</span>Tu texto</h2>
+          <p class="nota" id="ayuda-src">Pega el texto, o abre un archivo .docx o .txt. Si es un PDF, copia su texto y pégalo aquí.</p>
+          <textarea id="src" spellcheck="false" aria-labelledby="h-src" aria-describedby="ayuda-src" placeholder="Pega aquí el escrito, el contrato o el correo…"></textarea>
+          <div class="fila-acc">
+            <button type="button" class="btn" id="abrir">Abrir Word o .txt</button>
+            <input type="file" id="file" accept=".docx,.txt,text/plain" hidden>
+            <button type="button" class="btn" id="ejemplo">Probar con un ejemplo</button>
+            <button type="button" class="btn peligro" id="limpiar">Borrar todo</button>
+          </div>
+          <p class="msg" id="fileMsg" role="status"></p>
+        </div>
 
-  <section id="panel-devolver" hidden>
-    <div class="grid">
-      <div class="card">
-        <span class="step">PASO 4</span>
-        <h2>Respuesta de la IA</h2>
-        <p class="hint">Pega aquí lo que respondió la IA, con sus etiquetas. Uso la llave de esta sesión; si cerraste la página, carga la que guardaste.</p>
-        <textarea id="resp" spellcheck="false" placeholder="Pega aquí la respuesta de la IA…"></textarea>
-        <div class="row">
-          <label class="btn" for="llaveFile">Cargar una llave guardada</label>
-          <input type="file" id="llaveFile" accept=".json,application/json">
-          <span class="msg" id="llaveMsg"></span>
+        <div class="caja" id="caja2">
+          <h2><span class="paso-n" aria-hidden="true">2</span>Revisa lo que encontré</h2>
+          <p class="nota">Busco patrones y una lista de nombres y apellidos comunes en Chile; no entiendo el texto. Toca un dato marcado, o desmárcalo en la lista de abajo, para dejarlo sin tachar. <b>Lo que no está marcado no se tacha</b>: léelo entero.</p>
+          <fieldset class="tipos">
+            <legend>Qué tipos de dato tachar</legend>
+            <div class="tipos-lista" id="tipos"></div>
+          </fieldset>
+          <label class="marca"><input type="checkbox" id="estricto"> <span><b>Modo estricto:</b> tacha también las demás palabras con mayúscula que no reconozco (nombres poco comunes, apodos, lugares). Marca de más: revisa la lista y desmarca lo que no sea un dato.</span></label>
+          <p class="msg" id="stats" role="status"></p>
+          <div class="preview" id="preview" tabindex="0" role="region" aria-label="Texto con los datos marcados"></div>
+          <div class="selbar">
+            <p class="nota" id="selHint">¿Se me pasó algo? Selecciónalo en el texto de arriba y elige cómo tacharlo. También puedes escribirlo en «Agregar a mano», más abajo.</p>
+            <button type="button" class="btn" id="selPersona" aria-describedby="selHint" disabled>Tachar como persona</button>
+            <button type="button" class="btn" id="selOtro" aria-describedby="selHint" disabled>Tachar como otro dato</button>
+          </div>
+          <p class="msg" id="selMsg" role="status"></p>
+          <p class="nota" id="listaTit" hidden>Datos encontrados. Desmarca los que no quieras tachar.</p>
+          <ul class="list" id="list" aria-labelledby="listaTit"></ul>
+          <details class="agregar" id="agregar">
+            <summary>Agregar a mano personas u otros datos</summary>
+            <label class="lbl" for="personas">Personas que quieres tachar sí o sí</label>
+            <p class="nota" id="ayuda-personas">Una por línea. Si la misma persona aparece de varias formas, sepáralas con «/»: <i>Juan Pérez Soto / don Juan / el Chino</i>.</p>
+            <textarea id="personas" class="small" spellcheck="false" aria-describedby="ayuda-personas"></textarea>
+            <label class="lbl" for="otros">Otras cosas que quieres tachar</label>
+            <p class="nota" id="ayuda-otros">Empresas, lugares, nombres de proyectos, cargos: lo que delate el caso. Una por línea.</p>
+            <textarea id="otros" class="small" spellcheck="false" aria-describedby="ayuda-otros"></textarea>
+          </details>
         </div>
       </div>
-      <div class="card">
-        <span class="step">PASO 5</span>
-        <h2>Con los datos de vuelta</h2>
-        <textarea id="restored" readonly spellcheck="false"></textarea>
-        <div class="row">
-          <button class="btn primary" id="copiar2">Copiar</button>
-          <span class="msg" id="restMsg"></span>
+
+      <div class="caja" id="caja3">
+        <h2 id="h-out"><span class="paso-n" aria-hidden="true">3</span>Texto tachado, listo para la IA</h2>
+        <label class="marca"><input type="checkbox" id="aviso" checked> <span>Agregar al inicio una nota para que la IA respete las etiquetas</span></label>
+        <textarea id="out" readonly spellcheck="false" aria-labelledby="h-out" style="margin-top:10px"></textarea>
+        <div class="fila-acc" id="acciones3">
+          <button type="button" class="btn primario" id="copiar">Copiar texto tachado</button>
+          <button type="button" class="btn" id="bajarLlave">Guardar la llave</button>
+        </div>
+        <p class="msg" id="outMsg" role="status"></p>
+        <div class="alerta" id="alertaLlave" hidden>
+          <p><b>Guarda la llave antes de cerrar.</b> Sin ella no podrás poner los datos reales de vuelta en la respuesta de la IA.</p>
+          <button type="button" class="btn chico" id="bajarLlave2">Guardar la llave</button>
+        </div>
+        <p class="nota" style="margin-top:12px">La llave es la lista de qué etiqueta corresponde a qué dato real. Queda solo en este computador: guárdala con el expediente y <b>no la subas a ninguna IA</b>. Si cierras esta página sin guardarla, se pierde.</p>
+        <div class="siguiente">
+          <p>¿Ya pegaste el texto en la IA y tienes su respuesta?</p>
+          <button type="button" class="btn" id="irDevolver">Ya tengo la respuesta de la IA → Devolver los datos</button>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <details>
-    <summary>Lo que esta herramienta no hace (léelo una vez)</summary>
-    <ul>
-      <li><b>Tachar no es anonimizar.</b> La Ley 21.719 llama anonimización a un procedimiento irreversible. Esto es seudonimización: con la llave se vuelve atrás, y para la ley siguen siendo datos personales.</li>
-      <li><b>El contexto delata.</b> «La gerenta de la única farmacia de Puerto Williams» identifica a alguien sin decir su nombre. Tacha también lo que, junto, apunte a una persona.</li>
-      <li><b>No reconoce todo.</b> Reconoce los nombres y apellidos más comunes en Chile; un nombre poco común, un apodo o un nombre escrito sin mayúscula puede pasar. Usa el modo estricto o selecciónalo y pulsa «Tachar como persona».</li>
-      <li><b>Las fechas y los montos se tachan por defecto.</b> Si la IA los necesita (para calcular un plazo, por ejemplo), desmárcalos arriba del texto.</li>
-      <li><b>Los hechos siguen siendo secretos.</b> El deber de confidencialidad cubre los asuntos del cliente, no sólo su nombre. Tachar baja el riesgo; no reemplaza un plan de empresa con contrato ni el consentimiento del cliente cuando hay riesgo.</li>
-      <li><b>No guarda nada.</b> No usa internet ni memoria del navegador: al cerrar la página se borra todo. Para comprobarlo, apaga el wifi y úsala igual.</li>
-      <li>De un Word sólo toma el texto: el resultado no conserva el formato.</li>
-    </ul>
-  </details>
+    <section id="panel-devolver" role="tabpanel" aria-labelledby="tab-devolver" hidden>
+      <div class="dos">
+        <div class="caja" id="caja4">
+          <h2 id="h-resp"><span class="paso-n" aria-hidden="true">4</span>Respuesta de la IA</h2>
+          <p class="nota" id="ayuda-resp">Pega aquí lo que respondió la IA, con sus etiquetas.</p>
+          <textarea id="resp" spellcheck="false" aria-labelledby="h-resp" aria-describedby="ayuda-resp llaveEstado" placeholder="Pega aquí la respuesta de la IA…"></textarea>
+          <p class="nota" id="llaveEstado" style="margin-top:10px"></p>
+          <div class="fila-acc">
+            <button type="button" class="btn" id="cargarLlave">Cargar una llave guardada</button>
+            <input type="file" id="llaveFile" accept=".json,application/json" hidden>
+            <button type="button" class="btn-txt" id="soltarLlave" hidden>Usar la llave de esta sesión</button>
+          </div>
+          <p class="msg" id="llaveMsg" role="status"></p>
+        </div>
+        <div class="caja" id="caja5">
+          <h2 id="h-restored"><span class="paso-n" aria-hidden="true">5</span>Con los datos de vuelta</h2>
+          <textarea id="restored" readonly spellcheck="false" aria-labelledby="h-restored"></textarea>
+          <div class="fila-acc">
+            <button type="button" class="btn primario" id="copiar2">Copiar</button>
+          </div>
+          <p class="msg" id="restMsg" role="status"></p>
+        </div>
+      </div>
+    </section>
 
-  <footer>EVA LAB · Herramienta educativa, no asesoría legal. Revisa siempre el resultado antes de pegarlo.</footer>
+    <details class="caja" style="margin-top:16px">
+      <summary>Lo que esta herramienta no hace (léelo una vez)</summary>
+      <ul>
+        <li><b>Tachar no es anonimizar.</b> La Ley 21.719 llama anonimización a un procedimiento irreversible. Esto es seudonimización: con la llave se vuelve atrás, y para la ley siguen siendo datos personales.</li>
+        <li><b>El contexto delata.</b> «La gerenta de la única farmacia de Puerto Williams» identifica a alguien sin decir su nombre. Tacha también lo que, junto, apunte a una persona.</li>
+        <li><b>No reconoce todo.</b> Reconoce los nombres y apellidos más comunes en Chile; un nombre poco común, un apodo o un nombre escrito sin mayúscula puede pasar. Usa el modo estricto o selecciónalo y pulsa «Tachar como persona».</li>
+        <li><b>Las fechas y los montos se tachan por defecto.</b> Si la IA los necesita (para calcular un plazo, por ejemplo), desmárcalos arriba del texto.</li>
+        <li><b>Los hechos siguen siendo secretos.</b> El deber de confidencialidad cubre los asuntos del cliente, no solo su nombre. Tachar baja el riesgo; no reemplaza un plan de empresa con contrato ni el consentimiento del cliente cuando hay riesgo.</li>
+        <li><b>No guarda tus textos.</b> No usa internet y no guarda nada de lo que escribes: al cerrar la página se borra todo. El navegador solo recuerda que ya viste la guía. Para comprobarlo, apaga el wifi y úsala igual.</li>
+        <li>De un Word solo toma el texto: el resultado no conserva el formato.</li>
+      </ul>
+    </details>
+  </main>
+
+  <footer class="pie">
+    <p>Herramienta del estudio MLV Abogados, no es asesoría legal. Revisa siempre el resultado antes de pegarlo en una IA.</p>
+  </footer>
 </div>
+
+<!-- Confirmación -->
+<dialog id="dlgConfirmar" aria-labelledby="dlgConfTit" aria-describedby="dlgConfTxt">
+  <div class="dlg-cab"><h2 id="dlgConfTit"></h2></div>
+  <div class="dlg-cuerpo"><p id="dlgConfTxt"></p></div>
+  <div class="dlg-pie">
+    <button type="button" class="btn" id="dlgConfNo">Cancelar</button>
+    <button type="button" class="btn primario" id="dlgConfSi"></button>
+  </div>
+</dialog>
 
 <script>
 'use strict';
 
 /* ───────── Tipos de dato ───────── */
+// color: texto de la etiqueta y raya bajo el dato (≥ 5,3:1 sobre blanco); fondo: el mismo color al 16 % (la tinta queda ≥ 11,8:1).
 const TYPES = {
-  PERSONA:   { label: 'Personas',        color: '#2a8cff' },
-  EMPRESA:   { label: 'Empresas',        color: '#a24dff' },
-  RUT:       { label: 'RUT y documentos', color: '#ff5fa2' },
-  CORREO:    { label: 'Correos',         color: '#3ddc97' },
-  TELEFONO:  { label: 'Teléfonos',       color: '#3ddc97' },
-  DIRECCION: { label: 'Direcciones',     color: '#ffb547' },
-  LUGAR:     { label: 'Comunas y lugares', color: '#ffb547' },
-  CAUSA:     { label: 'Roles de causa',  color: '#5a60ff' },
-  FECHA:     { label: 'Fechas',          color: '#7fd1ff' },
-  MONTO:     { label: 'Montos',          color: '#ffd166' },
-  EDAD:      { label: 'Edades',          color: '#7fd1ff' },
-  PATENTE:   { label: 'Patentes',        color: '#ffb547' },
-  CUENTA:    { label: 'Cuentas y tarjetas', color: '#ff5fa2' },
-  NOMBRE:    { label: 'Otros nombres propios', color: '#8aa0ff' },
-  DATO:      { label: 'Lo que agregaste', color: '#a9b8d6' },
+  PERSONA:   { label: 'Personas',        color: '#1f5fa6', fondo: '#dbe5f1' },
+  EMPRESA:   { label: 'Empresas',        color: '#6f3fa0', fondo: '#e8e0f0' },
+  RUT:       { label: 'RUT y documentos', color: '#a8325e', fondo: '#f1dee5' },
+  CORREO:    { label: 'Correos',         color: '#2b7549', fondo: '#dde9e2' },
+  TELEFONO:  { label: 'Teléfonos',       color: '#2b7549', fondo: '#dde9e2' },
+  DIRECCION: { label: 'Direcciones',     color: '#8a5a0e', fondo: '#ece5d8' },
+  LUGAR:     { label: 'Comunas y lugares', color: '#8a5a0e', fondo: '#ece5d8' },
+  CAUSA:     { label: 'Roles de causa',  color: '#46499e', fondo: '#e1e2ef' },
+  FECHA:     { label: 'Fechas',          color: '#2d6a86', fondo: '#dde7ec' },
+  MONTO:     { label: 'Montos',          color: '#7a5d00', fondo: '#eae5d6' },
+  EDAD:      { label: 'Edades',          color: '#2d6a86', fondo: '#dde7ec' },
+  PATENTE:   { label: 'Patentes',        color: '#8a5a0e', fondo: '#ece5d8' },
+  CUENTA:    { label: 'Cuentas y tarjetas', color: '#a8325e', fondo: '#f1dee5' },
+  NOMBRE:    { label: 'Otros nombres propios', color: '#596273', fondo: '#e4e6e9' },
+  DATO:      { label: 'Lo que agregaste', color: '#5d6670', fondo: '#e5e7e8' },
 };
 
 /* ───────── Nombres y apellidos comunes en Chile (sin tildes, en minúscula) ───────── */
@@ -603,14 +741,34 @@ function analyze(text) {
 /* ───────── Pantalla ───────── */
 function $(id) { return document.getElementById(id); }
 const isOff = (canon, e) => off.has(canon) || offTypes.has(e.type);
+const plural = (n, uno, varios) => `${n} ${n === 1 ? uno : varios}`;
+const cuantos = (o) => Object.keys(o ?? {}).length;
+const hora = (d) => `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
 
-$('chips').innerHTML = Object.entries(TYPES).filter(([t]) => t !== 'NOMBRE' && t !== 'DATO').map(([t, v]) =>
-  `<label class="chip" style="--c:${v.color}"><input type="checkbox" data-type="${t}" checked> ${v.label}</label>`).join('');
-$('chips').addEventListener('change', (e) => {
+/** Muestra un mensaje junto a la acción; si `dura`, se borra solo después de esos milisegundos. */
+const timers = new Map();
+function decir(el, texto, warn = false, dura = 0) {
+  el.textContent = texto;
+  el.className = 'msg' + (warn ? ' warn' : '');
+  clearTimeout(timers.get(el));
+  if (dura) timers.set(el, setTimeout(() => { el.textContent = ''; }, dura));
+}
+
+$('tipos').innerHTML = Object.entries(TYPES).filter(([t]) => t !== 'NOMBRE' && t !== 'DATO').map(([t, v]) =>
+  `<label class="tipo" style="--c:${v.color}"><input type="checkbox" data-type="${t}" checked> ${v.label}</label>`).join('');
+$('tipos').addEventListener('change', (e) => {
   const t = e.target.dataset.type; if (!t) return;
   e.target.checked ? offTypes.delete(t) : offTypes.add(t);
   render();
 });
+
+/* La llave del texto que se copió queda fija: si después se edita el texto, las etiquetas pueden cambiar de número,
+   y «Devolver» tiene que usar las que recibió la IA. */
+let llaveCopiada = null, horaCopia = null, firmaGuardada = '';
+let loadedKey = null, nombreLlave = '';
+const firma = (o) => JSON.stringify(o ?? {});
+const faltaGuardar = () => !!llaveCopiada && cuantos(llaveCopiada) > 0 && firma(llaveCopiada) !== firmaGuardada;
+const pintarAlerta = () => { $('alertaLlave').hidden = !faltaGuardar(); };
 
 function render() {
   const text = $('src').value;
@@ -624,7 +782,7 @@ function render() {
     const e = map.get(s.canon);
     const no = isOff(s.canon, e);
     html += escHtml(text.slice(pos, s.start));
-    html += `<mark data-canon="${escHtml(s.canon)}" class="${no ? 'off' : ''}" style="--c:${TYPES[e.type].color}" title="${escHtml(e.token)} · ${TYPES[e.type].label}${no ? ' · no se tacha' : ''}">${escHtml(text.slice(s.start, s.end))}</mark>`;
+    html += `<mark data-canon="${escHtml(s.canon)}" class="${no ? 'off' : ''}" style="--c:${TYPES[e.type].color};--f:${TYPES[e.type].fondo}" title="${escHtml(e.token)} · ${TYPES[e.type].label}${no ? ' · no se tacha' : ''}">${escHtml(text.slice(s.start, s.end))}</mark>`;
     out += text.slice(pos, s.start) + (no ? text.slice(s.start, s.end) : e.token);
     pos = s.end;
   }
@@ -632,18 +790,22 @@ function render() {
   out += text.slice(pos);
   $('preview').innerHTML = text ? html : '';
 
-  // Lista de datos.
+  // Lista de datos (el foco vuelve a la misma casilla después de repintar).
+  const enLista = document.activeElement && document.activeElement.closest && document.activeElement.closest('#list') ? document.activeElement.dataset.canon : null;
   $('list').innerHTML = [...map.entries()].map(([canon, e]) => `
-    <li style="--c:${TYPES[e.type].color}">
+    <li style="--c:${TYPES[e.type].color}"${isOff(canon, e) ? ' class="apagado"' : ''}><label>
       <input type="checkbox" data-canon="${escHtml(canon)}" ${isOff(canon, e) ? '' : 'checked'} ${offTypes.has(e.type) ? 'disabled' : ''} aria-label="Tachar ${escHtml(e.value)}">
-      <span class="val">${escHtml(e.value)}${e.weak ? ' <span class="hint">(el dígito verificador no cuadra: revisa)</span>' : ''}${e.n > 1 ? ` <span class="hint">×${e.n}</span>` : ''}</span>
+      <span class="val">${escHtml(e.value)}${e.weak ? ' <small>(el dígito verificador no cuadra: revisa)</small>' : ''}${e.n > 1 ? ` <small>×${e.n}</small>` : ''}</span>
       <span class="tok">${escHtml(e.token)}</span>
-    </li>`).join('');
+    </label></li>`).join('');
+  $('listaTit').hidden = !map.size;
+  if (enLista) [...$('list').querySelectorAll('input')].find((i) => i.dataset.canon === enLista)?.focus();
 
   const active = [...map.entries()].filter(([c, e]) => !isOff(c, e)).length;
-  $('stats').textContent = text
-    ? (map.size ? `Encontré ${spans.length} marcas de ${map.size} datos distintos. Se tachan ${active}.` : 'No encontré datos. Agrega a mano lo que quieras tachar, o prueba el modo estricto.')
+  const stats = text
+    ? (map.size ? `Encontré ${plural(map.size, 'dato', 'datos')} (${plural(spans.length, 'aparición', 'apariciones')}). Se tacharán ${active}.` : 'No encontré datos. Agrégalos en «Agregar a mano», más abajo, o prueba el modo estricto.')
     : '';
+  if ($('stats').textContent !== stats) $('stats').textContent = stats;
   $('stats').className = 'msg' + (text && !map.size ? ' warn' : '');
 
   const nota = 'Nota: los textos entre corchetes, como [PERSONA_1], reemplazan datos reales. Úsalos tal cual en tu respuesta y no intentes adivinar a qué corresponden.\n\n';
@@ -665,6 +827,7 @@ $('preview').addEventListener('click', (e) => {
 $('list').addEventListener('change', (e) => { if (e.target.dataset.canon) toggle(e.target.dataset.canon); });
 
 /* Seleccionar en la vista algo que no marqué y tacharlo en todo el texto. */
+const HINT_SEL = $('selHint').textContent;
 let picked = '';
 document.addEventListener('selectionchange', () => {
   const sel = window.getSelection();
@@ -672,7 +835,7 @@ document.addEventListener('selectionchange', () => {
   picked = inside ? String(sel).replace(/\s+/g, ' ').trim() : '';
   const ok = picked.length >= 2 && picked.length <= 80;
   $('selPersona').disabled = $('selOtro').disabled = !ok;
-  $('selHint').textContent = ok ? `Seleccionaste «${picked}». Tacharlo en todo el texto como:` : '¿Se me pasó algo? Selecciónalo arriba con el mouse y elige:';
+  $('selHint').textContent = ok ? `Seleccionaste «${picked}». Tacharlo en todo el texto como:` : HINT_SEL;
 });
 function addPicked(id) {
   if (!picked) return;
@@ -680,11 +843,16 @@ function addPicked(id) {
   const lines = box.value.split('\n').map((l) => l.trim()).filter(Boolean);
   if (!lines.some((l) => l.split('/').some((v) => norm(v) === norm(picked)))) lines.push(picked);
   box.value = lines.join('\n');
+  const dicho = picked;
   window.getSelection().removeAllRanges();
+  $('agregar').open = true;
   render();
+  decir($('selMsg'), `Agregué «${dicho}» a «${id === 'personas' ? 'Personas que quieres tachar sí o sí' : 'Otras cosas que quieres tachar'}».`, false, 6000);
 }
 for (const [btn, box] of [['selPersona', 'personas'], ['selOtro', 'otros']]) {
-  $(btn).addEventListener('mousedown', (e) => e.preventDefault());   // que el clic no borre la selección
+  // Que el clic o el toque no borre la selección antes de leerla.
+  $(btn).addEventListener('mousedown', (e) => e.preventDefault());
+  $(btn).addEventListener('pointerdown', (e) => e.preventDefault());
   $(btn).addEventListener('click', () => addPicked(box));
 }
 
@@ -692,35 +860,62 @@ for (const [btn, box] of [['selPersona', 'personas'], ['selOtro', 'otros']]) {
 async function copy(text, msgEl) {
   try { await navigator.clipboard.writeText(text); }
   catch { const t = document.createElement('textarea'); t.value = text; document.body.append(t); t.select(); document.execCommand('copy'); t.remove(); }
-  msgEl.textContent = 'Copiado.';
-  setTimeout(() => { msgEl.textContent = ''; }, 2200);
+  decir(msgEl, 'Copiado.', false, 5000);
 }
-$('copiar').addEventListener('click', () => copy($('out').value, $('outMsg')));
-$('copiar2').addEventListener('click', () => copy($('restored').value, $('restMsg')));
+$('copiar').addEventListener('click', async () => {
+  const t = $('out').value;
+  if (!t) { decir($('outMsg'), 'Todavía no hay texto. Pega tu escrito en el paso 1.', true, 6000); return; }
+  await copy(t, $('outMsg'));
+  llaveCopiada = keyObject();
+  horaCopia = new Date();
+  pintarAlerta();
+  restore();
+});
+$('copiar2').addEventListener('click', () => {
+  const t = $('restored').value;
+  if (!t) { decir($('restMsg'), 'Todavía no hay nada que copiar. Pega la respuesta de la IA en el paso 4.', true, 6000); return; }
+  copy(t, $('restMsg'));
+});
 
 function keyObject() {
   const llave = {};
   for (const [canon, e] of lastMap) if (!isOff(canon, e)) llave[e.token] = e.value;
   return llave;
 }
-$('bajarLlave').addEventListener('click', () => {
-  const llave = keyObject();
-  if (!Object.keys(llave).length) { $('outMsg').textContent = 'No hay nada tachado todavía.'; return; }
-  const data = { herramienta: 'EVA · Tachar antes de pegar', creada: new Date().toISOString(), aviso: 'Contiene los datos reales. No la subas a ninguna IA.', llave };
+function guardarLlave() {
+  const llave = llaveCopiada ?? keyObject();
+  if (!cuantos(llave)) { decir($('outMsg'), 'No hay nada tachado todavía.', true, 6000); return; }
+  const data = { herramienta: 'MLV Abogados · Tachar antes de pegar', creada: new Date().toISOString(), aviso: 'Contiene los datos reales. No la subas a ninguna IA.', llave };
   const a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }));
   const d = new Date();
-  a.download = `llave-${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}-${String(d.getHours()).padStart(2, '0')}${String(d.getMinutes()).padStart(2, '0')}.json`;
+  a.download = `llave-MLV-${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}-${String(d.getHours()).padStart(2, '0')}${String(d.getMinutes()).padStart(2, '0')}.json`;
   document.body.append(a); a.click(); a.remove();
   setTimeout(() => URL.revokeObjectURL(a.href), 4000);
-  $('outMsg').textContent = 'Llave guardada en tu carpeta de descargas.';
-});
+  firmaGuardada = firma(llave);
+  pintarAlerta();
+  decir($('outMsg'), 'Llave guardada (normalmente queda en Descargas). Muévela a la carpeta del expediente.');
+}
+$('bajarLlave').addEventListener('click', guardarLlave);
+$('bajarLlave2').addEventListener('click', () => { guardarLlave(); $('bajarLlave').focus(); });
+// Si se copió el texto y la llave no está guardada, el navegador pregunta antes de cerrar.
+window.addEventListener('beforeunload', (e) => { if (faltaGuardar()) { e.preventDefault(); e.returnValue = ''; } });
 
 /* ───────── Devolver ───────── */
-let loadedKey = null;
 const TOKEN_RE = new RegExp(`\\[?\\b(${Object.keys(TYPES).join('|')})_(\\d+)\\b\\]?`, 'g');
+
+/** Qué llave se usa: la cargada, la del texto copiado o la de esta sesión. */
+function llaveActual() {
+  if (loadedKey) return { llave: loadedKey, txt: `Uso la llave que cargaste, «${nombreLlave}» (${plural(cuantos(loadedKey), 'dato', 'datos')}).` };
+  if (llaveCopiada && cuantos(llaveCopiada)) return { llave: llaveCopiada, txt: `Uso la llave del texto que copiaste a las ${hora(horaCopia)} (${plural(cuantos(llaveCopiada), 'dato', 'datos')}).` };
+  const viva = keyObject();
+  if (cuantos(viva)) return { llave: viva, txt: `Uso la llave de esta sesión (${plural(cuantos(viva), 'dato', 'datos')}). Si cerraste la página, carga la que guardaste.` };
+  return { llave: {}, txt: 'Todavía no hay llave. Tacha un texto en «Antes de la IA» o carga la llave que guardaste.' };
+}
 function restore() {
-  const llave = loadedKey ?? keyObject();
+  const { llave, txt } = llaveActual();
+  $('llaveEstado').textContent = txt;
+  $('soltarLlave').hidden = !loadedKey;
   const text = $('resp').value;
   let n = 0;
   const unknown = new Set();
@@ -731,19 +926,43 @@ function restore() {
     unknown.add(k); return m;
   });
   $('restored').value = text ? out : '';
-  $('restMsg').textContent = text ? `Devolví ${n} datos.` + (unknown.size ? ` Sin llave para: ${[...unknown].join(', ')}.` : '') : '';
-  $('restMsg').className = 'msg' + (unknown.size ? ' warn' : '');
+  let msg = '';
+  if (text) msg = cuantos(llave)
+    ? `Puse de vuelta ${plural(n, 'dato', 'datos')}.` + (unknown.size ? ` No están en la llave: ${[...unknown].join(', ')}. Revisa que sea la llave de este escrito.` : '')
+    : 'No hay llave: tacha un texto en esta sesión o carga la llave que guardaste.';
+  if ($('restMsg').textContent !== msg) decir($('restMsg'), msg, !!text && (!cuantos(llave) || unknown.size > 0));
 }
 $('resp').addEventListener('input', restore);
+
+/** Una llave válida es un objeto { "[TIPO_n]": "dato" }, suelto o dentro de «llave». Sirve también para las llaves
+    guardadas con la versión anterior de esta herramienta (decían «EVA · Tachar antes de pegar»). */
+function leerLlave(data) {
+  if (!data || typeof data !== 'object' || Array.isArray(data)) return null;
+  const llave = data.llave ?? data;
+  if (!llave || typeof llave !== 'object' || Array.isArray(llave)) return null;
+  const pares = Object.entries(llave);
+  if (!pares.length || !pares.every(([k, v]) => /^\[[A-Z]+_\d+\]$/.test(k) && typeof v === 'string')) return null;
+  return llave;
+}
+$('cargarLlave').addEventListener('click', () => $('llaveFile').click());
 $('llaveFile').addEventListener('change', async (e) => {
   const f = e.target.files[0]; if (!f) return;
-  try {
-    const data = JSON.parse(await f.text());
-    loadedKey = data.llave ?? data;
-    $('llaveMsg').textContent = `Llave cargada: ${Object.keys(loadedKey).length} datos.`;
-  } catch { $('llaveMsg').textContent = 'Ese archivo no es una llave de esta herramienta.'; }
+  let llave = null;
+  try { llave = leerLlave(JSON.parse(await f.text())); } catch { llave = null; }
+  if (llave) {
+    loadedKey = llave; nombreLlave = f.name;
+    decir($('llaveMsg'), `Llave cargada: ${plural(cuantos(llave), 'dato', 'datos')}.`);
+  } else {
+    decir($('llaveMsg'), 'Ese archivo no es una llave de «Tachar antes de pegar». Busca el archivo llave-…json que guardaste.', true);
+  }
   e.target.value = '';
   restore();
+});
+$('soltarLlave').addEventListener('click', () => {
+  loadedKey = null; nombreLlave = '';
+  decir($('llaveMsg'), 'Dejé de usar la llave cargada.', false, 5000);
+  restore();
+  $('cargarLlave').focus();
 });
 
 /* ───────── Leer un Word sin subirlo a ningún lado ───────── */
@@ -780,20 +999,87 @@ async function readDocx(buf) {
   }
   throw new Error('nodoc');
 }
+$('abrir').addEventListener('click', () => $('file').click());
 $('file').addEventListener('change', async (e) => {
   const f = e.target.files[0]; if (!f) return;
-  const msg = $('fileMsg');
   try {
     $('src').value = /\.docx$/i.test(f.name) ? await readDocx(await f.arrayBuffer()) : await f.text();
-    msg.textContent = `Abrí «${f.name}» en este computador. No se subió a ningún lado.`;
-    msg.className = 'msg';
+    decir($('fileMsg'), `Abrí «${f.name}» en este computador. No se subió a ningún lado.`);
   } catch {
-    msg.textContent = 'No pude leer ese archivo. Si es un .doc antiguo o un PDF, copia el texto y pégalo.';
-    msg.className = 'msg warn';
+    decir($('fileMsg'), 'No pude leer ese archivo. Si es un .doc antiguo o un PDF, copia el texto y pégalo.', true);
   }
   e.target.value = '';
   render();
 });
+
+/* ───────── Confirmación con diálogo propio ───────── */
+function confirmar(titulo, texto, boton) {
+  const d = $('dlgConfirmar');
+  $('dlgConfTit').textContent = titulo;
+  $('dlgConfTxt').textContent = texto;
+  $('dlgConfSi').textContent = boton;
+  $('dlgConfSi').className = 'btn peligro lleno';
+  const antes = document.activeElement;
+  d.showModal();
+  $('dlgConfNo').focus();   // la acción borra: el foco parte en «Cancelar»
+  return new Promise((resolver) => {
+    const fin = (v) => {
+      d.close();
+      $('dlgConfSi').onclick = $('dlgConfNo').onclick = d.oncancel = null;
+      if (!v && antes && document.contains(antes)) antes.focus();
+      resolver(v);
+    };
+    $('dlgConfSi').onclick = () => fin(true);
+    $('dlgConfNo').onclick = () => fin(false);
+    d.oncancel = (e) => { e.preventDefault(); fin(false); };
+  });
+}
+
+function cargarEjemplo() { $('src').value = EJEMPLO; off.clear(); render(); }
+$('ejemplo').addEventListener('click', async () => {
+  const actual = $('src').value;
+  if (actual.trim() && actual !== EJEMPLO
+    && !(await confirmar('Reemplazar tu texto por el ejemplo', 'Lo que pegaste en el paso 1 se reemplaza por un escrito de ejemplo con datos ficticios. No se puede deshacer.', 'Reemplazar por el ejemplo'))) return;
+  cargarEjemplo();
+});
+$('limpiar').addEventListener('click', async () => {
+  const hay = ['src', 'personas', 'otros', 'resp'].some((id) => $(id).value.trim()) || loadedKey || llaveCopiada;
+  if (hay && !(await confirmar('Borrar el texto y la llave', 'Se borran tu texto, lo que agregaste a mano, la respuesta de la IA y la llave de esta sesión. Si no guardaste la llave, ya no podrás poner los datos de vuelta. No se puede deshacer.', 'Borrar todo'))) return;
+  for (const id of ['src', 'personas', 'otros', 'resp']) $(id).value = '';
+  off.clear(); loadedKey = null; nombreLlave = ''; llaveCopiada = null; horaCopia = null; firmaGuardada = '';
+  for (const id of ['fileMsg', 'llaveMsg', 'outMsg', 'selMsg', 'restMsg']) decir($(id), '');
+  pintarAlerta();
+  render();
+  show('tachar');
+  $('src').focus();
+});
+
+/* ───────── Pestañas ───────── */
+const TITULOS = { tachar: 'Tachar antes de pegar · MLV Abogados', devolver: 'Devolver los datos · Tachar antes de pegar · MLV Abogados' };
+function show(which, enfocar = false) {
+  for (const t of ['tachar', 'devolver']) {
+    const sel = t === which;
+    $('tab-' + t).setAttribute('aria-selected', sel);
+    $('tab-' + t).tabIndex = sel ? 0 : -1;
+    $('panel-' + t).hidden = !sel;
+  }
+  document.title = TITULOS[which];
+  if (enfocar) $('tab-' + which).focus();
+}
+$('tab-tachar').addEventListener('click', () => show('tachar'));
+$('tab-devolver').addEventListener('click', () => show('devolver'));
+// Teclado: ← → (y Inicio, Fin) cambian de pestaña, como en cualquier lista de pestañas.
+document.querySelector('[role=tablist]').addEventListener('keydown', (e) => {
+  const actual = $('tab-tachar').getAttribute('aria-selected') === 'true' ? 'tachar' : 'devolver';
+  let otra = null;
+  if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') otra = actual === 'tachar' ? 'devolver' : 'tachar';
+  else if (e.key === 'Home') otra = 'tachar';
+  else if (e.key === 'End') otra = 'devolver';
+  if (!otra) return;
+  e.preventDefault();
+  show(otra, true);
+});
+$('irDevolver').addEventListener('click', () => { show('devolver'); $('resp').focus(); });
 
 /* ───────── Ejemplo ficticio ───────── */
 const EJEMPLO = `EN LO PRINCIPAL: Demanda de indemnización de perjuicios.
@@ -809,20 +1095,155 @@ El 3 de marzo de 2025, el vehículo patente BCDF·12, conducido por Salinas, da�
 En Santiago, a 14 de abril de 2025.
 
 (Datos ficticios: el ejemplo es para probar la herramienta.)`;
-$('ejemplo').addEventListener('click', () => { $('src').value = EJEMPLO; off.clear(); render(); });
-$('limpiar').addEventListener('click', () => { for (const id of ['src', 'personas', 'otros', 'resp']) $(id).value = ''; off.clear(); loadedKey = null; $('fileMsg').textContent = ''; $('llaveMsg').textContent = ''; render(); });
 
-/* ───────── Pestañas ───────── */
-function show(which) {
-  $('tab-tachar').setAttribute('aria-selected', which === 'tachar');
-  $('tab-devolver').setAttribute('aria-selected', which === 'devolver');
-  $('panel-tachar').hidden = which !== 'tachar';
-  $('panel-devolver').hidden = which !== 'devolver';
-}
-$('tab-tachar').addEventListener('click', () => show('tachar'));
-$('tab-devolver').addEventListener('click', () => show('devolver'));
+/* ───────── Guía de primer uso (la misma en todas las herramientas del estudio) ─────────
+   Cada paso: { titulo, texto, el: selector que se destaca (opcional), ir: ruta '#/…' o función que prepara la pantalla (opcional) }.
+   Se abre sola la primera vez y después con el botón «Cómo se usa». No guarda nada más que «ya la vi». */
+const Guia = (() => {
+  let pasos = [], i = 0, capa, foco, globo, antes = null, rutaInicial = '';
+  const vista = (clave) => { try { return localStorage.getItem(clave) === '1'; } catch { return true; } };
+  const enfocables = () => [...globo.querySelectorAll('button')];
 
+  function construir() {
+    capa = document.createElement('div');
+    capa.className = 'guia-capa';
+    foco = document.createElement('div');
+    foco.className = 'guia-foco';
+    globo = document.createElement('div');
+    globo.className = 'guia-globo';
+    globo.tabIndex = -1;
+    globo.setAttribute('role', 'dialog');
+    globo.setAttribute('aria-modal', 'true');
+    globo.setAttribute('aria-labelledby', 'guiaTit');
+    globo.setAttribute('aria-describedby', 'guiaTxt');
+    globo.innerHTML = `<p class="guia-n" id="guiaN"></p><h2 id="guiaTit"></h2><p class="guia-txt" id="guiaTxt"></p>
+      <div class="guia-puntos" aria-hidden="true"></div>
+      <div class="guia-pie"><button type="button" class="guia-saltar" data-tour-cerrar>Saltar la guía</button>
+        <button type="button" class="btn" data-guia="atras">Anterior</button><button type="button" class="btn primario" data-guia="sig">Siguiente</button></div>`;
+    globo.addEventListener('click', (e) => {
+      const b = e.target.closest('button');
+      if (!b) return;
+      if (b.hasAttribute('data-tour-cerrar')) cerrar();
+      else if (b.dataset.guia === 'atras') ir(i - 1);
+      else if (b.dataset.guia === 'sig') ir(i + 1);
+    });
+    document.body.append(capa, foco, globo);
+  }
+
+  function teclas(e) {
+    if (e.key === 'Escape') { e.preventDefault(); cerrar(); return; }
+    if (e.key === 'ArrowRight' && !e.altKey) { e.preventDefault(); ir(i + 1); return; }
+    if (e.key === 'ArrowLeft' && !e.altKey) { e.preventDefault(); ir(i - 1); return; }
+    if (e.key === 'Tab') {   // el foco no sale del globo mientras la guía está abierta
+      const b = enfocables(), primero = b[0], ultimo = b[b.length - 1];
+      if (e.shiftKey && document.activeElement === primero) { e.preventDefault(); ultimo.focus(); }
+      else if (!e.shiftKey && document.activeElement === ultimo) { e.preventDefault(); primero.focus(); }
+      else if (!globo.contains(document.activeElement)) { e.preventDefault(); primero.focus(); }
+    }
+  }
+
+  function ubicar() {
+    if (!globo || globo.hidden) return;
+    const p = pasos[i];
+    const el = p.el && document.querySelector(p.el);
+    const r = el && el.getBoundingClientRect();
+    const visible = r && r.width > 0 && r.height > 0;
+    capa.classList.toggle('con-foco', !!visible);
+    foco.hidden = !visible;
+    const W = window.innerWidth, H = window.innerHeight, m = 8;
+    const gw = globo.offsetWidth, gh = globo.offsetHeight;
+    if (!visible) {   // sin elemento: el globo va al centro
+      globo.style.left = Math.max(12, (W - gw) / 2) + 'px';
+      globo.style.top = Math.max(12, (H - gh) / 2) + 'px';
+      return;
+    }
+    Object.assign(foco.style, { left: r.left - m + 'px', top: r.top - m + 'px', width: r.width + 2 * m + 'px', height: r.height + 2 * m + 'px' });
+    let top = r.bottom + m + 12;
+    if (top + gh > H - 12) top = r.top - m - 12 - gh;   // no cabe abajo: arriba
+    if (top < 12) top = Math.min(H - gh - 12, Math.max(12, r.top + 12));   // tampoco arriba: encima del elemento
+    const left = Math.min(W - gw - 12, Math.max(12, r.left));
+    globo.style.left = left + 'px';
+    globo.style.top = top + 'px';
+  }
+
+  function ir(n) {
+    if (n < 0) return;
+    if (n >= pasos.length) { cerrar(); return; }
+    i = n;
+    const p = pasos[i];
+    if (typeof p.ir === 'function') p.ir();
+    else if (p.ir && location.hash !== p.ir) location.hash = p.ir;
+    globo.querySelector('#guiaN').textContent = `Paso ${i + 1} de ${pasos.length}`;
+    globo.querySelector('#guiaTit').textContent = p.titulo;
+    globo.querySelector('#guiaTxt').textContent = p.texto;
+    globo.querySelector('.guia-puntos').innerHTML = pasos.map((_, k) => `<i${k === i ? ' class="on"' : ''}></i>`).join('');
+    globo.querySelector('[data-guia="atras"]').hidden = i === 0;
+    globo.querySelector('[data-guia="sig"]').textContent = i === pasos.length - 1 ? 'Terminar' : 'Siguiente';
+    // Se espera a que la pantalla se pinte (cambio de ruta) antes de buscar el elemento.
+    setTimeout(() => {
+      const el = p.el && document.querySelector(p.el);
+      if (el) {
+        const chico = window.innerWidth <= 600;
+        el.scrollIntoView({ block: chico ? 'start' : 'center', behavior: 'instant' });
+        if (chico) window.scrollBy(0, -16);
+      }
+      ubicar();
+      globo.querySelector('[data-guia="sig"]').focus();
+    }, 60);
+  }
+
+  function abrir(lista, clave) {
+    if (!lista || !lista.length) return;
+    pasos = lista;
+    antes = document.activeElement;
+    rutaInicial = location.hash;
+    try { localStorage.setItem(clave, '1'); } catch { /* sin almacenamiento: igual se muestra */ }
+    if (!globo) construir();
+    capa.hidden = foco.hidden = globo.hidden = false;
+    document.addEventListener('keydown', teclas, true);
+    window.addEventListener('resize', ubicar);
+    window.addEventListener('scroll', ubicar, { passive: true });
+    ir(0);
+  }
+
+  function cerrar() {
+    if (!globo || globo.hidden) return;
+    capa.hidden = foco.hidden = globo.hidden = true;
+    document.removeEventListener('keydown', teclas, true);
+    window.removeEventListener('resize', ubicar);
+    window.removeEventListener('scroll', ubicar);
+    if (location.hash !== rutaInicial) location.hash = rutaInicial || '#/';
+    // Si se abrió sola, el foco vuelve al botón «Cómo se usa», que es donde se reabre.
+    const volver = antes && antes !== document.body && document.contains(antes) ? antes : document.querySelector('[data-guia-abrir]');
+    if (volver) volver.focus();
+  }
+
+  return { abrir, cerrar, vista };
+})();
+
+/* Los pasos de la guía de esta herramienta. Si la página está vacía, el paso 2 carga el ejemplo ficticio para mostrar algo. */
+const CLAVE_GUIA = 'mlv-tachar-guia-v1';
+let guiaEjemplo = false;
+const GUIA = [
+  { ir: () => { show('tachar'); guiaEjemplo = false; }, titulo: 'Para qué sirve',
+    texto: 'Antes de pegar un escrito en una IA, cambia nombres, RUT, direcciones y otros datos por etiquetas como [PERSONA_1], y después los pone de vuelta. Seudonimiza, no anonimiza: con la llave se vuelve atrás y para la ley siguen siendo datos personales.' },
+  { ir: () => { show('tachar'); if (!$('src').value.trim()) { cargarEjemplo(); guiaEjemplo = true; } }, el: '#caja1', titulo: 'Pega tu texto',
+    get texto() { return 'Pega aquí el escrito o abre un Word: se lee en este computador y no se sube a ningún lado.' + (guiaEjemplo ? ' Para mostrarte cómo funciona, cargué un ejemplo con datos ficticios.' : ' Para probar, usa «Probar con un ejemplo».'); } },
+  { ir: () => show('tachar'), el: '#preview', titulo: 'Revisa lo marcado',
+    texto: 'Cada dato encontrado queda marcado con el color de su tipo. Toca uno, o desmárcalo en la lista de abajo, para dejarlo sin tachar. Lo que no está marcado no se tacha: lee el texto entero.' },
+  { ir: () => show('tachar'), el: '#acciones3', titulo: 'Copia y guarda la llave',
+    texto: 'Copia el texto tachado y pégalo en la IA. Guarda también la llave: es la única forma de poner los datos reales de vuelta. La llave no se sube a ninguna IA.' },
+  { ir: () => show('devolver'), el: '#caja4', titulo: 'Devuelve los datos',
+    texto: 'Cuando la IA responda, pega aquí su respuesta y la página cambia las etiquetas por los datos reales. Si cerraste la página, carga la llave que guardaste.' },
+  { ir: () => show('tachar'), el: '[data-guia-abrir]', titulo: 'Para empezar con tu texto',
+    get texto() { return (guiaEjemplo ? 'Usa «Borrar todo» para quitar el ejemplo y pega tu escrito en el paso 1.' : 'Pega tu escrito en el paso 1 y revisa lo marcado antes de copiar.') + ' Esta guía se vuelve a abrir con «Cómo se usa».'; } },
+];
+
+/* ───────── Arranque ───────── */
+show('tachar');
 render();
+document.addEventListener('click', (e) => { if (e.target.closest('[data-guia-abrir]')) Guia.abrir(GUIA, CLAVE_GUIA); });
+if (!Guia.vista(CLAVE_GUIA)) setTimeout(() => Guia.abrir(GUIA, CLAVE_GUIA), 500);
 </script>
 </body>
 </html>

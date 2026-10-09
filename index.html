@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="es">
+<html lang="es-CL">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -7,51 +7,92 @@
 <meta name="robots" content="noindex">
 <title>Herramientas · MLV Abogados</title>
 <style>
-  :root { --bg: #f6f4ef; --card: #fff; --ink: #1c2433; --soft: #5b6475; --line: #e3ded4; --accent: #0f5c63; }
+  :root {
+    --fondo: #f6f5f1; --papel: #ffffff; --hundido: #efede6;
+    --tinta: #1a2636; --tinta2: #3b4859; --suave: #5f6873; --linea: #dddbd2;
+    --acento: #0d5c68; --acento-claro: #e3eef0; --acento-borde: #c3dbde;
+    --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", serif;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
   * { box-sizing: border-box; }
-  body { margin: 0; background: var(--bg); color: var(--ink); font: 17px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; padding: 0 16px; }
-  main { max-width: 760px; margin: 0 auto; padding: 56px 0 64px; }
-  h1 { font: 600 34px/1.15 Georgia, "Iowan Old Style", serif; margin: 0 0 6px; }
-  .sub { color: var(--soft); letter-spacing: .12em; font-size: 13px; text-transform: uppercase; margin: 0 0 28px; }
-  h2.seccion { font: 600 13px/1.4 system-ui, sans-serif; letter-spacing: .1em; text-transform: uppercase; color: var(--soft); margin: 30px 0 12px; }
-  p.lead { color: var(--soft); margin: 0 0 28px; }
-  a.card { display: block; background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 22px 24px; margin-bottom: 14px; color: inherit; text-decoration: none; }
-  a.card:hover { border-color: var(--accent); }
-  a.card h2 { font: 600 21px/1.25 Georgia, serif; margin: 0 0 6px; color: var(--accent); }
-  a.card p { margin: 0; color: var(--soft); font-size: 16px; }
-  footer { margin-top: 32px; color: var(--soft); font-size: 14px; border-top: 1px solid var(--line); padding-top: 14px; }
+  body { margin: 0; background: var(--fondo); color: var(--tinta); font: 17px/1.55 var(--sans); padding: 0 16px; }
+  main { max-width: 800px; margin: 0 auto; padding: 56px 0 40px; }
+  :focus-visible { outline: 2px solid var(--acento); outline-offset: 3px; }
+  h1 { font: 600 34px/1.15 var(--serif); margin: 0 0 6px; }
+  .sub { color: var(--suave); letter-spacing: .12em; font-size: 13px; text-transform: uppercase; margin: 0 0 24px; }
+  p.lead { color: var(--tinta2); margin: 0 0 20px; max-width: 680px; }
+  .garantias { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 8px; padding: 0; list-style: none; }
+  .garantias li { display: inline-flex; align-items: center; gap: 7px; font-size: 14px; color: var(--tinta2); background: var(--papel); border: 1px solid var(--linea); border-radius: 999px; padding: 5px 12px; }
+  .garantias .ico { color: var(--acento); }
+  h2.seccion { font: 600 13px/1.4 var(--sans); letter-spacing: .1em; text-transform: uppercase; color: var(--suave); margin: 34px 0 12px; }
+  .ico { width: 1.1em; height: 1.1em; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  a.card { display: grid; grid-template-columns: 48px minmax(0, 1fr); gap: 4px 18px; align-items: start; background: var(--papel); border: 1px solid var(--linea); border-radius: 14px; padding: 22px 24px; margin-bottom: 14px; color: inherit; text-decoration: none; transition: border-color .15s, box-shadow .15s; }
+  a.card:hover { border-color: var(--acento); box-shadow: 0 6px 20px rgba(20, 30, 45, .07); }
+  .card .icono { grid-row: span 3; width: 48px; height: 48px; border-radius: 12px; display: grid; place-items: center; background: var(--acento-claro); color: var(--acento); }
+  .card .icono .ico { width: 24px; height: 24px; }
+  .card h3 { display: flex; align-items: center; gap: 6px; font: 600 21px/1.25 var(--serif); margin: 0; color: var(--acento); }
+  .card h3 .ico { width: 20px; height: 20px; transition: transform .15s; }
+  a.card:hover h3 .ico { transform: translateX(3px); }
+  .card p { margin: 0; color: var(--tinta2); font-size: 16px; }
+  .card .para { font-size: 13px; color: var(--suave); }
+  .card .para b { font-weight: 600; color: var(--tinta2); }
+  footer { max-width: 800px; margin: 0 auto 48px; color: var(--suave); font-size: 14px; border-top: 1px solid var(--linea); padding-top: 14px; }
+  @media (max-width: 560px) {
+    main { padding-top: 36px; }
+    h1 { font-size: 29px; }
+    a.card { grid-template-columns: 1fr; padding: 18px; }
+    .card .icono { grid-row: auto; width: 40px; height: 40px; margin-bottom: 6px; }
+  }
+  @media (prefers-reduced-motion: reduce) { a.card, .card h3 .ico { transition: none; } }
 </style>
 </head>
 <body>
 <main>
   <h1>MLV Abogados</h1>
   <p class="sub">Herramientas del estudio</p>
-  <p class="lead">Demos de trabajo. Ninguna envía información fuera del navegador: lo que se escribe o se pega se procesa y se guarda solo en el computador de quien la usa.</p>
+  <p class="lead">Demos de trabajo con datos ficticios. Se abren en el navegador y la primera vez muestran una guía corta de cómo se usan.</p>
+  <ul class="garantias" aria-label="Cómo funcionan">
+    <li><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>Nada sale del computador</li>
+    <li><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 12 2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>Sin instalar nada</li>
+    <li><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>Guía al entrar</li>
+  </ul>
 
   <h2 class="seccion">Cómo trabaja el estudio</h2>
   <a class="card" href="herramientas/sistema-de-trabajo.html">
-    <h2>Sistema de trabajo del estudio →</h2>
-    <p>Cada proceso del estudio paso a paso: quién lo hace, en qué plazo y qué entrega, con un dueño y una fecha de revisión. Un tablero para seguir los casos de cada proceso (por ejemplo, investigaciones Ley Karin). Lo que ya está ordenado se convierte en instrucciones para Claude.</p>
+    <span class="icono"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect width="8" height="8" x="3" y="3" rx="2"/><path d="M7 11v4a2 2 0 0 0 2 2h4"/><rect width="8" height="8" x="13" y="13" rx="2"/></svg></span>
+    <h3>Sistema de trabajo <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></h3>
+    <p>Cada proceso del estudio paso a paso: quién lo hace, en qué plazo y qué entrega, con un dueño y una fecha de revisión. Un tablero para seguir los casos de cada proceso (por ejemplo, investigaciones Ley Karin) y las instrucciones para trabajarlo con Claude.</p>
+    <span class="para"><b>Para:</b> abogados y equipo del estudio</span>
   </a>
   <a class="card" href="herramientas/protocolo-ia.html">
-    <h2>Protocolo de uso de IA →</h2>
+    <span class="icono"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg></span>
+    <h3>Protocolo de uso de IA <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></h3>
     <p>Las reglas del estudio para usar Claude y otras IA, deducidas del perfil del estudio y de la Ley 21.719: semáforo, medidas técnicas, organizativas y de gestión, y cómo se trabaja hoy con Claude Code. Borrador para revisión.</p>
-  </a>
-  <h2 class="seccion">Ley 21.719 de protección de datos</h2>
-  <a class="card" href="herramientas/panel-clientes.html">
-    <h2>Panel de clientes →</h2>
-    <p>El estado de la adecuación de cada cliente: etapa, avance por obligación, solicitudes de titulares con su plazo, incidentes, tareas e informe para el cliente.</p>
-  </a>
-  <a class="card" href="herramientas/derechos-y-consentimientos.html">
-    <h2>Derechos y consentimientos →</h2>
-    <p>Para la empresa cliente: cada uso de datos con su base legal, las solicitudes de los titulares con sus plazos y cartas borrador, los consentimientos y sus revocaciones, y un historial que delata cualquier alteración.</p>
-  </a>
-  <a class="card" href="herramientas/tachar.html">
-    <h2>Tachar antes de pegar →</h2>
-    <p>Cambia nombres, RUT, direcciones, fechas y montos por etiquetas antes de consultar a una IA, y después los devuelve.</p>
+    <span class="para"><b>Para:</b> todo el estudio</span>
   </a>
 
-  <footer>Demos con datos ficticios. No reemplazan la revisión de la ley vigente.</footer>
+  <h2 class="seccion">Ley 21.719 de protección de datos</h2>
+  <a class="card" href="herramientas/panel-clientes.html">
+    <span class="icono"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg></span>
+    <h3>Panel de clientes <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></h3>
+    <p>El estado de la adecuación de cada cliente: etapa, avance por obligación, solicitudes de titulares con su plazo, incidentes, tareas e informe para el cliente.</p>
+    <span class="para"><b>Para:</b> abogados del estudio</span>
+  </a>
+  <a class="card" href="herramientas/derechos-y-consentimientos.html">
+    <span class="icono"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg></span>
+    <h3>Derechos y consentimientos <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></h3>
+    <p>Cada uso de datos con su base legal, las solicitudes de las personas con sus plazos y cartas en borrador, los consentimientos y sus revocaciones, y un historial que delata cualquier alteración.</p>
+    <span class="para"><b>Para:</b> la empresa cliente (RR. HH., administración)</span>
+  </a>
+
+  <h2 class="seccion">Antes de consultar a una IA</h2>
+  <a class="card" href="herramientas/tachar.html">
+    <span class="icono"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21"/><path d="M22 21H7"/><path d="m5 11 9 9"/></svg></span>
+    <h3>Tachar antes de pegar <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></h3>
+    <p>Cambia nombres, RUT, direcciones, fechas y montos por etiquetas antes de pegar un escrito en una IA, y después pone los datos de vuelta en la respuesta.</p>
+    <span class="para"><b>Para:</b> abogados del estudio</span>
+  </a>
 </main>
+<footer>Demos con datos ficticios. No reemplazan la revisión de la ley vigente. Íconos: Lucide (licencia ISC).</footer>
 </body>
 </html>
