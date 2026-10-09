@@ -607,7 +607,7 @@ function interpretar(tabla) {
     }
     if (algo) filas.push(f);
   }
-  if (otras) avisos.push(`${otras} respuestas no calzan con las opciones (por ejemplo, las escritas en «Otro»): se cuentan como «Otra respuesta».`);
+  if (otras) avisos.push(`${otras === 1 ? '1 respuesta no calza' : `${otras} respuestas no calzan`} con las opciones (por ejemplo, las escritas en «Otro»): se ${otras === 1 ? 'cuenta' : 'cuentan'} como «Otra respuesta».`);
   return { filas, avisos };
 }
 
