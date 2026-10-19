@@ -1,0 +1,1080 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Prototipo: la página no puede conectarse a nada. Todo queda en este navegador. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; connect-src 'none'; form-action 'none'; base-uri 'none'">
+<title>Consentimientos MLV · prototipo</title>
+<style>
+  :root {
+    --fondo: #f6f5f1; --papel: #ffffff; --papel2: #fbfaf7; --hundido: #efede6;
+    --tinta: #1a2636; --tinta2: #3b4859; --suave: #5f6873; --linea: #dddbd2; --linea2: #ebe9e2; --campo: #8e8a82;
+    --acento: #0d5c68; --acento-osc: #094650; --acento-claro: #e3eef0; --acento-borde: #c3dbde;
+    --verde: #2b7549; --verde-f: #e4f0e8; --verde-b: #bcd8c6;
+    --ambar: #94600f; --ambar-f: #f9eed8; --ambar-b: #ead2a2;
+    --rojo: #a12f2a; --rojo-f: #f7e2e0; --rojo-b: #e6bdb9;
+    --gris-f: #eceae4;
+    --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", serif;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --mono: ui-monospace, "Cascadia Mono", Consolas, "Courier New", monospace;
+    --radio: 10px;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; background: var(--fondo); color: var(--tinta); font: 15px/1.5 var(--sans); }
+  .app { max-width: 1280px; margin: 0 auto; padding: 0 28px 40px; }
+  a { color: var(--acento); }
+  h1, h2, h3 { font-family: var(--serif); font-weight: 600; color: var(--tinta); }
+  h2 { font-size: 21px; margin: 0 0 10px; }
+  h3 { font-size: 17px; margin: 0 0 8px; }
+  :focus-visible { outline: 2px solid var(--acento); outline-offset: 2px; }
+  [hidden] { display: none !important; }
+  .sr { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+  code, .mono { font-family: var(--mono); font-size: 12.5px; }
+
+  .demo-aviso { background: var(--tinta); color: #dfe6ee; font-size: 13px; text-align: center; padding: 7px 16px; }
+  .demo-aviso b { color: #fff; }
+
+  /* Cabecera */
+  .cabecera { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px 24px; padding: 22px 0 16px; }
+  .firma { font: 600 25px/1.1 var(--serif); color: var(--tinta); text-decoration: none; }
+  .sub { color: var(--suave); font-size: 12.5px; letter-spacing: .1em; text-transform: uppercase; margin-top: 6px; }
+  .cab-der { display: flex; align-items: flex-end; flex-wrap: wrap; gap: 10px 14px; }
+  .modo { display: inline-flex; border: 1px solid var(--linea); border-radius: 9px; overflow: hidden; background: var(--papel); }
+  .modo button { font: inherit; font-size: 13.5px; border: 0; background: none; padding: 8px 13px; cursor: pointer; color: var(--tinta2); }
+  .modo button + button { border-left: 1px solid var(--linea); }
+  .modo button[aria-pressed="true"] { background: var(--tinta); color: #fff; }
+  .guardado { font-size: 12.5px; color: var(--suave); }
+
+  .vistas { display: flex; flex-wrap: wrap; gap: 2px; border-bottom: 1px solid var(--linea); margin-bottom: 22px; }
+  .vistas button { font: inherit; background: none; border: 0; padding: 10px 13px; color: var(--tinta2); border-bottom: 2px solid transparent; margin-bottom: -1px; font-weight: 500; font-size: 14.5px; cursor: pointer; }
+  .vistas button[aria-current="page"] { color: var(--tinta); border-color: var(--acento); }
+  .vistas .cuenta-p { display: inline-block; min-width: 20px; padding: 0 6px; margin-left: 5px; border-radius: 999px; background: var(--hundido); color: var(--tinta2); font-size: 12px; text-align: center; }
+  .vistas .cuenta-p.rojo { background: var(--rojo-f); color: var(--rojo); }
+  .vistas .cuenta-p.ambar { background: var(--ambar-f); color: var(--ambar); }
+  @media (max-width: 700px) {
+    .vistas { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; }
+    .vistas button { min-height: 44px; padding: 6px 4px; font-size: 13px; line-height: 1.2; }
+  }
+
+  /* Botones y campos */
+  .btn { font: inherit; font-size: 14px; font-weight: 500; line-height: 1.3; color: var(--tinta); background: var(--papel); border: 1px solid var(--linea); border-radius: 8px; padding: 8px 14px; cursor: pointer; text-decoration: none; display: inline-block; }
+  .btn:hover { border-color: var(--acento); color: var(--acento); }
+  .btn.primario { background: var(--acento); border-color: var(--acento); color: #fff; }
+  .btn.primario:hover { background: var(--acento-osc); color: #fff; }
+  .btn.peligro { color: var(--rojo); }
+  .btn.peligro:hover { border-color: var(--rojo); }
+  .btn.chico { font-size: 13px; padding: 5px 10px; }
+  .btn:disabled { opacity: .5; cursor: not-allowed; }
+  .btn-txt { font: inherit; font-size: 13px; background: none; border: 0; color: var(--acento); cursor: pointer; padding: 2px 0; text-decoration: underline; text-underline-offset: 2px; }
+  input, select, textarea { font: inherit; font-size: 14px; color: var(--tinta); background: var(--papel); border: 1px solid var(--campo); border-radius: 7px; padding: 7px 10px; min-width: 0; max-width: 100%; }
+  input:focus, select:focus, textarea:focus { border-color: var(--acento); outline: none; box-shadow: 0 0 0 3px var(--acento-claro); }
+  input[aria-invalid="true"] { border-color: var(--rojo); }
+  input[type=checkbox], input[type=radio] { width: 17px; height: 17px; accent-color: var(--acento); margin: 0; flex: none; }
+  textarea { resize: vertical; min-height: 70px; width: 100%; }
+  label.campo { display: flex; flex-direction: column; gap: 4px; font-size: 12.5px; color: var(--suave); min-width: 0; }
+  label.campo > span { font-weight: 500; }
+  label.campo input, label.campo select, label.campo textarea { width: 100%; }
+  label.marca { display: flex; align-items: flex-start; gap: 9px; font-size: 14px; color: var(--tinta2); cursor: pointer; line-height: 1.4; }
+  label.marca input { margin-top: 2px; }
+  label.marca small { display: block; color: var(--suave); font-size: 12.5px; }
+  .rejilla { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px 14px; }
+  .fila-btn { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+
+  /* Bloques */
+  .caja { background: var(--papel); border: 1px solid var(--linea); border-radius: var(--radio); padding: 18px 20px; min-width: 0; }
+  .caja + .caja { margin-top: 16px; }
+  .dos { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 18px; align-items: start; }
+  @media (max-width: 980px) { .dos { grid-template-columns: 1fr; } }
+  .nota { font-size: 13px; color: var(--suave); }
+  .franja { margin: 0 0 18px; background: var(--acento-claro); border: 1px solid var(--acento-borde); color: var(--acento-osc); border-radius: 8px; padding: 10px 14px; font-size: 14px; }
+  .alerta { border-radius: 8px; padding: 10px 14px; font-size: 14px; border: 1px solid; margin: 0 0 10px; }
+  .alerta.rojo { background: var(--rojo-f); border-color: var(--rojo-b); color: #6e1f1b; }
+  .alerta.ambar { background: var(--ambar-f); border-color: var(--ambar-b); color: #5f3d08; }
+  .alerta.verde { background: var(--verde-f); border-color: var(--verde-b); color: #1c4f31; }
+  .alerta b { color: inherit; }
+
+  .sec-cab { display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 10px 20px; margin-bottom: 14px; }
+  .sec-cab h1 { font-size: 27px; line-height: 1.15; margin: 0; }
+  .sec-cab p { margin: 6px 0 0; color: var(--tinta2); max-width: 780px; font-size: 14.5px; }
+
+  /* Indicadores */
+  .resumen { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 14px; margin: 0 0 22px; }
+  .kpi { background: var(--papel); border: 1px solid var(--linea); border-radius: var(--radio); padding: 14px 16px; min-width: 0; }
+  .kpi .eti { font-size: 12.5px; color: var(--suave); }
+  .kpi .num { font: 600 29px/1.15 var(--serif); margin-top: 5px; font-variant-numeric: tabular-nums; }
+  .kpi .det { font-size: 12.5px; color: var(--tinta2); margin-top: 3px; }
+  .kpi.oscuro { background: var(--tinta); border-color: var(--tinta); color: #fff; }
+  .kpi.oscuro .eti, .kpi.oscuro .det { color: #c6cfdb; }
+  .kpi.oscuro .num { color: #fff; }
+  @media (max-width: 1050px) { .resumen { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+  /* Cartera de clientes */
+  .cartera { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; margin-bottom: 24px; }
+  .cli { background: var(--papel); border: 1px solid var(--linea); border-radius: var(--radio); padding: 15px 17px; cursor: pointer; text-align: left; font: inherit; color: inherit; width: 100%; }
+  .cli:hover { border-color: var(--acento); }
+  .cli[aria-pressed="true"] { border-color: var(--acento); box-shadow: 0 0 0 2px var(--acento-claro); }
+  .cli .top { display: flex; gap: 11px; align-items: center; }
+  .sello { width: 38px; height: 38px; border-radius: 9px; color: #fff; display: grid; place-items: center; font: 600 14px/1 var(--sans); flex: none; letter-spacing: .02em; }
+  .cli b { display: block; font-size: 15px; }
+  .cli .mini { font-size: 12.5px; color: var(--suave); }
+  .cli .cifras { display: flex; gap: 14px; margin-top: 11px; font-size: 13px; color: var(--tinta2); flex-wrap: wrap; }
+  .cli .cifras b { display: inline; font-size: 13px; }
+
+  /* Tablas */
+  .tabla { width: 100%; border-collapse: separate; border-spacing: 0; background: var(--papel); border: 1px solid var(--linea); border-radius: var(--radio); font-variant-numeric: tabular-nums; }
+  .tabla th { text-align: left; font-size: 11.5px; font-weight: 600; color: var(--suave); letter-spacing: .05em; text-transform: uppercase; padding: 10px 12px; border-bottom: 1px solid var(--linea); background: var(--papel2); }
+  .tabla th:first-child { border-top-left-radius: var(--radio); }
+  .tabla th:last-child { border-top-right-radius: var(--radio); }
+  .tabla td { padding: 11px 12px; border-bottom: 1px solid var(--linea2); vertical-align: top; font-size: 14px; }
+  .tabla tbody tr:last-child td { border-bottom: 0; }
+  .tabla tr.clic { cursor: pointer; }
+  .tabla tr.clic:hover td { background: var(--papel2); }
+  .tabla tr.mal td { background: var(--rojo-f); }
+  .mini { display: block; font-size: 12.5px; color: var(--suave); }
+  .vacio { padding: 30px 20px; text-align: center; color: var(--suave); background: var(--papel); border: 1px dashed var(--linea); border-radius: var(--radio); }
+  .tabla-env { overflow-x: auto; }
+  @media screen and (max-width: 760px) {
+    .app { padding: 0 16px 28px; }
+    .tabla.resp, .tabla.resp tbody, .tabla.resp tr, .tabla.resp td { display: block; width: 100%; }
+    .tabla.resp thead { display: none; }
+    .tabla.resp { background: none; border: 0; }
+    .tabla.resp tr { background: var(--papel); border: 1px solid var(--linea); border-radius: var(--radio); margin-bottom: 12px; padding: 4px 14px; }
+    .tabla.resp td { display: flex; justify-content: space-between; gap: 12px; padding: 8px 0; text-align: right; }
+    .tabla.resp td::before { content: attr(data-et); flex: none; color: var(--suave); font-size: 12.5px; text-align: left; }
+    .tabla.resp td.cab { display: block; text-align: left; }
+    .tabla.resp td.cab::before { display: none; }
+  }
+
+  /* Chips */
+  .chip { display: inline-block; font-size: 12px; font-weight: 600; padding: 2px 9px; border-radius: 999px; border: 1px solid; white-space: nowrap; line-height: 1.5; }
+  .chip.verde { background: var(--verde-f); border-color: var(--verde-b); color: var(--verde); }
+  .chip.ambar { background: var(--ambar-f); border-color: var(--ambar-b); color: var(--ambar); }
+  .chip.rojo { background: var(--rojo-f); border-color: var(--rojo-b); color: var(--rojo); }
+  .chip.gris { background: var(--gris-f); border-color: var(--linea); color: var(--suave); }
+  .chip.azul { background: var(--acento-claro); border-color: var(--acento-borde); color: var(--acento-osc); }
+  .razones { margin: 6px 0 0; padding-left: 18px; font-size: 12.5px; color: var(--tinta2); }
+  .razones li + li { margin-top: 3px; }
+
+  /* Línea de tiempo */
+  .tiempo { list-style: none; margin: 0; padding: 0; border-left: 2px solid var(--linea); }
+  .tiempo li { position: relative; padding: 0 0 14px 18px; }
+  .tiempo li::before { content: ""; position: absolute; left: -7px; top: 5px; width: 12px; height: 12px; border-radius: 50%; background: var(--papel); border: 2px solid var(--acento); }
+  .tiempo li.revoca::before { border-color: var(--rojo); }
+  .tiempo li.acceso::before { border-color: var(--suave); }
+  .tiempo .cuando { font-size: 12.5px; color: var(--suave); }
+  .huella { font-family: var(--mono); font-size: 11.5px; color: var(--suave); word-break: break-all; }
+
+  /* Diálogo */
+  dialog { border: 1px solid var(--linea); border-radius: 12px; padding: 0; width: min(760px, calc(100vw - 24px)); max-height: calc(100vh - 40px); color: var(--tinta); background: var(--papel); }
+  dialog::backdrop { background: rgba(20, 30, 40, .45); }
+  dialog .d-cab { padding: 16px 20px 6px; }
+  dialog .d-cuerpo { padding: 8px 20px 16px; overflow: auto; max-height: calc(100vh - 190px); }
+  dialog .d-pie { padding: 12px 20px; border-top: 1px solid var(--linea2); display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap; }
+
+  /* ───── Vista del titular (formulario con la marca del cliente) ───── */
+  .titular-fondo { background: #eef0f2; min-height: 100vh; padding: 0 0 40px; }
+  .barra-demo { background: #fff8e6; border-bottom: 1px solid var(--ambar-b); color: #5f3d08; font-size: 13.5px; padding: 9px 16px; display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; justify-content: center; }
+  .barra-demo select { font-size: 13px; padding: 4px 8px; }
+  .t-marco { max-width: 680px; margin: 26px auto 0; padding: 0 16px; }
+  .t-cab { background: var(--marca, #234); color: #fff; border-radius: 14px 14px 0 0; padding: 20px 22px; display: flex; align-items: center; gap: 14px; }
+  .t-cab .sello { background: rgba(255,255,255,.18); width: 46px; height: 46px; font-size: 16px; }
+  .t-cab b { display: block; font-size: 17px; }
+  .t-cab span { font-size: 13px; opacity: .85; }
+  .t-cuerpo { background: #fff; border: 1px solid #d9dde2; border-top: 0; border-radius: 0 0 14px 14px; padding: 22px; }
+  .t-pasos { display: flex; gap: 6px; margin: 0 0 18px; }
+  .t-pasos span { flex: 1; height: 5px; border-radius: 3px; background: #e2e5e9; }
+  .t-pasos span.hecho { background: var(--marca, #234); }
+  .t-cuerpo h2 { font-family: var(--sans); font-size: 19px; margin: 0 0 6px; }
+  .t-cuerpo .lead { color: #4a5563; font-size: 14.5px; margin: 0 0 16px; }
+  .t-btn { font: inherit; font-weight: 600; font-size: 15px; background: var(--marca, #234); color: #fff; border: 0; border-radius: 9px; padding: 11px 18px; cursor: pointer; }
+  .t-btn:disabled { opacity: .45; cursor: not-allowed; }
+  .t-btn.sec { background: #fff; color: #2a3440; border: 1px solid #c9ced5; font-weight: 500; }
+  .pol-caja { border: 1px solid #d9dde2; border-radius: 9px; height: 300px; overflow-y: auto; padding: 14px 16px; font-size: 13.5px; line-height: 1.55; color: #2a3440; background: #fbfbfc; }
+  .pol-caja h4 { margin: 12px 0 4px; font-size: 14px; }
+  .pol-caja p { margin: 0 0 8px; }
+  .pol-avance { font-size: 12.5px; color: #5d6773; margin: 6px 0 12px; }
+  .fin { border: 1px solid #d9dde2; border-radius: 10px; padding: 13px 15px; margin-bottom: 10px; }
+  .fin.marcada { border-color: var(--marca, #234); box-shadow: 0 0 0 1px var(--marca, #234); }
+  .fin .det { font-size: 12.8px; color: #5d6773; margin: 6px 0 0 26px; }
+  .fin .det div + div { margin-top: 2px; }
+  .aviso-lab { background: #f3f6f9; border-left: 3px solid var(--marca, #234); padding: 9px 12px; font-size: 13.2px; color: #33404d; border-radius: 0 6px 6px 0; margin: 0 0 14px; }
+  .t-pie { text-align: center; font-size: 12px; color: #6b7480; margin-top: 14px; }
+  .t-tabs { display: flex; gap: 4px; margin: 0 0 18px; border-bottom: 1px solid #e2e5e9; }
+  .t-tabs button { font: inherit; font-size: 14px; background: none; border: 0; padding: 9px 12px; cursor: pointer; color: #4a5563; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+  .t-tabs button[aria-current="page"] { color: #1b2530; border-color: var(--marca, #234); font-weight: 600; }
+  .comprobante { border: 1px dashed #b9c0c8; border-radius: 10px; padding: 14px 16px; background: #fafbfc; font-size: 13.5px; }
+  .codigo { font: 600 20px/1.2 var(--mono); letter-spacing: .06em; color: #1b2530; }
+
+  /* ───── Vista del fiscalizador ───── */
+  .fisc-banda { background: #14202e; color: #e8edf3; border-radius: var(--radio); padding: 16px 20px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px 24px; margin-bottom: 18px; }
+  .fisc-banda b { color: #fff; }
+  .fisc-banda .mini { color: #aab6c4; }
+  .fisc-banda .estado { display: flex; align-items: center; gap: 10px; }
+  .semaforo { width: 14px; height: 14px; border-radius: 50%; background: #39b36b; box-shadow: 0 0 0 4px rgba(57,179,107,.22); flex: none; }
+  .semaforo.mal { background: #e0524b; box-shadow: 0 0 0 4px rgba(224,82,75,.25); }
+  .fisc-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-bottom: 16px; }
+  @media (max-width: 980px) { .fisc-grid { grid-template-columns: 1fr; } }
+  .barra { height: 9px; background: var(--hundido); border-radius: 5px; overflow: hidden; display: flex; }
+  .barra i { display: block; height: 100%; }
+  .leyenda { display: flex; gap: 12px; flex-wrap: wrap; font-size: 12px; color: var(--suave); margin-top: 6px; }
+  .leyenda i { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 4px; vertical-align: -1px; }
+  .dl { display: grid; grid-template-columns: 170px minmax(0, 1fr); gap: 6px 14px; font-size: 14px; margin: 0; }
+  .dl dt { color: var(--suave); }
+  .dl dd { margin: 0; }
+  @media (max-width: 600px) { .dl { grid-template-columns: 1fr; } .dl dd { margin-bottom: 6px; } }
+
+  /* Impresión: solo el expediente */
+  #imprimible { display: none; }
+  @media print {
+    body { background: #fff; }
+    .app, .demo-aviso, #titular { display: none !important; }
+    #imprimible { display: block; font: 11.5pt/1.45 var(--sans); color: #000; padding: 0 6mm; }
+    #imprimible h1 { font-size: 18pt; margin: 0 0 4pt; }
+    #imprimible h2 { font-size: 13pt; margin: 14pt 0 5pt; }
+    #imprimible table { width: 100%; border-collapse: collapse; font-size: 9.5pt; }
+    #imprimible th, #imprimible td { border: 1px solid #999; padding: 4pt 5pt; text-align: left; vertical-align: top; }
+    #imprimible .huella { font-size: 8pt; color: #333; }
+    @page { margin: 14mm 12mm; }
+  }
+</style>
+</head>
+<body>
+<div class="demo-aviso" id="demoAviso"><b>Prototipo con datos ficticios.</b> Todo se guarda solo en este navegador; ninguna empresa, persona ni RUT es real.</div>
+
+<div class="app" id="app">
+  <header class="cabecera">
+    <div>
+      <a class="firma" href="../index.html">MLV Abogados</a>
+      <div class="sub">Consentimientos · registro trazable · prototipo</div>
+    </div>
+    <div class="cab-der">
+      <div class="modo" role="group" aria-label="Ver como">
+        <button type="button" data-modo="mlv">Equipo MLV</button>
+        <button type="button" data-modo="titular">Trabajador o titular</button>
+        <button type="button" data-modo="fiscal">Fiscalizador</button>
+      </div>
+      <span class="guardado" id="guardado"></span>
+    </div>
+  </header>
+  <nav class="vistas" id="vistas" aria-label="Secciones"></nav>
+  <main id="main"></main>
+</div>
+
+<div id="titular" hidden></div>
+<section id="imprimible" aria-hidden="true"></section>
+
+<dialog id="dlg"><form method="dialog" id="dlgForm"><div class="d-cab"><h2 id="dlgTit"></h2></div><div class="d-cuerpo" id="dlgCuerpo"></div><div class="d-pie" id="dlgPie"></div></form></dialog>
+
+<script>
+'use strict';
+const CLAVE = 'mlv-consentimientos-v1';
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const dos = (n) => String(n).padStart(2, '0');
+const ahora = () => { const d = new Date(); return `${d.getFullYear()}-${dos(d.getMonth() + 1)}-${dos(d.getDate())} ${dos(d.getHours())}:${dos(d.getMinutes())}:${dos(d.getSeconds())}`; };
+const MESES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+const fFecha = (fh) => { if (!fh) return '—'; const [y, m, d] = fh.slice(0, 10).split('-').map(Number); return `${d} ${MESES[m - 1].slice(0, 3)}. ${y}`; };
+const fFechaHora = (fh) => (fh ? `${fFecha(fh)}, ${fh.slice(11, 16)}` : '—');
+const corta = (h) => (h ? h.slice(0, 12) + '…' : '');
+
+/* ───────── RUT ───────── */
+function dvRut(num) { let s = 0, m = 2; for (let i = String(num).length - 1; i >= 0; i--) { s += Number(String(num)[i]) * m; m = m === 7 ? 2 : m + 1; } const r = 11 - (s % 11); return r === 11 ? '0' : r === 10 ? 'K' : String(r); }
+const fmtRut = (num) => `${String(num).replace(/\B(?=(\d{3})+(?!\d))/g, '.')}-${dvRut(num)}`;
+function limpiarRut(t) { const s = String(t || '').toUpperCase().replace(/[^0-9K]/g, ''); if (s.length < 2) return null; const cuerpo = s.slice(0, -1), dv = s.slice(-1); if (!/^\d{6,8}$/.test(cuerpo) || dvRut(cuerpo) !== dv) return null; return fmtRut(cuerpo); }
+
+/* ───────── SHA-256 propio (la página no usa internet): cada anotación guarda la huella de la anterior ───────── */
+const ror = (x, n) => (x >>> n) | (x << (32 - n));
+const K256 = (() => { const k = [], H = []; const primo = (x) => { for (let i = 2; i * i <= x; i++) if (x % i === 0) return false; return true; }; const frac = (x) => ((x - Math.floor(x)) * 0x100000000) >>> 0; for (let n = 2; k.length < 64; n++) { if (!primo(n)) continue; if (H.length < 8) H.push(frac(Math.sqrt(n))); k.push(frac(Math.cbrt(n))); } return { k, H }; })();
+function sha256(str) {
+  const m = new TextEncoder().encode(str), l = m.length;
+  const buf = new Uint8Array(((l + 9 + 63) >> 6) << 6); buf.set(m); buf[l] = 0x80;
+  const dv = new DataView(buf.buffer); dv.setUint32(buf.length - 4, (l * 8) >>> 0); dv.setUint32(buf.length - 8, Math.floor(l / 0x20000000));
+  const h = K256.H.slice(), w = new Uint32Array(64);
+  for (let i = 0; i < buf.length; i += 64) {
+    for (let t = 0; t < 16; t++) w[t] = dv.getUint32(i + t * 4);
+    for (let t = 16; t < 64; t++) { const a = w[t - 15], b = w[t - 2]; w[t] = (w[t - 16] + (ror(a, 7) ^ ror(a, 18) ^ (a >>> 3)) + w[t - 7] + (ror(b, 17) ^ ror(b, 19) ^ (b >>> 10))) >>> 0; }
+    let [A, B, C, D, E, F, G, H] = h;
+    for (let t = 0; t < 64; t++) { const t1 = (H + (ror(E, 6) ^ ror(E, 11) ^ ror(E, 25)) + ((E & F) ^ (~E & G)) + K256.k[t] + w[t]) >>> 0; const t2 = ((ror(A, 2) ^ ror(A, 13) ^ ror(A, 22)) + ((A & B) ^ (A & C) ^ (B & C))) >>> 0; H = G; G = F; F = E; E = (D + t1) >>> 0; D = C; C = B; B = A; A = (t1 + t2) >>> 0; }
+    [A, B, C, D, E, F, G, H].forEach((v, j) => { h[j] = (h[j] + v) >>> 0; });
+  }
+  return h.map((x) => x.toString(16).padStart(8, '0')).join('');
+}
+
+/* ───────── Catálogos ───────── */
+const BASES = {
+  consentimiento: 'Consentimiento del titular (art. 12)',
+  ley: 'Obligación legal o lo dispone la ley (art. 13 b)',
+  contrato: 'Necesario para el contrato (art. 13 c)',
+  interes: 'Interés legítimo (art. 13 d)',
+  defensa: 'Defensa de un derecho ante tribunales u órganos públicos (art. 13 e)',
+  laboral_sensible: 'Sensibles en el ámbito laboral, en el marco de la ley (art. 16 inc. 2 e)',
+  medicina_laboral: 'Medicina preventiva o laboral (art. 16 bis inc. 2 e)',
+};
+const BASE_CORTA = { consentimiento: 'Consentimiento', ley: 'Ley', contrato: 'Contrato', interes: 'Interés legítimo', defensa: 'Defensa de derechos', laboral_sensible: 'Laboral (art. 16)', medicina_laboral: 'Medicina laboral' };
+const SENS = { no: 'No sensibles', sensible: 'Sensibles (art. 16)', salud: 'Salud o perfil biológico (art. 16 bis)', biometrico: 'Biométricos (art. 16 ter)', ninos: 'De niños y niñas menores de 14 (art. 16 quáter)', adolescentes: 'De adolescentes de 14 a 17 (art. 16 quáter)' };
+const TITULARES = { trabajadores: 'Trabajadores', postulantes: 'Postulantes', extrabajadores: 'Ex trabajadores', clientes: 'Clientes', pacientes: 'Pacientes', proveedores: 'Proveedores', visitas: 'Visitas' };
+const TIPOS = { consentimiento: 'Consentimiento', revocacion: 'Revocación', politica: 'Política publicada', formulario: 'Formulario publicado', rat: 'Inventario (RAT)', acceso: 'Acceso del fiscalizador' };
+
+/* ¿Corresponde pedir consentimiento para este tratamiento? Devuelve un semáforo con las razones y su artículo. */
+function evaluar(t) {
+  const r = [];
+  const sal = t.sensibilidad === 'salud', bio = t.sensibilidad === 'biometrico', sen = t.sensibilidad !== 'no';
+  const ninos = t.sensibilidad === 'ninos', adol = t.sensibilidad === 'adolescentes';
+  if (t.laboral && sal && !['medicina_laboral', 'ley'].includes(t.base)) {
+    return { nivel: 'rojo', eti: 'No usar consentimiento', r: ['Datos de salud reunidos en el ámbito laboral: la ley prohíbe tratarlos salvo autorización legal expresa; el consentimiento del trabajador no basta (art. 16 bis inc. 3).', 'Alternativa: hacerlo anónimo (sin datos de salud identificables) o apoyarlo en una norma legal concreta.'] };
+  }
+  if (t.base !== 'consentimiento') {
+    r.push('No se pide consentimiento: se informa en la política (base de licitud y finalidad, art. 14 ter letra d).');
+    if (t.base === 'interes') r.push('Hay que decir cuál es el interés legítimo (art. 14 ter letra d) y el titular puede exigir que se le informe (art. 13 letra d).');
+    // Salud, perfil biológico y biometría sin consentimiento: solo las causales del art. 16 bis inc. 2 (art. 16 ter inc. 3 remite a ellas).
+    if ((sal || bio) && !['medicina_laboral', 'ley', 'defensa'].includes(t.base)) return { nivel: 'ambar', eti: 'Revisar la base', r: [`${bio ? 'Datos biométricos' : 'Datos de salud o perfil biológico'}: sin consentimiento solo se pueden tratar en las causales del art. 16 bis inc. 2 (${bio ? 'art. 16 ter inc. 3; ' : ''}la causal laboral del art. 16 inc. 2 letra e no sirve aquí). Con la base elegida hay que pedir consentimiento expreso.`, ...r] };
+    if ((sal || bio) && t.laboral && !t.fundamento) return { nivel: 'ambar', eti: 'Falta la ley', r: [`${bio ? 'Biometría' : 'Salud'} en el ámbito laboral: indica en «Fundamento» la ley que autoriza expresamente este tratamiento (art. 16 bis inc. 3).`, ...r] };
+    if (sen && !sal && !bio && !['laboral_sensible', 'medicina_laboral', 'ley', 'defensa'].includes(t.base)) return { nivel: 'ambar', eti: 'Revisar la base', r: ['Datos sensibles: fuera de las excepciones del art. 16 inc. 2 requieren consentimiento expreso (art. 16 inc. 1).', ...r] };
+    if (ninos && t.base !== 'ley') r.push('Niños y niñas menores de 14: sin consentimiento de padres o representantes solo cuando la ley lo autorice o mandate expresamente (art. 16 quáter inc. 2).');
+    return { nivel: 'gris', eti: 'No corresponde', r };
+  }
+  if (t.necesarioLey) return { nivel: 'ambar', eti: 'Revisar la base', r: ['Si una ley lo exige, la base es la ley (art. 13 b). Pedir consentimiento confunde: si el titular lo revoca, ¿la empresa deja de cumplir la ley?'] };
+  if (t.necesarioContrato) return { nivel: 'ambar', eti: 'Revisar la base', r: ['Si es necesario para el contrato, la base es el contrato (art. 13 c), no el consentimiento.'] };
+  r.push('El consentimiento debe ser libre, informado, específico, previo e inequívoco (art. 12 inc. 2): una casilla por finalidad, sin marcar.');
+  if (t.laboral) r.push('Relación laboral: pedirlo aparte del contrato, sin consecuencias por negarse y con una alternativa real; si se pide dentro del contrato sin ser necesario se presume que no es libre (art. 12 inc. 6).');
+  if (sen && !ninos && !adol) r.push('Datos sensibles: consentimiento expreso (art. 16 inc. 1).');
+  if (sal && !t.laboral) r.push('Salud o perfil biológico: aun con consentimiento, solo para los fines previstos por las leyes sanitarias (art. 16 bis inc. 1).');
+  if (bio) {
+    r.push('Biometría: informar el sistema usado, la finalidad, el período de uso y cómo ejercer derechos (art. 16 ter inc. 2).');
+    if (!t.sistema || !t.conservacion) return { nivel: 'ambar', eti: 'Falta información', r: [...r, 'Completa «Sistema» y «Conservación» en el inventario.'] };
+  }
+  if (ninos) r.push('Niños y niñas menores de 14: el consentimiento lo dan los padres, representantes legales o quien tiene su cuidado personal (art. 16 quáter inc. 2); el formulario debe recogerlo de ese adulto.');
+  if (adol) r.push('Adolescentes de 14 a 17 consienten por sí mismos; si son datos sensibles y tienen menos de 16, consienten sus padres o representantes (art. 16 quáter inc. 3 y 4). Hay que registrar la edad.');
+  return { nivel: 'verde', eti: 'Corresponde', r };
+}
+
+/* ───────── Datos de ejemplo (todo ficticio) ───────── */
+const NOMBRES = ['Valentina Rivas Cárcamo', 'Tomás Herrera Lagos', 'Catalina Navarro Díaz', 'Joaquín Vergara Silva', 'Antonia Paredes Fuentes', 'Martín Espinoza Rojas', 'Isidora Cáceres Moya', 'Vicente Sandoval Leiva', 'Florencia Gallardo Pizarro', 'Sebastián Figueroa Toro', 'Constanza Bravo Núñez', 'Ignacio Alarcón Vidal', 'Trinidad Saavedra Ortiz', 'Cristián Peña Molina', 'Josefa Urrutia Campos', 'Felipe Carrasco Salinas', 'Amanda Riquelme Soto', 'Gaspar Jara Muñoz', 'Emilia Tapia Cortés', 'Renato Olivares Mena'];
+let semillaN = 7;
+const azar = () => { semillaN = (semillaN * 16807) % 2147483647; return semillaN / 2147483647; };
+const codigo = (rnd = Math.random) => { const L = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; let s = ''; for (let i = 0; i < 8; i++) s += L[Math.floor(rnd() * L.length)]; return s.slice(0, 4) + '-' + s.slice(4); };
+
+function textoPolitica(c, ids) {
+  const trs = c.rat.filter((t) => !ids || ids.includes(t.id));
+  const porBase = (fn) => trs.filter(fn).map((t) => `${t.nombre} (${BASE_CORTA[t.base]}${t.base === 'interes' && t.fundamento ? ': ' + t.fundamento : ''})`).join('; ');
+  return [
+    `## 1. Quién trata sus datos\n${c.nombre}, RUT ${c.rut}, domiciliada en ${c.domicilio}, representada por ${c.representante}. ${c.prevencion ? 'Encargado de prevención: ' + c.prevencion + '.' : ''}`,
+    `## 2. Cómo contactarnos\nPara ejercer sus derechos o hacer consultas escriba a ${c.correo}. Responderemos dentro de los plazos legales.`,
+    `## 3. Qué datos tratamos, de quiénes, para qué y con qué base\n${trs.map((t) => `• ${t.nombre}. De: ${TITULARES[t.titulares] || t.titulares}. Datos: ${t.datos}. Finalidad: ${t.finalidad}. Base: ${BASES[t.base]}.${t.base === 'interes' && t.fundamento ? ' Interés legítimo: ' + t.fundamento + '.' : ''}`).join('\n')}`,
+    `## 4. Con quién compartimos los datos\n${[...new Set(trs.map((t) => t.destinatarios).filter(Boolean))].join('; ') || 'No comunicamos ni cedemos sus datos a terceros.'}`,
+    `## 5. Transferencias fuera de Chile\n${[...new Set(trs.map((t) => t.transferencia).filter(Boolean))].join('; ') || 'No transferimos sus datos fuera de Chile.'}`,
+    `## 6. Cuánto tiempo los guardamos\n${trs.map((t) => `• ${t.nombre}: ${t.conservacion || 'mientras dure la finalidad'}.`).join('\n')}`,
+    `## 7. Tratamientos basados en su consentimiento\n${porBase((t) => t.base === 'consentimiento') || 'Ninguno.'}. Puede retirar su consentimiento en cualquier momento, sin expresar causa, por el mismo medio en que lo dio; el retiro no afecta la licitud del tratamiento anterior.`,
+    `## 8. Sus derechos\nPuede pedir acceso, rectificación, supresión, oposición, portabilidad y bloqueo de sus datos. Si no respondemos o rechazamos su solicitud, puede reclamar ante la Agencia de Protección de Datos Personales.`,
+    `## 9. Seguridad\n${c.seguridad || '[Completar: medidas de seguridad reales del responsable, art. 14 ter letra e]'}`,
+    `## 10. Decisiones automatizadas\n${trs.some((t) => t.automatizada) ? `Sí, en: ${trs.filter((t) => t.automatizada).map((t) => t.nombre).join('; ')}. [Completar: lógica aplicada y consecuencias previstas para el titular, art. 14 ter letra l]` : 'No tomamos decisiones basadas únicamente en tratamiento automatizado ni elaboramos perfiles.'}`,
+  ].join('\n\n');
+}
+
+function semilla() {
+  semillaN = 7;
+  const c1 = {
+    id: 'c1', nombre: 'Transportes Cordillera SpA', sigla: 'TC', color: '#1f4e79', rubro: 'Transporte y logística · 240 trabajadores',
+    rut: '76.412.358-' + dvRut(76412358), domicilio: 'Av. Ejemplo 1234, Quilicura, Santiago', representante: 'Gerente General (ficticio)', prevencion: '', correo: 'privacidad@cordillera.ejemplo',
+    seguridad: 'Acceso a los sistemas de personas con clave individual y doble factor, limitado por cargo; registro de accesos; respaldo diario cifrado; plantillas biométricas cifradas en el reloj, sin imagen de la huella; contratos de confidencialidad con el personal y los proveedores.',
+    rat: [
+      { id: 'T-01', nombre: 'Remuneraciones y cotizaciones', area: 'Personas', titulares: 'trabajadores', datos: 'Identificación, sueldo, cuenta bancaria, AFP e Isapre', sensibilidad: 'no', finalidad: 'Pagar remuneraciones y enterar cotizaciones', base: 'ley', fundamento: 'Código del Trabajo y normas previsionales', laboral: true, necesarioLey: true, necesarioContrato: true, conservacion: 'Según plazos legales laborales y previsionales', destinatarios: 'Previred, AFP, Isapre, banco pagador', transferencia: '', sistema: 'Software de remuneraciones' },
+      { id: 'T-02', nombre: 'Control de asistencia con tarjeta', area: 'Operaciones', titulares: 'trabajadores', datos: 'Nombre, RUT, horas de entrada y salida', sensibilidad: 'no', finalidad: 'Registrar asistencia y jornada', base: 'ley', fundamento: 'Registro de asistencia del Código del Trabajo', laboral: true, necesarioLey: true, necesarioContrato: false, conservacion: 'Según plazos legales', destinatarios: '', transferencia: '', sistema: 'Reloj de tarjeta' },
+      { id: 'T-03', nombre: 'Marcación de asistencia con huella digital (voluntaria)', area: 'Operaciones', titulares: 'trabajadores', datos: 'Plantilla biométrica de la huella digital', sensibilidad: 'biometrico', finalidad: 'Marcar asistencia con huella en lugar de tarjeta, solo para quien lo elija', base: 'consentimiento', fundamento: '', laboral: true, necesarioLey: false, necesarioContrato: false, conservacion: 'Mientras dure la relación laboral o hasta que retire el consentimiento; luego se elimina la plantilla', destinatarios: 'Proveedor del reloj biométrico (encargado)', transferencia: '', sistema: 'Reloj biométrico de huella, plantilla cifrada (no guarda la imagen de la huella)' },
+      { id: 'T-04', nombre: 'Uso de imagen y nombre en redes sociales y comunicaciones', area: 'Comunicaciones', titulares: 'trabajadores', datos: 'Fotografías, videos, nombre y cargo', sensibilidad: 'no', finalidad: 'Publicar fotos y videos de actividades de la empresa en redes sociales, sitio web y boletín interno', base: 'consentimiento', fundamento: '', laboral: true, necesarioLey: false, necesarioContrato: false, conservacion: 'Mientras esté publicada; se retira al revocar', destinatarios: 'Público general (redes sociales)', transferencia: 'Redes sociales con servidores fuera de Chile', sistema: 'Redes sociales de la empresa' },
+      { id: 'T-05', nombre: 'Convenios de beneficios con terceros', area: 'Personas', titulares: 'trabajadores', datos: 'Nombre, RUT, correo y teléfono', sensibilidad: 'no', finalidad: 'Enviar sus datos a empresas en convenio (gimnasio, óptica, seguros) para ofrecerle descuentos', base: 'consentimiento', fundamento: '', laboral: true, necesarioLey: false, necesarioContrato: false, conservacion: 'Mientras participe en el convenio', destinatarios: 'Empresas en convenio (cesión, art. 15)', transferencia: '', sistema: 'Planilla de convenios' },
+      { id: 'T-06', nombre: 'Exámenes preocupacionales y de salud ocupacional', area: 'Prevención de riesgos', titulares: 'trabajadores', datos: 'Resultados de exámenes de salud ocupacional', sensibilidad: 'salud', finalidad: 'Evaluar la aptitud para cargos con exposición a riesgos', base: 'medicina_laboral', fundamento: 'Medicina laboral y normas de seguridad laboral', laboral: true, necesarioLey: true, necesarioContrato: false, conservacion: 'Según normas de salud ocupacional', destinatarios: 'Mutualidad (encargado)', transferencia: '', sistema: 'Portal de la mutualidad' },
+      { id: 'T-07', nombre: 'Encuesta de bienestar con preguntas de salud mental (identificada)', area: 'Personas', titulares: 'trabajadores', datos: 'Respuestas sobre estrés, ánimo y diagnósticos', sensibilidad: 'salud', finalidad: 'Diseñar programas de bienestar', base: 'consentimiento', fundamento: '', laboral: true, necesarioLey: false, necesarioContrato: false, conservacion: '1 año', destinatarios: '', transferencia: '', sistema: 'Formulario en línea' },
+      { id: 'T-08', nombre: 'Conservar el currículum para futuros procesos', area: 'Selección', titulares: 'postulantes', datos: 'Currículum, contacto, experiencia', sensibilidad: 'no', finalidad: 'Considerarlo en procesos de selección futuros, después de cerrado el proceso al que postuló', base: 'consentimiento', fundamento: '', laboral: true, necesarioLey: false, necesarioContrato: false, conservacion: '2 años desde que lo autoriza', destinatarios: '', transferencia: '', sistema: 'Carpeta de selección' },
+      { id: 'T-09', nombre: 'Cámaras de seguridad en bodegas', area: 'Seguridad', titulares: 'trabajadores', datos: 'Imagen en video', sensibilidad: 'no', finalidad: 'Seguridad de bienes y personas en bodegas', base: 'interes', fundamento: 'Prevenir robos y accidentes; cámaras informadas y sin cobertura de baños ni comedores', laboral: true, necesarioLey: false, necesarioContrato: false, conservacion: '30 días, salvo incidente', destinatarios: 'Empresa de seguridad (encargado)', transferencia: '', sistema: 'Grabador de video' },
+    ],
+    politicas: [], formularios: [], titulares: [], eventos: [],
+    accesoFiscal: { nombre: 'Fiscalizador (demostración)', organismo: 'Agencia de Protección de Datos Personales', desde: '2026-10-19', hasta: '2026-10-26' },
+  };
+  const c2 = {
+    id: 'c2', nombre: 'Clínica Dental Los Aromos Ltda.', sigla: 'LA', color: '#7a3b69', rubro: 'Salud dental · 2 sedes',
+    rut: '77.905.214-' + dvRut(77905214), domicilio: 'Calle Ejemplo 455, Ñuñoa, Santiago', representante: 'Director Médico (ficticio)', prevencion: '', correo: 'datos@losaromos.ejemplo',
+    seguridad: 'Software clínico con clave individual por profesional y registro de accesos a cada ficha; respaldo diario; celulares de recepción con bloqueo y sin copia de fichas; contratos de confidencialidad con el personal y el laboratorio.',
+    rat: [
+      { id: 'T-01', nombre: 'Ficha clínica', area: 'Clínica', titulares: 'pacientes', datos: 'Identificación, antecedentes de salud, tratamientos', sensibilidad: 'salud', finalidad: 'Atención de salud dental', base: 'medicina_laboral', fundamento: 'Prestación de asistencia sanitaria (art. 16 bis inc. 2 e) y normas de ficha clínica', laboral: false, necesarioLey: true, necesarioContrato: true, conservacion: 'Según normas de ficha clínica', destinatarios: 'Laboratorio dental (encargado)', transferencia: '', sistema: 'Software clínico' },
+      { id: 'T-02', nombre: 'Recordatorios de citas por WhatsApp', area: 'Recepción', titulares: 'pacientes', datos: 'Nombre y celular', sensibilidad: 'no', finalidad: 'Recordarle sus horas por WhatsApp', base: 'consentimiento', fundamento: '', laboral: false, necesarioLey: false, necesarioContrato: false, conservacion: 'Mientras sea paciente', destinatarios: 'WhatsApp (encargado)', transferencia: 'Servidores de WhatsApp fuera de Chile', sistema: 'WhatsApp Business' },
+      { id: 'T-03', nombre: 'Promociones y campañas', area: 'Marketing', titulares: 'pacientes', datos: 'Nombre, correo y celular', sensibilidad: 'no', finalidad: 'Enviarle promociones de tratamientos', base: 'consentimiento', fundamento: '', laboral: false, necesarioLey: false, necesarioContrato: false, conservacion: 'Hasta que retire el consentimiento', destinatarios: '', transferencia: '', sistema: 'Plataforma de correo masivo' },
+    ],
+    politicas: [], formularios: [], titulares: [], eventos: [],
+    accesoFiscal: { nombre: 'Fiscalizador (demostración)', organismo: 'Agencia de Protección de Datos Personales', desde: '2026-10-19', hasta: '2026-10-26' },
+  };
+  const db = { version: 1, actual: 'c1', clientes: [c1, c2] };
+
+  // Transportes Cordillera: política 1.0 (sin convenios) y 1.1 (agrega convenios con terceros).
+  // Los hechos se arman con su fecha y se anotan en orden cronológico (la cadena debe seguir el orden real).
+  const ids10 = c1.rat.filter((t) => t.id !== 'T-05').map((t) => t.id);
+  const f1 = { id: 'F-1', nombre: 'Trabajadores', publico: 'trabajadores', titulo: 'Autorizaciones voluntarias para trabajadores', intro: 'Estas autorizaciones son voluntarias y aparte de su contrato de trabajo. Marque solo las que quiera dar.', finalidades: ['T-03', 'T-04'], version: 1 };
+  const f2 = { id: 'F-2', nombre: 'Postulantes', publico: 'postulantes', titulo: 'Conservar su currículum', intro: 'Al terminar este proceso de selección eliminaremos su currículum, salvo que nos autorice a guardarlo.', finalidades: ['T-08'], version: 1 };
+  c1.formularios.push(f1, f2);
+  const dias = (base, n) => { const d = new Date(base + 'T12:00:00'); d.setDate(d.getDate() + n); return `${d.getFullYear()}-${dos(d.getMonth() + 1)}-${dos(d.getDate())}`; };
+  const hora = () => `${dos(8 + Math.floor(azar() * 10))}:${dos(Math.floor(azar() * 60))}:${dos(Math.floor(azar() * 60))}`;
+  const decisiones10 = [[1, 1], [0, 1], [1, 1], [0, 0], [1, 0], [0, 1], [1, 1], [0, 1], [1, 1], [0, 1]];
+  const trab = [], post = [];
+  for (let i = 0; i < 14; i++) trab.push(nuevoTitular(c1, NOMBRES[i], 12000000 + Math.floor(azar() * 9000000), 'trabajadores', azar));
+  for (let i = 14; i < 17; i++) post.push(nuevoTitular(c1, NOMBRES[i], 17000000 + Math.floor(azar() * 6000000), 'postulantes', azar));
+  const hechos = [
+    ['2026-08-28 10:14:02', () => registrar(c1, 'rat', { accion: 'Inventario inicial cargado', cantidad: c1.rat.length - 1 }, '', '2026-08-28 10:14:02')],
+    ['2026-09-01 09:00:00', () => publicarPolitica(c1, '1.0', textoPolitica(c1, ids10), '2026-09-01 09:00:00')],
+    ['2026-09-01 09:05:00', () => registrar(c1, 'formulario', { id: 'F-1', nombre: 'Trabajadores', version: 1, finalidades: ['T-03', 'T-04'] }, '', '2026-09-01 09:05:00')],
+    ['2026-09-01 09:06:00', () => registrar(c1, 'formulario', { id: 'F-2', nombre: 'Postulantes', version: 1, finalidades: ['T-08'] }, '', '2026-09-01 09:06:00')],
+    ['2026-10-04 17:40:11', () => registrar(c1, 'rat', { accion: 'Alta de tratamiento', id: 'T-05', nombre: 'Convenios de beneficios con terceros', base: 'consentimiento' }, '', '2026-10-04 17:40:11')],
+    ['2026-10-05 09:00:00', () => publicarPolitica(c1, '1.1', textoPolitica(c1), '2026-10-05 09:00:00')],
+    ['2026-10-05 09:05:00', () => { f1.finalidades = ['T-03', 'T-04', 'T-05']; f1.version = 2; registrar(c1, 'formulario', { id: 'F-1', nombre: 'Trabajadores', version: 2, finalidades: f1.finalidades }, '', '2026-10-05 09:05:00'); }],
+    ['2026-10-08 19:22:41', () => revocar(c1, trab[2], ['T-04'], 'Formulario web (mismo medio)', '2026-10-08 19:22:41')],
+    ['2026-10-12 11:05:09', () => revocar(c1, trab[6], ['T-03'], 'Correo electrónico a privacidad@ (anotado por la empresa)', '2026-10-12 11:05:09')],
+    ['2026-10-16 10:31:52', () => registrar(c1, 'acceso', { quien: 'Fiscalizador (demostración)', accion: 'Revisó la integridad del registro y la política vigente' }, '', '2026-10-16 10:31:52')],
+  ];
+  for (let i = 0; i < 10; i++) { const [a, b] = decisiones10[i], f = `${dias('2026-09-02', i * 2)} ${hora()}`, leyo = azar() > .25, seg = 20 + Math.floor(azar() * 140); hechos.push([f, () => otorgar(c1, trab[i], f1, { 'T-03': !!a, 'T-04': !!b }, { abierta: true, alFinal: leyo, segundos: seg, declarada: true }, f, 'Formulario web (celular)', 1)]); }
+  for (let i = 10; i < 14; i++) { const f = `${dias('2026-10-06', (i - 10) * 2)} ${hora()}`, seg = 35 + Math.floor(azar() * 90); hechos.push([f, () => otorgar(c1, trab[i], f1, { 'T-03': i % 2 === 0, 'T-04': true, 'T-05': i !== 12 }, { abierta: true, alFinal: true, segundos: seg, declarada: true }, f, 'Formulario web (computador)', 2)]); }
+  for (let i = 0; i < 3; i++) { const f = `${dias('2026-09-15', i * 9)} ${hora()}`, seg = 25 + Math.floor(azar() * 60); hechos.push([f, () => otorgar(c1, post[i], f2, { 'T-08': i !== 1 }, { abierta: true, alFinal: true, segundos: seg, declarada: true }, f, 'Formulario web (computador)', 1)]); }
+  hechos.sort((a, b) => (a[0] < b[0] ? -1 : 1)).forEach(([, fn]) => fn());
+
+  // Clínica: un formulario para pacientes.
+  publicarPolitica(c2, '1.0', textoPolitica(c2), '2026-09-20 09:00:00');
+  c2.formularios.push({ id: 'F-1', nombre: 'Pacientes', publico: 'pacientes', titulo: 'Comunicaciones con la clínica', intro: 'Su atención no depende de estas autorizaciones.', finalidades: ['T-02', 'T-03'], version: 1 });
+  registrar(c2, 'formulario', { id: 'F-1', nombre: 'Pacientes', version: 1, finalidades: ['T-02', 'T-03'] }, '', '2026-09-20 09:05:00');
+  for (let i = 17; i < 20; i++) {
+    const tit = nuevoTitular(c2, NOMBRES[i], 9000000 + Math.floor(azar() * 9000000), 'pacientes', azar);
+    otorgar(c2, tit, c2.formularios[0], { 'T-02': true, 'T-03': i === 18 }, { abierta: true, alFinal: i !== 19, segundos: 15 + Math.floor(azar() * 50), declarada: true }, `${dias('2026-09-22', (i - 17) * 6)} ${hora()}`, 'Tablet en recepción', 1);
+  }
+  return db;
+}
+
+/* ───────── Registro con huellas encadenadas (una cadena por cliente) ───────── */
+const huellaDe = (e) => sha256([e.prev, e.n, e.fecha, e.tipo, e.titular || '', JSON.stringify(e.det)].join('|'));
+function registrar(c, tipo, det, titular = '', fecha = ahora()) {
+  const prev = c.eventos.length ? c.eventos[c.eventos.length - 1].hash : '0'.repeat(64);
+  const e = { n: c.eventos.length + 1, fecha, tipo, titular, det, prev };
+  e.hash = huellaDe(e);
+  c.eventos.push(e);
+  return e;
+}
+/** Revisa toda la cadena: devuelve el número de la primera anotación alterada, o 0 si está íntegra. */
+function verificar(eventos) {
+  let prev = '0'.repeat(64);
+  for (const e of eventos) { if (e.prev !== prev || huellaDe(e) !== e.hash) return e.n; prev = e.hash; }
+  return 0;
+}
+
+const polVigente = (c) => c.politicas[c.politicas.length - 1];
+function publicarPolitica(c, version, texto, fecha = ahora()) {
+  const p = { version, fecha, texto, hash: sha256(texto) };
+  c.politicas.push(p);
+  registrar(c, 'politica', { version, hash: p.hash, caracteres: texto.length }, '', fecha);
+  return p;
+}
+/* La identidad del titular queda fuera de la cadena (así se puede suprimir sin romperla); la cadena guarda su huella. */
+function nuevoTitular(c, nombre, rutNum, relacion, rnd = Math.random) {
+  const rut = typeof rutNum === 'number' ? fmtRut(rutNum) : rutNum;
+  const n = c.titulares.length + 1;
+  const correo = nombre.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').split(' ').slice(0, 2).join('.') + '@correo.ejemplo';
+  const t = { id: `${c.sigla}-${String(n).padStart(4, '0')}`, nombre, rut, correo, relacion, codigo: codigo(rnd) };
+  c.titulares.push(t);
+  return t;
+}
+const identidadHash = (t) => sha256([t.nombre, t.rut, t.correo].join('|'));
+const textoFinalidad = (t) => `${t.finalidad}. Datos: ${t.datos}. Conservación: ${t.conservacion || '—'}. Destinatarios: ${t.destinatarios || 'ninguno fuera de la empresa'}.`;
+function otorgar(c, tit, form, marcas, lectura, fecha, canal, formVersion = form.version) {
+  const pol = c.politicas.filter((p) => p.fecha <= fecha).pop() || polVigente(c);
+  const textos = {};
+  for (const id of Object.keys(marcas)) { const t = c.rat.find((x) => x.id === id); if (t) textos[id] = sha256(textoFinalidad(t)).slice(0, 16); }
+  return registrar(c, 'consentimiento', {
+    formulario: { id: form.id, nombre: form.nombre, version: formVersion }, politica: { version: pol.version, hash: pol.hash },
+    finalidades: marcas, textoMostrado: textos, lectura, canal, identidad: identidadHash(tit), comprobante: tit.codigo,
+  }, tit.id, fecha);
+}
+function revocar(c, tit, ids, canal, fecha = ahora()) {
+  return registrar(c, 'revocacion', { finalidades: ids, canal, causa: 'Sin expresión de causa (art. 12 inc. 4)', identidad: identidadHash(tit) }, tit.id, fecha);
+}
+
+/** Estado actual de cada finalidad de un titular, según su último evento. */
+function estados(c, tid) {
+  const m = {};
+  for (const e of c.eventos) {
+    if (e.titular !== tid) continue;
+    if (e.tipo === 'consentimiento') for (const [k, v] of Object.entries(e.det.finalidades)) m[k] = { estado: v ? 'otorgado' : 'rechazado', ev: e, version: e.det.politica.version };
+    if (e.tipo === 'revocacion') for (const k of e.det.finalidades) if (m[k]) m[k] = { ...m[k], estado: 'revocado', rev: e };
+  }
+  return m;
+}
+const ultimoConsent = (c, tid) => c.eventos.filter((e) => e.titular === tid && e.tipo === 'consentimiento').pop();
+/** Titulares a los que su formulario les agregó una finalidad que no han respondido (el consentimiento dado sigue valiendo: una nueva versión de la política no lo invalida). */
+function porReconfirmar(c, tit) {
+  const u = ultimoConsent(c, tit.id); if (!u) return null;
+  const form = c.formularios.find((f) => f.id === u.det.formulario.id);
+  const faltan = form ? form.finalidades.filter((id) => !(id in u.det.finalidades)) : [];
+  return faltan.length ? { version: u.det.politica.version, faltan } : null;
+}
+function resumen(c) {
+  let vig = 0, rev = 0, rech = 0, tits = 0;
+  const porFin = {};
+  for (const t of c.titulares) {
+    const m = estados(c, t.id); if (Object.keys(m).length) tits++;
+    for (const [k, v] of Object.entries(m)) {
+      porFin[k] = porFin[k] || { otorgado: 0, revocado: 0, rechazado: 0 };
+      porFin[k][v.estado]++;
+      if (v.estado === 'otorgado') vig++; else if (v.estado === 'revocado') rev++; else rech++;
+    }
+  }
+  const evals = c.rat.map((t) => ({ t, ev: evaluar(t) }));
+  return {
+    tits, vig, rev, rech, porFin, evals,
+    rojos: evals.filter((x) => x.ev.nivel === 'rojo'), ambar: evals.filter((x) => x.ev.nivel === 'ambar'),
+    reconf: c.titulares.filter((t) => porReconfirmar(c, t)),
+    roto: verificar(c.eventos),
+  };
+}
+
+/* ───────── Guardado ───────── */
+let db, sinGuardar = false;
+function cargar() {
+  let crudo = null;
+  try { crudo = localStorage.getItem(CLAVE); } catch { sinGuardar = true; }
+  if (crudo) { try { const d = JSON.parse(crudo); if (d && Array.isArray(d.clientes) && d.clientes.length) return d; } catch { /* dañado: se parte de nuevo */ } }
+  return semilla();
+}
+function guardar() {
+  try { localStorage.setItem(CLAVE, JSON.stringify(db)); sinGuardar = false; } catch { sinGuardar = true; }
+  $('guardado').textContent = sinGuardar ? 'No se puede guardar en este navegador' : 'Guardado en este navegador';
+}
+const cli = () => db.clientes.find((c) => c.id === db.actual) || db.clientes[0];
+function descargar(nombre, contenido, tipo = 'application/json') {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([contenido], { type: tipo }));
+  a.download = nombre; document.body.appendChild(a); a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+}
+
+/* ───────── Estado de la pantalla ───────── */
+let modo = 'mlv', ruta = 'panel', fichaId = null, filtroTit = '', fiscConsulta = '', fiscExp = null, simulacion = null;
+let T = null; // flujo del formulario del titular
+
+/* ───────── Pintado general ───────── */
+function render() {
+  document.querySelectorAll('[data-modo]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.modo === modo)));
+  const enTitular = modo === 'titular';
+  $('app').hidden = enTitular; $('titular').hidden = !enTitular; $('demoAviso').hidden = enTitular;
+  if (enTitular) { pintarTitular(); return; }
+  const c = cli(), r = resumen(c);
+  const tabs = modo === 'fiscal'
+    ? [['fiscal', 'Panel del fiscalizador']]
+    : [['panel', 'Panel'], ['rat', 'Inventario (RAT)', r.rojos.length ? ['rojo', r.rojos.length] : r.ambar.length ? ['ambar', r.ambar.length] : null], ['formularios', 'Formularios y política'], ['titulares', 'Titulares', r.reconf.length ? ['ambar', r.reconf.length] : null], ['bitacora', 'Registro probatorio'], ['como', 'Cómo funciona']];
+  if (modo === 'fiscal') ruta = 'fiscal'; else if (ruta === 'fiscal') ruta = 'panel';
+  $('vistas').innerHTML = tabs.map(([k, e, n]) => `<button type="button" data-ruta="${k}" ${k === ruta ? 'aria-current="page"' : ''}>${e}${n ? `<span class="cuenta-p ${n[0]}">${n[1]}</span>` : ''}</button>`).join('');
+  const vistas = { panel: vPanel, rat: vRat, formularios: vFormularios, titulares: vTitulares, bitacora: vBitacora, como: vComo, fiscal: vFiscal };
+  $('main').innerHTML = (vistas[ruta] || vPanel)(c, r);
+  guardar();
+}
+
+const chip = (nivel, eti) => `<span class="chip ${nivel}">${esc(eti)}</span>`;
+const chipEstado = (e) => (e === 'otorgado' ? chip('verde', 'Vigente') : e === 'revocado' ? chip('rojo', 'Revocado') : e === 'rechazado' ? chip('gris', 'No autorizó') : chip('gris', 'Sin respuesta'));
+const selloCli = (c, tam = 38) => `<span class="sello" style="background:${esc(c.color)};width:${tam}px;height:${tam}px">${esc(c.sigla)}</span>`;
+
+/* ───── Panel ───── */
+function vPanel(c, r) {
+  const cartera = db.clientes.map((k) => { const s = resumen(k); return `<button type="button" class="cli" data-cli="${k.id}" aria-pressed="${k.id === c.id}">
+    <div class="top">${selloCli(k)}<div><b>${esc(k.nombre)}</b><span class="mini">${esc(k.rubro)}</span></div></div>
+    <div class="cifras"><span><b>${s.vig}</b> vigentes</span><span><b>${s.rev}</b> revocados</span><span>Política <b>v${esc(polVigente(k).version)}</b></span>
+    ${s.roto ? chip('rojo', 'Registro alterado') : chip('verde', 'Registro íntegro')}${s.rojos.length ? ' ' + chip('rojo', s.rojos.length + ' alerta') : ''}</div></button>`; }).join('');
+  const recientes = c.eventos.slice(-6).reverse().map((e) => `<li class="${e.tipo === 'revocacion' ? 'revoca' : e.tipo === 'acceso' ? 'acceso' : ''}"><div class="cuando">${fFechaHora(e.fecha)} · N° ${e.n}</div>${describir(c, e)}</li>`).join('');
+  const alertas = [
+    ...r.rojos.map(({ t, ev }) => `<div class="alerta rojo"><b>${esc(t.id)} · ${esc(t.nombre)}:</b> ${esc(ev.r[0])} <button class="btn-txt" data-ruta="rat">Ver en el inventario</button></div>`),
+    ...r.ambar.map(({ t, ev }) => `<div class="alerta ambar"><b>${esc(t.id)} · ${esc(t.nombre)}:</b> ${esc(ev.r[0])}</div>`),
+    r.reconf.length ? `<div class="alerta ambar"><b>${r.reconf.length} titulares</b> respondieron antes de que su formulario agregara una finalidad: hay que pedirles esa autorización aparte (lo ya autorizado sigue vigente). <button class="btn-txt" data-ruta="titulares">Ver quiénes</button></div>` : '',
+    r.roto ? `<div class="alerta rojo"><b>El registro probatorio fue alterado</b> desde la anotación N° ${r.roto}.</div>` : '',
+  ].join('');
+  return `<div class="sec-cab"><div><h1>Panel de MLV</h1><p>Cada cliente tiene su inventario, su política con versiones, sus formularios y un registro de consentimientos que no se puede alterar sin que se note. Elige un cliente:</p></div>
+    <button class="btn" data-acc="reiniciar">Volver a los datos de ejemplo</button></div>
+  <div class="cartera">${cartera}</div>
+  <div class="resumen">
+    <div class="kpi oscuro"><div class="eti">${esc(c.nombre)}</div><div class="num">${r.tits}</div><div class="det">titulares con respuesta registrada</div></div>
+    <div class="kpi"><div class="eti">Consentimientos vigentes</div><div class="num">${r.vig}</div><div class="det">por finalidad</div></div>
+    <div class="kpi"><div class="eti">Revocados</div><div class="num">${r.rev}</div><div class="det">${r.rech} finalidades no autorizadas</div></div>
+    <div class="kpi"><div class="eti">Finalidad nueva sin responder</div><div class="num">${r.reconf.length}</div><div class="det">titulares por consultar</div></div>
+    <div class="kpi"><div class="eti">Registro probatorio</div><div class="num">${c.eventos.length}</div><div class="det">${r.roto ? '<b style="color:var(--rojo)">alterado</b>' : 'anotaciones, íntegro'}</div></div>
+  </div>
+  <div class="dos">
+    <div class="caja"><h2>Alertas</h2>${alertas || '<p class="nota">Sin alertas.</p>'}</div>
+    <div class="caja"><h2>Últimos movimientos</h2><ul class="tiempo">${recientes}</ul><button class="btn-txt" data-ruta="bitacora">Ver el registro completo</button></div>
+  </div>
+  <div class="caja" style="margin-top:16px"><h2>Para la demostración</h2>
+    <ol style="margin:0;padding-left:20px;line-height:1.7">
+      <li><b>Inventario (RAT):</b> el semáforo dice en qué tratamientos corresponde pedir consentimiento y en cuáles no (T-07: salud mental de trabajadores).</li>
+      <li><b>Trabajador o titular</b> (arriba a la derecha): llenar el formulario con la marca del cliente, leer la política y elegir finalidades; recibir el comprobante y revocar con el mismo código.</li>
+      <li><b>Registro probatorio:</b> verificar la cadena y «Simular una alteración» para ver cómo se detecta.</li>
+      <li><b>Fiscalizador:</b> el panel de solo lectura que se entrega a la Agencia, con el expediente por titular.</li>
+    </ol></div>`;
+}
+
+function describir(c, e) {
+  const tit = c.titulares.find((t) => t.id === e.titular);
+  const quien = tit ? `<b>${esc(tit.nombre)}</b> (${esc(tit.id)})` : '';
+  const nom = (id) => esc((c.rat.find((t) => t.id === id) || {}).nombre || id);
+  switch (e.tipo) {
+    case 'consentimiento': {
+      const si = Object.entries(e.det.finalidades).filter(([, v]) => v).map(([k]) => k), no = Object.entries(e.det.finalidades).filter(([, v]) => !v).map(([k]) => k);
+      return `${quien} respondió el formulario «${esc(e.det.formulario.nombre)}» v${e.det.formulario.version} con la política v${esc(e.det.politica.version)}. Autorizó: ${si.length ? si.map(nom).join(', ') : 'ninguna'}${no.length ? `. No autorizó: ${no.map(nom).join(', ')}` : ''}.`;
+    }
+    case 'revocacion': return `${quien} revocó: ${e.det.finalidades.map(nom).join(', ')}. Canal: ${esc(e.det.canal)}.`;
+    case 'politica': return `Se publicó la política de privacidad <b>v${esc(e.det.version)}</b> (huella ${corta(e.det.hash)}).`;
+    case 'formulario': return `Se publicó el formulario «${esc(e.det.nombre)}» v${e.det.version} con: ${e.det.finalidades.map(nom).join(', ')}.`;
+    case 'rat': return `Inventario: ${esc(e.det.accion)}${e.det.id ? ` ${esc(e.det.id)} «${esc(e.det.nombre)}» (${esc(BASE_CORTA[e.det.base] || '')})` : ''}${e.det.cantidad ? ` (${e.det.cantidad} tratamientos)` : ''}.`;
+    case 'acceso': return `${esc(e.det.quien)}: ${esc(e.det.accion)}.`;
+    default: return esc(e.tipo);
+  }
+}
+
+/* ───── Inventario (RAT) ───── */
+function vRat(c) {
+  const enForm = (id) => c.formularios.filter((f) => f.finalidades.includes(id)).map((f) => f.nombre);
+  const filas = c.rat.map((t) => { const ev = evaluar(t), fs = enForm(t.id); return `<tr class="clic" data-trat="${esc(t.id)}">
+    <td class="cab" data-et="Tratamiento"><b>${esc(t.id)} · ${esc(t.nombre)}</b><span class="mini">${esc(t.area)} · ${esc(TITULARES[t.titulares] || t.titulares)}${t.laboral ? ' · relación laboral' : ''}</span></td>
+    <td data-et="Datos">${esc(t.datos)}${t.sensibilidad !== 'no' ? `<span class="mini" style="color:var(--ambar)">${esc(SENS[t.sensibilidad])}</span>` : ''}</td>
+    <td data-et="Base">${esc(BASE_CORTA[t.base])}</td>
+    <td data-et="¿Consentimiento?">${chip(ev.nivel, ev.eti)}<ul class="razones">${ev.r.map((x) => `<li>${esc(x)}</li>`).join('')}</ul></td>
+    <td data-et="ID consentimiento">${fs.length ? `<span class="mono">C-${esc(t.id)}</span><span class="mini">${fs.map(esc).join(', ')}</span>` : '—'}</td></tr>`; }).join('');
+  return `<div class="sec-cab"><div><h1>Inventario y RAT</h1><p>Es el registro de actividades de tratamiento. Cada tratamiento dice su base de licitud; el formulario solo ofrece los que tienen el consentimiento como base y luz verde. La columna «ID consentimiento» es el enlace con el registro (equivale al campo «ID Consentimiento asociado» de la planilla RAT).</p></div>
+    <div class="fila-btn"><button class="btn primario" data-acc="nuevoTrat">Agregar tratamiento</button><button class="btn" data-acc="csvPlantilla">Exportar a Excel (CSV)</button><label class="btn">Importar CSV<input type="file" accept=".csv,text/csv" id="csvImport" hidden></label></div></div>
+  <div class="tabla-env"><table class="tabla resp"><thead><tr><th>Tratamiento</th><th>Datos</th><th>Base</th><th>¿Pedir consentimiento?</th><th>ID consentimiento</th></tr></thead><tbody>${filas}</tbody></table></div>
+  <p class="nota">Haz clic en un tratamiento para editarlo. El semáforo es una ayuda para el abogado, no reemplaza su análisis. Cada cambio queda anotado en el registro probatorio.</p>`;
+}
+
+function editarTrat(id) {
+  const c = cli(), t = c.rat.find((x) => x.id === id) || { id: 'T-' + String(c.rat.length + 1).padStart(2, '0'), nombre: '', area: '', titulares: 'trabajadores', datos: '', sensibilidad: 'no', finalidad: '', base: 'consentimiento', fundamento: '', laboral: true, necesarioLey: false, necesarioContrato: false, conservacion: '', destinatarios: '', transferencia: '', sistema: '' };
+  const nuevo = !c.rat.includes(t);
+  const sel = (n, obj, v) => `<select name="${n}">${Object.entries(obj).map(([k, e]) => `<option value="${k}" ${k === v ? 'selected' : ''}>${esc(e)}</option>`).join('')}</select>`;
+  const inp = (n, e, v, ph = '') => `<label class="campo"><span>${e}</span><input name="${n}" value="${esc(v)}" placeholder="${esc(ph)}"></label>`;
+  abrirDialogo(nuevo ? 'Nuevo tratamiento' : `${t.id} · ${t.nombre}`, `
+    <div class="rejilla">${inp('nombre', 'Actividad de tratamiento', t.nombre)}${inp('area', 'Área', t.area)}
+      <label class="campo"><span>De quiénes</span>${sel('titulares', TITULARES, t.titulares)}</label>
+      <label class="campo"><span>Tipo de datos</span>${sel('sensibilidad', SENS, t.sensibilidad)}</label></div>
+    <div style="margin-top:12px">${inp('datos', 'Datos que se tratan', t.datos)}</div>
+    <div style="margin-top:12px">${inp('finalidad', 'Finalidad (así la leerá el titular)', t.finalidad)}</div>
+    <div class="rejilla" style="margin-top:12px"><label class="campo" style="grid-column:1/-1"><span>Base de licitud</span>${sel('base', BASES, t.base)}</label>
+      ${inp('fundamento', 'Fundamento o interés legítimo', t.fundamento)}${inp('conservacion', 'Conservación', t.conservacion)}${inp('destinatarios', 'Destinatarios', t.destinatarios)}${inp('transferencia', 'Transferencia internacional', t.transferencia)}${inp('sistema', 'Sistema o herramienta', t.sistema)}</div>
+    <div style="display:grid;gap:8px;margin-top:14px">
+      <label class="marca"><input type="checkbox" name="laboral" ${t.laboral ? 'checked' : ''}> Ocurre en el marco de una relación laboral</label>
+      <label class="marca"><input type="checkbox" name="necesarioLey" ${t.necesarioLey ? 'checked' : ''}> Una ley lo exige</label>
+      <label class="marca"><input type="checkbox" name="necesarioContrato" ${t.necesarioContrato ? 'checked' : ''}> Es necesario para cumplir el contrato</label>
+      <label class="marca"><input type="checkbox" name="automatizada" ${t.automatizada ? 'checked' : ''}> Incluye decisiones automatizadas o elaboración de perfiles (se informa en la política, art. 14 ter letra l)</label></div>
+    <div id="evalVivo" style="margin-top:14px"></div>`,
+  [['cancelar', 'Cancelar'], ['ok', nuevo ? 'Agregar' : 'Guardar cambios', 'primario']], (f) => {
+    const v = leerForm(f);
+    if (!v.nombre.trim()) return false;
+    Object.assign(t, v);
+    if (nuevo) c.rat.push(t);
+    registrar(c, 'rat', { accion: nuevo ? 'Alta de tratamiento' : 'Cambio de tratamiento', id: t.id, nombre: t.nombre, base: t.base });
+    render();
+  });
+  const vivo = () => { const v = { ...t, ...leerForm($('dlgForm')) }, ev = evaluar(v); $('evalVivo').innerHTML = `<div class="alerta ${ev.nivel === 'gris' ? 'verde' : ev.nivel}"><b>${esc(ev.eti)}.</b> ${ev.r.map(esc).join(' ')}</div>`; };
+  $('dlgForm').oninput = vivo; vivo();
+}
+function leerForm(f) {
+  const o = {};
+  for (const el of f.elements) { if (!el.name) continue; o[el.name] = el.type === 'checkbox' ? el.checked : el.value; }
+  return o;
+}
+
+/* CSV compatible con Excel (punto y coma, con BOM). */
+const COLS = [['id', 'ID'], ['nombre', 'Actividad de tratamiento'], ['area', 'Área'], ['titulares', 'Categoría de titulares'], ['datos', 'Categorías de datos'], ['sensibilidad', 'Datos sensibles'], ['finalidad', 'Finalidad'], ['base', 'Base de licitud'], ['fundamento', 'Fundamento'], ['conservacion', 'Plazo de conservación'], ['destinatarios', 'Destinatarios'], ['transferencia', 'Transferencia internacional'], ['sistema', 'Sistema'], ['laboral', 'Relación laboral'], ['automatizada', 'Decisiones automatizadas'], ['consId', 'ID Consentimiento asociado']];
+function exportarCsv() {
+  const c = cli(), q = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
+  const filas = c.rat.map((t) => COLS.map(([k]) => q(k === 'titulares' ? TITULARES[t.titulares] : k === 'sensibilidad' ? SENS[t.sensibilidad] : k === 'base' ? BASES[t.base] : k === 'laboral' ? (t.laboral ? 'Sí' : 'No') : k === 'automatizada' ? (t.automatizada ? 'Sí' : 'No') : k === 'consId' ? (t.base === 'consentimiento' ? 'C-' + t.id : '') : t[k])).join(';'));
+  descargar(`RAT-${c.sigla}.csv`, '﻿' + [COLS.map(([, e]) => q(e)).join(';'), ...filas].join('\r\n'), 'text/csv');
+}
+function parseCsv(txt) {
+  txt = txt.replace(/^﻿/, '');
+  const sep = (txt.split('\n')[0].match(/;/g) || []).length >= (txt.split('\n')[0].match(/,/g) || []).length ? ';' : ',';
+  const filas = []; let f = [], cel = '', com = false;
+  for (let i = 0; i < txt.length; i++) {
+    const ch = txt[i];
+    if (com) { if (ch === '"' && txt[i + 1] === '"') { cel += '"'; i++; } else if (ch === '"') com = false; else cel += ch; }
+    else if (ch === '"') com = true; else if (ch === sep) { f.push(cel); cel = ''; } else if (ch === '\n') { f.push(cel.replace(/\r$/, '')); filas.push(f); f = []; cel = ''; } else cel += ch;
+  }
+  if (cel || f.length) { f.push(cel); filas.push(f); }
+  return filas.filter((r) => r.some((x) => x.trim()));
+}
+const norm = (s) => String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').trim();
+function importarCsv(txt) {
+  const c = cli(), filas = parseCsv(txt); if (filas.length < 2) return alert('El archivo no tiene filas.');
+  const cab = filas[0].map(norm);
+  const col = (...pal) => cab.findIndex((h) => pal.some((p) => h.includes(p)));
+  const ix = { id: col('id'), nombre: col('actividad', 'tratamiento', 'nombre'), area: col('area'), titulares: col('titular'), datos: col('categorias de datos', 'datos'), sensibilidad: col('sensib'), finalidad: col('finalidad'), base: col('base', 'licitud'), fundamento: col('fundamento'), conservacion: col('conservacion', 'plazo'), destinatarios: col('destinatario'), transferencia: col('transferencia'), sistema: col('sistema'), laboral: col('laboral'), automatizada: col('automat', 'perfil') };
+  if (ix.id === cab.findIndex((h) => h.includes('consentimiento'))) ix.id = cab.findIndex((h) => h === 'id');
+  const baseDe = (v) => { v = norm(v); return v.includes('consent') ? 'consentimiento' : v.includes('contrat') ? 'contrato' : v.includes('interes') ? 'interes' : v.includes('defensa') || v.includes('tribunal') ? 'defensa' : v.includes('medicina') ? 'medicina_laboral' : 'ley'; };
+  const sensDe = (v) => { v = norm(v); return v.includes('salud') ? 'salud' : v.includes('biometr') ? 'biometrico' : v.includes('adolesc') ? 'adolescentes' : v.includes('nin') || v.includes('menor') ? 'ninos' : v && !['no', 'no sensibles'].includes(v) ? 'sensible' : 'no'; };
+  const titDe = (v) => Object.keys(TITULARES).find((k) => norm(v).includes(k.slice(0, 6))) || 'trabajadores';
+  let n = 0;
+  for (const r of filas.slice(1)) {
+    const g = (k) => (ix[k] >= 0 ? (r[ix[k]] || '').trim() : '');
+    if (!g('nombre')) continue;
+    const id = g('id') || 'T-' + String(c.rat.length + 1).padStart(2, '0');
+    const t = { id, nombre: g('nombre'), area: g('area'), titulares: titDe(g('titulares')), datos: g('datos'), sensibilidad: sensDe(g('sensibilidad')), finalidad: g('finalidad'), base: baseDe(g('base')), fundamento: g('fundamento'), conservacion: g('conservacion'), destinatarios: g('destinatarios'), transferencia: g('transferencia'), sistema: g('sistema'), laboral: ix.laboral < 0 ? true : norm(g('laboral')).startsWith('s'), automatizada: norm(g('automatizada')).startsWith('s'), necesarioLey: false, necesarioContrato: false };
+    const i = c.rat.findIndex((x) => x.id === id); if (i >= 0) c.rat[i] = { ...c.rat[i], ...t }; else c.rat.push(t);
+    n++;
+  }
+  registrar(c, 'rat', { accion: 'Importación desde planilla', cantidad: n });
+  render();
+}
+
+/* ───── Formularios y política ───── */
+function vFormularios(c) {
+  const pol = polVigente(c);
+  const aptos = c.rat.filter((t) => t.base === 'consentimiento');
+  const forms = c.formularios.map((f) => `<div class="caja"><div class="sec-cab" style="margin:0 0 8px"><div><h3 style="margin:0">${esc(f.nombre)} <span class="chip azul">v${f.version}</span></h3><span class="mini">Para: ${esc(TITULARES[f.publico] || f.publico)}</span></div>
+      <button class="btn primario chico" data-abrir-form="${esc(f.id)}">Abrir como lo ve el titular</button></div>
+    <p style="margin:0 0 8px"><b>${esc(f.titulo)}</b><br><span class="nota">${esc(f.intro)}</span></p>
+    <div style="display:grid;gap:7px">${aptos.map((t) => { const ev = evaluar(t), bloq = ev.nivel === 'rojo'; return `<label class="marca"><input type="checkbox" data-fin="${esc(f.id)}|${esc(t.id)}" ${f.finalidades.includes(t.id) ? 'checked' : ''} ${bloq ? 'disabled' : ''}><span>${esc(t.id)} · ${esc(t.nombre)} ${chip(ev.nivel, ev.eti)}<small>${bloq ? esc(ev.r[0]) : esc(t.finalidad)}</small></span></label>`; }).join('')}</div>
+    <p class="nota" style="margin:10px 0 0">Solo aparecen los tratamientos del inventario cuya base es el consentimiento. Al agregar una finalidad se publica una nueva versión del formulario y a los titulares anteriores hay que pedirles esa autorización aparte.</p></div>`).join('');
+  return `<div class="sec-cab"><div><h1>Formularios y política</h1><p>Cada cliente tiene su marca, su política de privacidad con fecha y versión (art. 14 ter letra a) y uno o más formularios. Cada versión se guarda con su huella: se puede probar qué texto exacto vio cada persona.</p></div></div>
+  <div class="dos"><div>${forms}</div>
+  <div><div class="caja"><h2>Marca del cliente</h2><div class="rejilla">
+      <label class="campo"><span>Nombre</span><input data-marca="nombre" value="${esc(c.nombre)}"></label>
+      <label class="campo"><span>Sigla</span><input data-marca="sigla" value="${esc(c.sigla)}" maxlength="3"></label>
+      <label class="campo"><span>Color</span><input type="color" data-marca="color" value="${esc(c.color)}" style="height:38px;padding:3px"></label>
+      <label class="campo"><span>Correo para derechos</span><input data-marca="correo" value="${esc(c.correo)}"></label>
+      <label class="campo"><span>RUT</span><input data-marca="rut" value="${esc(c.rut)}"></label>
+      <label class="campo"><span>Representante legal</span><input data-marca="representante" value="${esc(c.representante)}"></label>
+      <label class="campo" style="grid-column:1/-1"><span>Domicilio</span><input data-marca="domicilio" value="${esc(c.domicilio)}"></label>
+      <label class="campo" style="grid-column:1/-1"><span>Medidas de seguridad reales (se publican en la política, art. 14 ter letra e)</span><textarea data-marca="seguridad">${esc(c.seguridad || '')}</textarea></label></div>
+      <p class="nota">Los cambios en estos datos entran a la política al publicar la siguiente versión.</p></div>
+    <div class="caja"><h2>Política de privacidad</h2>
+      <p style="margin:0 0 8px">Vigente: <b>v${esc(pol.version)}</b> desde ${fFecha(pol.fecha)} · <span class="huella">huella ${corta(pol.hash)}</span></p>
+      <table class="tabla"><thead><tr><th>Versión</th><th>Publicada</th><th>Huella SHA-256</th></tr></thead><tbody>${c.politicas.slice().reverse().map((p) => `<tr><td>v${esc(p.version)}</td><td>${fFechaHora(p.fecha)}</td><td class="huella">${esc(p.hash)}</td></tr>`).join('')}</tbody></table>
+      <div class="fila-btn" style="margin-top:12px"><button class="btn" data-acc="nuevaPol">Publicar nueva versión</button><button class="btn-txt" data-acc="verPol">Ver el texto vigente</button></div>
+      <p class="nota">El borrador se arma desde el inventario con los puntos del art. 14 ter; MLV lo revisa antes de publicarlo.</p></div></div></div>`;
+}
+function nuevaPolitica() {
+  const c = cli(), pol = polVigente(c);
+  const sig = (() => { const [a, b] = pol.version.split('.').map(Number); return `${a}.${(b || 0) + 1}`; })();
+  abrirDialogo(`Publicar política v${sig}`, `<p class="nota">Borrador generado desde el inventario actual. Revísalo y ajústalo.</p><label class="campo"><span>Versión</span><input name="version" value="${sig}"></label><label class="campo" style="margin-top:10px"><span>Texto</span><textarea name="texto" style="min-height:340px;font-size:13px">${esc(textoPolitica(c))}</textarea></label>`,
+    [['cancelar', 'Cancelar'], ['ok', 'Publicar', 'primario']], (f) => { const v = leerForm(f); if (!v.version.trim() || c.politicas.some((p) => p.version === v.version.trim())) { alert('Esa versión ya existe.'); return false; } publicarPolitica(c, v.version.trim(), v.texto); render(); });
+}
+function verPolitica(c, p = polVigente(c)) {
+  abrirDialogo(`Política v${p.version} · ${c.nombre}`, `<p class="huella">SHA-256: ${esc(p.hash)}</p><div class="pol-caja" style="height:auto;max-height:60vh">${polHtml(p.texto)}</div>`, [['ok', 'Cerrar', 'primario']]);
+}
+const polHtml = (txt) => txt.split('\n').map((l) => (l.startsWith('## ') ? `<h4>${esc(l.slice(3))}</h4>` : l.trim() ? `<p>${esc(l)}</p>` : '')).join('');
+
+/* ───── Titulares ───── */
+function vTitulares(c) {
+  if (fichaId) return vFicha(c, c.titulares.find((t) => t.id === fichaId));
+  const fins = [...new Set(c.formularios.flatMap((f) => f.finalidades))];
+  const lista = c.titulares.filter((t) => !filtroTit || norm(t.nombre + ' ' + t.rut + ' ' + t.id).includes(norm(filtroTit)));
+  const filas = lista.map((t) => { const m = estados(c, t.id), rc = porReconfirmar(c, t), u = ultimoConsent(c, t.id); return `<tr class="clic" data-ficha="${esc(t.id)}">
+    <td class="cab" data-et="Titular"><b>${esc(t.nombre)}</b><span class="mini">${esc(t.rut)} · ${esc(TITULARES[t.relacion] || '')} · ${esc(t.id)}</span></td>
+    ${fins.map((id) => `<td data-et="${esc(id)}">${m[id] ? chipEstado(m[id].estado) : chip('gris', '—')}</td>`).join('')}
+    <td data-et="Última respuesta">${u ? fFecha(u.fecha) + `<span class="mini">política v${esc(u.det.politica.version)}</span>` : '—'}${rc ? ' ' + chip('ambar', 'Finalidad nueva') : ''}</td></tr>`; }).join('');
+  return `<div class="sec-cab"><div><h1>Titulares</h1><p>Estado de cada finalidad por persona. Haz clic en una persona para ver su historial completo, anotar una revocación recibida por otro medio o imprimir su expediente.</p></div>
+    <input type="search" id="buscarTit" placeholder="Buscar por nombre o RUT" value="${esc(filtroTit)}" style="min-width:260px"></div>
+  <div class="tabla-env"><table class="tabla resp"><thead><tr><th>Titular</th>${fins.map((id) => `<th title="${esc((c.rat.find((t) => t.id === id) || {}).nombre)}">${esc(id)}</th>`).join('')}<th>Última respuesta</th></tr></thead><tbody>${filas || `<tr><td colspan="9"><div class="vacio">Sin resultados.</div></td></tr>`}</tbody></table></div>
+  <p class="nota">${fins.map((id) => `<b>${esc(id)}</b> ${esc((c.rat.find((t) => t.id === id) || {}).nombre)}`).join(' · ')}</p>`;
+}
+function vFicha(c, t) {
+  if (!t) { fichaId = null; return vTitulares(c); }
+  const m = estados(c, t.id), evs = c.eventos.filter((e) => e.titular === t.id), rc = porReconfirmar(c, t);
+  return `<button class="btn-txt" data-acc="volverTit">← Todos los titulares</button>
+  <div class="sec-cab" style="margin-top:8px"><div><h1>${esc(t.nombre)}</h1><p>${esc(t.rut)} · ${esc(TITULARES[t.relacion] || '')} · ${esc(t.correo)} · código de comprobante <span class="mono">${esc(t.codigo)}</span></p></div>
+    <div class="fila-btn"><button class="btn" data-acc="revocarOtro">Anotar revocación recibida por otro medio</button><button class="btn primario" data-expediente="${esc(t.id)}">Imprimir expediente</button></div></div>
+  ${rc ? `<div class="alerta ambar">El formulario agregó ${rc.faltan.map(esc).join(', ')} después de su respuesta (dada con la política v${esc(rc.version)}). Hay que pedirle esa autorización aparte; lo que ya autorizó sigue vigente.</div>` : ''}
+  <div class="dos"><div class="caja"><h2>Finalidades</h2><table class="tabla"><thead><tr><th>Finalidad</th><th>Estado</th><th>Desde</th></tr></thead><tbody>${Object.entries(m).map(([id, v]) => `<tr><td>${esc(id)} · ${esc((c.rat.find((x) => x.id === id) || {}).nombre)}</td><td>${chipEstado(v.estado)}</td><td>${fFechaHora((v.rev || v.ev).fecha)}</td></tr>`).join('')}</tbody></table></div>
+  <div class="caja"><h2>Historial</h2><ul class="tiempo">${evs.map((e) => `<li class="${e.tipo === 'revocacion' ? 'revoca' : ''}"><div class="cuando">${fFechaHora(e.fecha)} · anotación N° ${e.n}</div>${describir(c, e)}${e.tipo === 'consentimiento' ? `<div class="mini">Política ${e.det.lectura.alFinal ? 'leída hasta el final' : 'abierta, sin llegar al final'} · ${e.det.lectura.segundos} s en pantalla · ${esc(e.det.canal)}</div>` : ''}<div class="huella">${esc(e.hash)}</div></li>`).join('')}</ul></div></div>`;
+}
+
+/* ───── Registro probatorio ───── */
+function vBitacora(c, r) {
+  const eventos = simulacion ? simulacion.eventos : c.eventos;
+  const roto = simulacion ? verificar(eventos) : r.roto;
+  const filas = eventos.slice().reverse().map((e) => `<tr class="${roto && e.n >= roto ? 'mal' : ''}"><td data-et="N°">${e.n}</td><td data-et="Fecha">${fFechaHora(e.fecha)}</td><td data-et="Tipo">${esc(TIPOS[e.tipo] || e.tipo)}</td><td class="cab" data-et="Anotación">${describir(c, e)}</td><td data-et="Huella"><span class="huella" title="Anterior: ${esc(e.prev)}">${esc(e.hash.slice(0, 24))}…</span></td></tr>`).join('');
+  return `<div class="sec-cab"><div><h1>Registro probatorio</h1><p>Cada anotación lleva la huella SHA-256 de la anterior. Si alguien cambia, borra o intercala una anotación, la cadena se rompe desde ese punto y se nota. Sirve para cumplir el art. 12 inc. 8: «corresponde al responsable probar que contó con el consentimiento».</p></div>
+    <div class="fila-btn"><button class="btn" data-acc="verificar">Verificar la cadena</button><button class="btn" data-acc="${simulacion ? 'finSim' : 'simular'}">${simulacion ? 'Terminar la simulación' : 'Simular una alteración'}</button><button class="btn" data-acc="descCadena">Descargar el registro (JSON)</button></div></div>
+  ${simulacion ? `<div class="alerta rojo"><b>Simulación:</b> se cambió la anotación N° ${simulacion.n} (${esc(simulacion.que)}) sin tocar las huellas. La verificación falla desde la N° ${roto}. Nada de esto se guardó.</div>` : roto ? `<div class="alerta rojo">La cadena está rota desde la anotación N° ${roto}.</div>` : `<div class="alerta verde"><b>Cadena íntegra:</b> ${eventos.length} anotaciones verificadas. Huella de cierre: <span class="huella">${esc(eventos[eventos.length - 1].hash)}</span></div>`}
+  <div class="tabla-env"><table class="tabla resp"><thead><tr><th>N°</th><th>Fecha</th><th>Tipo</th><th>Anotación</th><th>Huella</th></tr></thead><tbody>${filas}</tbody></table></div>
+  <p class="nota">En la versión con servidor, la huella de cierre de cada día se sella con un tercero (sello de tiempo) para probar además que nada se reescribió completo después. Los nombres y RUT no van dentro de la cadena: se guarda su huella, así una persona puede pedir la supresión de sus datos sin romper la prueba.</p>`;
+}
+
+/* ───── Cómo funciona ───── */
+function vComo() {
+  return `<div class="sec-cab"><div><h1>Cómo funciona</h1><p>Una plataforma de MLV, con la marca de cada cliente, que se usa solo cuando el consentimiento es la base que corresponde.</p></div></div>
+  <div class="fisc-grid">
+    <div class="caja"><h3>1. Inventario (RAT)</h3><p>Cada tratamiento con su base de licitud. El semáforo avisa cuándo el consentimiento no es la base (ley, contrato, interés legítimo) o no sirve (salud de trabajadores, art. 16 bis inc. 3).</p></div>
+    <div class="caja"><h3>2. Política y formularios</h3><p>La política se arma desde el inventario y se publica con fecha, versión y huella. El formulario muestra una casilla por finalidad, sin marcar, con datos, plazo y destinatarios.</p></div>
+    <div class="caja"><h3>3. Registro probatorio</h3><p>Quién, cuándo, qué versión de la política vio, si la leyó hasta el final, qué autorizó y qué no, por qué canal; luego cada revocación. Todo encadenado con huellas.</p></div>
+    <div class="caja"><h3>4. Revocación</h3><p>Por el mismo medio, gratis y siempre disponible (art. 12 inc. 4 y 5): con el código del comprobante, o anotada por la empresa si llega por correo.</p></div>
+    <div class="caja"><h3>5. Panel del fiscalizador</h3><p>Acceso de solo lectura, con vencimiento, para la Agencia: política y versiones, inventario, integridad del registro, estadísticas y expediente por titular. Cada consulta queda anotada.</p></div>
+    <div class="caja"><h3>6. Relaciones laborales</h3><p>Autorizaciones aparte del contrato, voluntarias, con alternativa real (art. 12 inc. 6). Biometría con la información del art. 16 ter. Exámenes de salud fuera del formulario.</p></div>
+  </div>
+  <div class="caja"><h2>Qué es prototipo y qué falta para producción</h2><ul style="margin:0;padding-left:20px;line-height:1.7">
+    <li>Hoy todo vive en este navegador. En producción: servidor, cuentas por cliente con doble factor, copias de respaldo y contrato de encargo (art. 15 bis).</li>
+    <li>El formulario se publicará como enlace o código QR con la marca del cliente, y enviará el comprobante por correo.</li>
+    <li>El acceso del fiscalizador será un enlace temporal y personal, entregado por el cliente.</li>
+    <li>Sello de tiempo diario de la huella de cierre con un tercero.</li></ul></div>`;
+}
+
+/* ───── Panel del fiscalizador ───── */
+function vFiscal(c, r) {
+  const pol = polVigente(c), a = c.accesoFiscal;
+  const consents = c.eventos.filter((e) => e.tipo === 'consentimiento');
+  const leidas = consents.filter((e) => e.det.lectura.alFinal).length;
+  const prom = consents.length ? Math.round(consents.reduce((s, e) => s + e.det.lectura.segundos, 0) / consents.length) : 0;
+  const finIds = Object.keys(r.porFin);
+  const barras = finIds.map((id) => { const v = r.porFin[id], tot = v.otorgado + v.revocado + v.rechazado || 1; return `<div style="margin-bottom:11px"><div style="display:flex;justify-content:space-between;font-size:13.5px"><span>${esc(id)} · ${esc((c.rat.find((t) => t.id === id) || {}).nombre)}</span><span class="mini">${tot}</span></div>
+    <div class="barra"><i style="width:${v.otorgado / tot * 100}%;background:var(--verde)"></i><i style="width:${v.revocado / tot * 100}%;background:var(--rojo)"></i><i style="width:${v.rechazado / tot * 100}%;background:#b8b4aa"></i></div></div>`; }).join('');
+  const accesos = c.eventos.filter((e) => e.tipo === 'acceso').slice().reverse();
+  return `<div class="fisc-banda"><div><div class="mini">Acceso de solo lectura · ${esc(a.organismo)}</div><b style="font-size:18px">${esc(c.nombre)}</b><div class="mini">RUT ${esc(c.rut)} · ${esc(a.nombre)} · vigente del ${fFecha(a.desde)} al ${fFecha(a.hasta)}</div></div>
+    <div class="estado"><span class="semaforo ${r.roto ? 'mal' : ''}"></span><div><b>${r.roto ? 'Registro alterado desde N° ' + r.roto : 'Registro íntegro'}</b><div class="mini">${c.eventos.length} anotaciones encadenadas · verificado ${fFechaHora(ahora())}</div></div></div></div>
+  <div class="resumen">
+    <div class="kpi"><div class="eti">Titulares con respuesta</div><div class="num">${r.tits}</div></div>
+    <div class="kpi"><div class="eti">Consentimientos vigentes</div><div class="num">${r.vig}</div></div>
+    <div class="kpi"><div class="eti">Revocaciones</div><div class="num">${r.rev}</div></div>
+    <div class="kpi"><div class="eti">Política leída hasta el final</div><div class="num">${consents.length ? Math.round(leidas / consents.length * 100) : 0}<small>%</small></div><div class="det">${prom} s en pantalla, en promedio</div></div>
+    <div class="kpi"><div class="eti">Política vigente</div><div class="num">v${esc(pol.version)}</div><div class="det">desde ${fFecha(pol.fecha)}</div></div>
+  </div>
+  <div class="fisc-grid">
+    <div class="caja"><h3>Responsable (art. 14 ter b y c)</h3><dl class="dl"><dt>Razón social</dt><dd>${esc(c.nombre)}</dd><dt>RUT</dt><dd>${esc(c.rut)}</dd><dt>Representante</dt><dd>${esc(c.representante)}</dd><dt>Domicilio</dt><dd>${esc(c.domicilio)}</dd><dt>Canal de derechos</dt><dd>${esc(c.correo)}</dd></dl></div>
+    <div class="caja"><h3>Política de privacidad (art. 14 ter a)</h3><table class="tabla"><thead><tr><th>Versión</th><th>Desde</th><th>Huella</th></tr></thead><tbody>${c.politicas.slice().reverse().map((p) => `<tr><td><button class="btn-txt" data-verpol="${esc(p.version)}">v${esc(p.version)}</button></td><td>${fFecha(p.fecha)}</td><td class="huella">${corta(p.hash)}</td></tr>`).join('')}</tbody></table></div>
+    <div class="caja"><h3>Consentimientos por finalidad</h3>${barras || '<p class="nota">Sin datos.</p>'}<div class="leyenda"><span><i style="background:var(--verde)"></i>vigente</span><span><i style="background:var(--rojo)"></i>revocado</span><span><i style="background:#b8b4aa"></i>no autorizó</span></div></div>
+  </div>
+  <div class="caja"><h3>Tratamientos y bases de licitud (art. 14 ter d)</h3><div class="tabla-env"><table class="tabla resp"><thead><tr><th>Tratamiento</th><th>Titulares</th><th>Base</th><th>Conservación</th></tr></thead><tbody>${c.rat.map((t) => `<tr><td class="cab" data-et="Tratamiento">${esc(t.id)} · ${esc(t.nombre)}</td><td data-et="Titulares">${esc(TITULARES[t.titulares] || '')}</td><td data-et="Base">${esc(BASES[t.base])}</td><td data-et="Conservación">${esc(t.conservacion)}</td></tr>`).join('')}</tbody></table></div></div>
+  <div class="dos" style="margin-top:16px">
+    <div class="caja"><h3>Consulta por titular (art. 12 inc. 8)</h3><p class="nota" style="margin-top:0">Escriba el RUT de la persona para ver la prueba de su consentimiento.</p>
+      <div class="fila-btn"><input id="fiscRut" placeholder="12.345.678-5" value="${esc(fiscConsulta)}"><button class="btn primario" data-acc="fiscBuscar">Consultar</button></div>
+      <p class="nota">Para probar: ${c.titulares.slice(0, 3).map((t) => `<button class="btn-txt" data-rutdemo="${esc(t.rut)}">${esc(t.rut)}</button>`).join(' · ')}</p>
+      ${fiscExp ? expedienteHtml(c, fiscExp, true) : ''}</div>
+    <div class="caja"><h3>Integridad y descargas</h3><p>Cada anotación incluye la huella de la anterior; cualquier cambio rompe la cadena. El fiscalizador puede descargar el registro completo y verificarlo por su cuenta con cualquier programa SHA-256.</p>
+      <div class="fila-btn"><button class="btn" data-acc="descCadena">Descargar el registro (JSON)</button><button class="btn" data-acc="descVerificador">Instrucciones de verificación</button></div>
+      <h3 style="margin-top:18px">Accesos del fiscalizador</h3><ul class="tiempo">${accesos.map((e) => `<li class="acceso"><div class="cuando">${fFechaHora(e.fecha)}</div>${esc(e.det.accion)}</li>`).join('') || '<li class="acceso">Sin accesos anteriores.</li>'}</ul></div>
+  </div>`;
+}
+function expedienteHtml(c, t, enPantalla) {
+  const m = estados(c, t.id), evs = c.eventos.filter((e) => e.titular === t.id);
+  const ok = !verificar(c.eventos);
+  return `<div style="margin-top:14px"><h3>${esc(t.nombre)} · ${esc(t.rut)}</h3>
+    <table class="tabla"><thead><tr><th>Finalidad</th><th>Estado</th><th>Otorgado</th><th>Política</th><th>Revocado</th></tr></thead><tbody>${Object.entries(m).map(([id, v]) => `<tr><td>${esc(id)} · ${esc((c.rat.find((x) => x.id === id) || {}).nombre)}</td><td>${enPantalla ? chipEstado(v.estado) : esc(v.estado)}</td><td>${fFechaHora(v.ev.fecha)}</td><td>v${esc(v.version)}</td><td>${v.rev ? fFechaHora(v.rev.fecha) + ' · ' + esc(v.rev.det.canal) : '—'}</td></tr>`).join('')}</tbody></table>
+    <h3 style="margin-top:14px">Anotaciones</h3><table class="tabla"><thead><tr><th>N°</th><th>Fecha</th><th>Detalle</th></tr></thead><tbody>${evs.map((e) => `<tr><td>${e.n}</td><td>${fFechaHora(e.fecha)}</td><td>${describir(c, e)}${e.tipo === 'consentimiento' ? `<br><span class="mini">Política v${esc(e.det.politica.version)} (huella ${corta(e.det.politica.hash)}) · ${e.det.lectura.alFinal ? 'leída hasta el final' : 'abierta, sin llegar al final'} · ${e.det.lectura.segundos} s · declaró haberla leído: ${e.det.lectura.declarada ? 'sí' : 'no'} · canal: ${esc(e.det.canal)} · casillas sin marcar por defecto</span>` : ''}<br><span class="huella">anterior ${esc(e.prev)}<br>esta ${esc(e.hash)}</span></td></tr>`).join('')}</tbody></table>
+    <p class="nota">Cadena ${ok ? 'íntegra' : 'alterada'} al ${fFechaHora(ahora())}. Huella de identidad del titular: <span class="huella">${esc(identidadHash(t))}</span></p>
+    ${enPantalla ? `<button class="btn primario" data-expediente="${esc(t.id)}">Imprimir o guardar en PDF</button>` : ''}</div>`;
+}
+function imprimirExpediente(tid) {
+  const c = cli(), t = c.titulares.find((x) => x.id === tid);
+  $('imprimible').innerHTML = `<h1>Expediente de consentimiento</h1><p>${esc(c.nombre)} · RUT ${esc(c.rut)} · emitido el ${fFechaHora(ahora())} desde la plataforma de MLV Abogados (prototipo, datos ficticios).</p>${expedienteHtml(c, t, false)}`;
+  if (modo === 'fiscal') registrar(c, 'acceso', { quien: c.accesoFiscal.nombre, accion: `Imprimió el expediente de ${t.id}` });
+  window.print();
+  render();
+}
+
+/* ───── Diálogo genérico ───── */
+let alAceptar = null;
+function abrirDialogo(tit, cuerpo, botones, fn) {
+  $('dlgTit').textContent = tit; $('dlgCuerpo').innerHTML = cuerpo;
+  $('dlgPie').innerHTML = botones.map(([v, e, cls]) => `<button class="btn ${cls || ''}" value="${v}">${esc(e)}</button>`).join('');
+  $('dlgForm').oninput = null; alAceptar = fn || null; $('dlg').showModal();
+}
+$('dlg').addEventListener('close', () => { if ($('dlg').returnValue === 'ok' && alAceptar) alAceptar($('dlgForm')); alAceptar = null; });
+$('dlgForm').addEventListener('submit', (ev) => {
+  if (ev.submitter && ev.submitter.value === 'ok' && alAceptar && alAceptar($('dlgForm')) === false) { ev.preventDefault(); return; }
+  if (ev.submitter && ev.submitter.value === 'ok') { ev.preventDefault(); alAceptar = null; $('dlg').close(); }
+});
+
+/* ═════════ Vista del titular: el formulario con la marca del cliente ═════════ */
+function iniciarTitular(formId) {
+  const c = cli();
+  T = { formId: formId || (c.formularios[0] || {}).id, tab: 'dar', paso: 1, nombre: '', rut: '', correo: '', pol: { abierta: false, alFinal: false, ms: 0, t0: 0, declarada: false }, marcas: {}, hecho: null, rev: { rut: '', cod: '', tit: null, sel: {}, hecho: null, error: '' } };
+}
+function pintarTitular() {
+  const c = cli(); if (!T) iniciarTitular();
+  const f = c.formularios.find((x) => x.id === T.formId) || c.formularios[0];
+  const pol = polVigente(c);
+  const pasos = `<div class="t-pasos" aria-label="Paso ${T.paso} de 4">${[1, 2, 3, 4].map((i) => `<span class="${i <= T.paso ? 'hecho' : ''}"></span>`).join('')}</div>`;
+  let cuerpo = '';
+  if (T.tab === 'dar') {
+    if (T.paso === 1) cuerpo = `${pasos}<h2>${esc(f.titulo)}</h2><p class="lead">${esc(f.intro)}</p>
+      ${f.publico === 'trabajadores' ? `<div class="aviso-lab">Estas autorizaciones son <b>voluntarias</b> y no forman parte de su contrato. Negarse o retirarlas después <b>no tiene ninguna consecuencia</b> en su relación laboral.</div>` : ''}
+      <div style="display:grid;gap:12px"><label class="campo"><span>Nombre completo</span><input id="tNombre" value="${esc(T.nombre)}" autocomplete="off"></label>
+      <label class="campo"><span>RUT</span><input id="tRut" value="${esc(T.rut)}" placeholder="12.345.678-5" autocomplete="off"></label>
+      <label class="campo"><span>Correo para recibir el comprobante</span><input id="tCorreo" value="${esc(T.correo)}" type="email" autocomplete="off"></label></div>
+      <p class="nota" id="tErr" style="color:var(--rojo)"></p>
+      <div class="fila-btn"><button class="t-btn" data-t="paso2">Continuar</button><button class="t-btn sec" data-t="relleno">Rellenar con datos ficticios</button></div>`;
+    if (T.paso === 2) cuerpo = `${pasos}<h2>Política de privacidad</h2><p class="lead">Versión ${esc(pol.version)}, vigente desde el ${fFecha(pol.fecha)}. Léala antes de decidir.</p>
+      <div class="pol-caja" id="polCaja" tabindex="0">${polHtml(pol.texto)}</div>
+      <div class="pol-avance" id="polAvance">${T.pol.alFinal ? '✓ Llegó al final del texto.' : 'Desplácese para leer el texto completo.'}</div>
+      <label class="marca" style="margin-bottom:14px"><input type="checkbox" id="tDecl" ${T.pol.declarada ? 'checked' : ''}> Leí la política de privacidad, versión ${esc(pol.version)}.</label>
+      <div class="fila-btn"><button class="t-btn sec" data-t="paso1">Volver</button><button class="t-btn" data-t="paso3" ${T.pol.declarada ? '' : 'disabled'} id="tSig2">Continuar</button></div>`;
+    if (T.paso === 3) cuerpo = `${pasos}<h2>¿Qué autoriza?</h2><p class="lead">Marque solo lo que quiera autorizar. Cada casilla es independiente y puede retirarla cuando quiera.</p>
+      ${f.finalidades.map((id) => { const t = c.rat.find((x) => x.id === id); if (!t) return ''; const sel = !!T.marcas[id]; return `<div class="fin ${sel ? 'marcada' : ''}"><label class="marca"><input type="checkbox" data-tfin="${esc(id)}" ${sel ? 'checked' : ''}><span><b>${esc(t.nombre)}</b>${t.sensibilidad !== 'no' ? ` <span class="chip ambar">${t.sensibilidad === 'biometrico' ? 'Dato biométrico' : 'Dato sensible'}</span>` : ''}</span></label>
+        <div class="det"><div>${esc(t.finalidad)}.</div><div>Datos: ${esc(t.datos)}.</div>${t.sensibilidad === 'biometrico' ? `<div>Sistema: ${esc(t.sistema)}.</div>` : ''}<div>Se guardan: ${esc(t.conservacion)}.</div>${t.sensibilidad === 'biometrico' ? `<div>Sus derechos sobre estos datos (acceso, rectificación, supresión, oposición, portabilidad): escriba a ${esc(c.correo)}; puede retirar esta autorización aquí mismo, en «Retirar o cambiar».</div>` : ''}<div>Se comparten con: ${esc(t.destinatarios || 'nadie fuera de la empresa')}.</div>${t.transferencia ? `<div>Fuera de Chile: ${esc(t.transferencia)}.</div>` : ''}${t.laboral && t.id === 'T-03' ? '<div><b>Si no autoriza, seguirá marcando con su tarjeta.</b></div>' : ''}</div></div>`; }).join('')}
+      <div class="fila-btn" style="margin-top:6px"><button class="t-btn sec" data-t="paso2">Volver</button><button class="t-btn" data-t="enviar">Enviar mi respuesta</button></div>
+      <p class="nota">Si no marca ninguna casilla, quedará registrado que no autorizó ninguna finalidad.</p>`;
+    if (T.paso === 4 && T.hecho) {
+      const e = T.hecho, si = Object.entries(e.det.finalidades).filter(([, v]) => v).map(([k]) => k);
+      cuerpo = `${pasos}<h2>Respuesta registrada</h2><p class="lead">Le enviaremos este comprobante a ${esc(T.correo)}.</p>
+        <div class="comprobante"><div class="mini">Código de comprobante (guárdelo para retirar su autorización)</div><div class="codigo">${esc(e.det.comprobante)}</div>
+        <p style="margin:10px 0 4px">Fecha: <b>${fFechaHora(e.fecha)}</b> · Política v${esc(e.det.politica.version)}</p>
+        <p style="margin:0 0 4px">Autorizó: <b>${si.length ? si.map((id) => esc(c.rat.find((t) => t.id === id).nombre)).join(', ') : 'ninguna finalidad'}</b></p>
+        <div class="huella">Huella del registro: ${esc(e.hash)}</div></div>
+        <p class="nota">Puede retirar su autorización cuando quiera, gratis y por este mismo medio, en «Retirar o cambiar».</p>
+        <div class="fila-btn"><button class="t-btn sec" data-t="otra">Responder como otra persona</button><button class="t-btn" data-t="irRev">Retirar o cambiar</button></div>`;
+    }
+  } else {
+    const R = T.rev;
+    if (R.hecho) cuerpo = `<h2>Autorización retirada</h2><div class="comprobante"><p style="margin:0 0 4px">Fecha: <b>${fFechaHora(R.hecho.fecha)}</b></p><p style="margin:0 0 6px">Retiró: <b>${R.hecho.det.finalidades.map((id) => esc(c.rat.find((t) => t.id === id).nombre)).join(', ')}</b></p><div class="huella">Huella del registro: ${esc(R.hecho.hash)}</div></div><p class="nota">El retiro rige desde ahora y no afecta lo hecho antes (art. 12 inc. 4).</p><button class="t-btn sec" data-t="revNueva">Volver</button>`;
+    else if (R.tit) {
+      const m = estados(c, R.tit.id), vig = Object.entries(m).filter(([, v]) => v.estado === 'otorgado');
+      cuerpo = `<h2>Hola, ${esc(R.tit.nombre.split(' ')[0])}</h2><p class="lead">Estas son sus autorizaciones vigentes. Marque las que quiere retirar.</p>
+        ${vig.length ? vig.map(([id]) => `<div class="fin"><label class="marca"><input type="checkbox" data-trev="${esc(id)}" ${R.sel[id] ? 'checked' : ''}><span><b>${esc(c.rat.find((t) => t.id === id).nombre)}</b><small>Autorizada el ${fFecha(m[id].ev.fecha)}</small></span></label></div>`).join('') + `<div class="fila-btn"><button class="t-btn sec" data-t="revNueva">Cancelar</button><button class="t-btn" data-t="revocar">Retirar las marcadas</button></div>` : '<p>No tiene autorizaciones vigentes.</p><button class="t-btn sec" data-t="revNueva">Volver</button>'}`;
+    } else cuerpo = `<h2>Retirar o cambiar mi autorización</h2><p class="lead">Use su RUT y el código del comprobante que recibió al autorizar. Es gratis y no necesita explicar el motivo.</p>
+      <div style="display:grid;gap:12px"><label class="campo"><span>RUT</span><input id="rRut" value="${esc(R.rut)}" autocomplete="off"></label><label class="campo"><span>Código del comprobante</span><input id="rCod" value="${esc(R.cod)}" placeholder="ABCD-1234" autocomplete="off"></label></div>
+      <p class="nota" style="color:var(--rojo)">${esc(R.error)}</p>
+      <div class="fila-btn"><button class="t-btn" data-t="revBuscar">Continuar</button>${c.titulares[0] ? `<button class="t-btn sec" data-t="revDemo">Usar un titular de ejemplo</button>` : ''}</div>`;
+  }
+  $('titular').innerHTML = `<div class="titular-fondo" style="--marca:${esc(c.color)}">
+    <div class="barra-demo"><span>Así lo ve el trabajador o titular (desde un enlace o código QR).</span>
+      <label>Cliente <select id="tCli">${db.clientes.map((k) => `<option value="${k.id}" ${k.id === c.id ? 'selected' : ''}>${esc(k.nombre)}</option>`).join('')}</select></label>
+      <label>Formulario <select id="tForm">${c.formularios.map((x) => `<option value="${x.id}" ${x.id === f.id ? 'selected' : ''}>${esc(x.nombre)}</option>`).join('')}</select></label>
+      <button class="btn chico" data-modo="mlv">Volver al equipo MLV</button></div>
+    <div class="t-marco"><div class="t-cab">${selloCli(c, 46)}<div><b>${esc(c.nombre)}</b><span>Privacidad y autorizaciones</span></div></div>
+      <div class="t-cuerpo"><div class="t-tabs"><button data-t="tabDar" ${T.tab === 'dar' ? 'aria-current="page"' : ''}>Dar mi autorización</button><button data-t="tabRev" ${T.tab === 'rev' ? 'aria-current="page"' : ''}>Retirar o cambiar</button></div>${cuerpo}</div>
+      <div class="t-pie">Responsable: ${esc(c.nombre)} · ${esc(c.correo)} · <button class="btn-txt" data-t="verPolT">Política v${esc(pol.version)}</button><br>Plataforma de consentimientos de MLV Abogados · prototipo con datos ficticios</div></div></div>`;
+  if (T.paso === 2 && T.tab === 'dar') { T.pol.abierta = true; T.pol.t0 = Date.now(); revisarScroll(); }
+}
+function revisarScroll() {
+  const b = $('polCaja'); if (!b) return;
+  if (b.scrollTop + b.clientHeight >= b.scrollHeight - 8) { T.pol.alFinal = true; const a = $('polAvance'); if (a) a.textContent = '✓ Llegó al final del texto.'; }
+}
+const pararReloj = () => { if (T && T.pol.t0) { T.pol.ms += Date.now() - T.pol.t0; T.pol.t0 = 0; } };
+
+function accionTitular(k, el) {
+  const c = cli();
+  const leer1 = () => { if ($('tNombre')) { T.nombre = $('tNombre').value; T.rut = $('tRut').value; T.correo = $('tCorreo').value; } };
+  switch (k) {
+    case 'tabDar': T.tab = 'dar'; break;
+    case 'tabRev': pararReloj(); T.tab = 'rev'; break;
+    case 'relleno': { const n = NOMBRES[Math.floor(Math.random() * NOMBRES.length)].split(' '); const nom = `${['Daniela', 'Pablo', 'Carolina', 'Andrés', 'Paula', 'Rodrigo'][Math.floor(Math.random() * 6)]} ${n[1]} ${n[2]}`; T.nombre = nom; T.rut = fmtRut(10000000 + Math.floor(Math.random() * 12000000)); T.correo = norm(nom).split(' ').slice(0, 2).join('.') + '@correo.ejemplo'; break; }
+    case 'paso1': pararReloj(); T.paso = 1; break;
+    case 'paso2': {
+      if (T.paso === 1) { leer1(); const rut = limpiarRut(T.rut); const err = !T.nombre.trim() ? 'Escriba su nombre.' : !rut ? 'El RUT no es válido.' : !/^\S+@\S+\.\S+$/.test(T.correo) ? 'Revise el correo.' : ''; if (err) { $('tErr').textContent = err; return; } T.rut = rut; }
+      T.paso = 2; break;
+    }
+    case 'paso3': pararReloj(); T.paso = 3; break;
+    case 'enviar': {
+      const f = c.formularios.find((x) => x.id === T.formId);
+      let tit = c.titulares.find((t) => t.rut === T.rut);
+      if (!tit) tit = nuevoTitular(c, T.nombre.trim(), T.rut, f.publico); else { tit.nombre = T.nombre.trim(); tit.correo = T.correo; }
+      tit.correo = T.correo;
+      const marcas = {}; f.finalidades.forEach((id) => { marcas[id] = !!T.marcas[id]; });
+      T.hecho = otorgar(c, tit, f, marcas, { abierta: T.pol.abierta, alFinal: T.pol.alFinal, segundos: Math.round(T.pol.ms / 1000), declarada: T.pol.declarada }, ahora(), /Mobi/.test(navigator.userAgent) ? 'Formulario web (celular)' : 'Formulario web (computador)');
+      T.paso = 4; guardar(); break;
+    }
+    case 'otra': iniciarTitular(T.formId); break;
+    case 'irRev': T.tab = 'rev'; T.rev = { rut: T.rut, cod: T.hecho ? T.hecho.det.comprobante : '', tit: null, sel: {}, hecho: null, error: '' }; break;
+    case 'revDemo': { const t = c.titulares.find((x) => Object.values(estados(c, x.id)).some((v) => v.estado === 'otorgado')); if (t) { T.rev.rut = t.rut; T.rev.cod = t.codigo; } break; }
+    case 'revBuscar': {
+      T.rev.rut = $('rRut').value; T.rev.cod = $('rCod').value;
+      const rut = limpiarRut(T.rev.rut), t = c.titulares.find((x) => x.rut === rut);
+      if (!t || t.codigo !== T.rev.cod.trim().toUpperCase()) { T.rev.error = 'El RUT y el código no coinciden.'; break; }
+      T.rev.tit = t; T.rev.error = ''; T.rev.sel = {}; break;
+    }
+    case 'revocar': { const ids = Object.keys(T.rev.sel).filter((k2) => T.rev.sel[k2]); if (!ids.length) return; T.rev.hecho = revocar(c, T.rev.tit, ids, 'Formulario web (mismo medio)'); guardar(); break; }
+    case 'revNueva': T.rev = { rut: '', cod: '', tit: null, sel: {}, hecho: null, error: '' }; break;
+    case 'verPolT': verPolitica(c); return;
+    default: return;
+  }
+  pintarTitular();
+}
+
+/* ───────── Eventos ───────── */
+document.addEventListener('click', (ev) => {
+  const el = ev.target.closest('[data-modo],[data-ruta],[data-cli],[data-acc],[data-trat],[data-ficha],[data-expediente],[data-abrir-form],[data-t],[data-verpol],[data-rutdemo]');
+  if (!el) return;
+  const c = cli(), d = el.dataset;
+  if (d.modo) {
+    if (modo === 'titular') pararReloj();
+    modo = d.modo; simulacion = null;
+    if (modo === 'titular') iniciarTitular();
+    if (modo === 'fiscal') { fiscExp = null; fiscConsulta = ''; registrar(c, 'acceso', { quien: c.accesoFiscal.nombre, accion: 'Ingresó al panel (solo lectura)' }); }
+    history.replaceState(null, '', modo === 'mlv' ? location.pathname : '#' + modo);
+    render(); window.scrollTo(0, 0); return;
+  }
+  if (d.ruta) { ruta = d.ruta; fichaId = null; simulacion = null; render(); return; }
+  if (d.cli) { db.actual = d.cli; fichaId = null; render(); return; }
+  if (d.trat) { editarTrat(d.trat); return; }
+  if (d.ficha) { fichaId = d.ficha; render(); window.scrollTo(0, 0); return; }
+  if (d.expediente) { imprimirExpediente(d.expediente); return; }
+  if (d.abrirForm) { modo = 'titular'; iniciarTitular(d.abrirForm); render(); window.scrollTo(0, 0); return; }
+  if (d.t) { accionTitular(d.t, el); return; }
+  if (d.verpol) { verPolitica(c, c.politicas.find((p) => p.version === d.verpol)); return; }
+  if (d.rutdemo) { $('fiscRut').value = d.rutdemo; return; }
+  switch (d.acc) {
+    case 'reiniciar': if (confirm('¿Borrar los cambios y volver a los datos de ejemplo?')) { db = semilla(); fichaId = null; render(); } break;
+    case 'nuevoTrat': editarTrat(null); break;
+    case 'csvPlantilla': exportarCsv(); break;
+    case 'nuevaPol': nuevaPolitica(); break;
+    case 'verPol': verPolitica(c); break;
+    case 'volverTit': fichaId = null; render(); break;
+    case 'revocarOtro': {
+      const t = c.titulares.find((x) => x.id === fichaId), vig = Object.entries(estados(c, t.id)).filter(([, v]) => v.estado === 'otorgado');
+      if (!vig.length) { alert('No tiene autorizaciones vigentes.'); break; }
+      abrirDialogo('Anotar revocación', `<p class="nota">Para revocaciones que llegan por correo, carta o en persona. Queda en el registro con el canal indicado.</p><div style="display:grid;gap:8px">${vig.map(([id]) => `<label class="marca"><input type="checkbox" name="f_${esc(id)}"> ${esc(id)} · ${esc(c.rat.find((x) => x.id === id).nombre)}</label>`).join('')}</div><label class="campo" style="margin-top:12px"><span>Canal</span><select name="canal"><option>Correo electrónico (anotado por la empresa)</option><option>Carta (anotado por la empresa)</option><option>En persona (anotado por la empresa)</option></select></label>`,
+        [['cancelar', 'Cancelar'], ['ok', 'Anotar', 'primario']], (f) => { const v = leerForm(f); const ids = vig.map(([id]) => id).filter((id) => v['f_' + id]); if (!ids.length) return false; revocar(c, t, ids, v.canal); render(); });
+      break;
+    }
+    case 'verificar': { const n = verificar(c.eventos); alert(n ? `La cadena está rota desde la anotación N° ${n}.` : `Cadena íntegra: ${c.eventos.length} anotaciones verificadas.`); break; }
+    case 'simular': {
+      const copia = JSON.parse(JSON.stringify(c.eventos));
+      const obj = copia.find((e) => e.tipo === 'revocacion') || copia[Math.floor(copia.length / 2)];
+      if (obj.tipo === 'revocacion') { obj.fecha = obj.fecha.replace(/^2026-10/, '2026-11'); }
+      else obj.fecha = obj.fecha.replace(/:\d\d$/, ':00');
+      simulacion = { eventos: copia, n: obj.n, que: obj.tipo === 'revocacion' ? 'se corrió un mes la fecha de una revocación' : 'se cambió la hora' };
+      render(); break;
+    }
+    case 'finSim': simulacion = null; render(); break;
+    case 'descCadena': {
+      if (modo === 'fiscal') registrar(c, 'acceso', { quien: c.accesoFiscal.nombre, accion: 'Descargó el registro completo' });
+      descargar(`registro-${c.sigla}-${ahora().slice(0, 10)}.json`, JSON.stringify({ responsable: { nombre: c.nombre, rut: c.rut }, generado: ahora(), algoritmo: 'SHA-256 de prev|n|fecha|tipo|titular|JSON(det)', politicas: c.politicas.map(({ version, fecha, hash }) => ({ version, fecha, hash })), eventos: c.eventos }, null, 2));
+      render(); break;
+    }
+    case 'descVerificador': descargar('como-verificar.txt', `Cómo verificar el registro de consentimientos\n\n1. Abra el archivo JSON del registro.\n2. Para cada anotación, en orden, una con "|" estos campos: prev, n, fecha, tipo, titular (vacío si no hay) y det (como JSON compacto, sin espacios).\n3. Calcule el SHA-256 de ese texto (UTF-8). Debe ser igual a "hash".\n4. El "prev" de cada anotación debe ser igual al "hash" de la anterior. La primera usa 64 ceros.\n5. Si una sola anotación fue cambiada, borrada o intercalada, la verificación falla desde ahí.\n6. Cada política publicada tiene su huella: SHA-256 del texto completo.\n`, 'text/plain'); break;
+    case 'fiscBuscar': {
+      fiscConsulta = $('fiscRut').value; const rut = limpiarRut(fiscConsulta), t = c.titulares.find((x) => x.rut === rut);
+      fiscExp = t || null;
+      if (t) registrar(c, 'acceso', { quien: c.accesoFiscal.nombre, accion: `Consultó el expediente de ${t.id}` });
+      else alert(rut ? 'No hay registros para ese RUT.' : 'El RUT no es válido.');
+      render(); break;
+    }
+    default: break;
+  }
+});
+document.addEventListener('change', (ev) => {
+  const el = ev.target, c = cli();
+  if (el.id === 'csvImport' && el.files[0]) { const r = new FileReader(); r.onload = () => importarCsv(String(r.result)); r.readAsText(el.files[0]); return; }
+  if (el.dataset.fin) {
+    const [fid, tid] = el.dataset.fin.split('|'), f = c.formularios.find((x) => x.id === fid);
+    f.finalidades = el.checked ? [...f.finalidades, tid].sort() : f.finalidades.filter((x) => x !== tid);
+    f.version++;
+    registrar(c, 'formulario', { id: f.id, nombre: f.nombre, version: f.version, finalidades: f.finalidades });
+    render(); return;
+  }
+  if (el.dataset.marca) { c[el.dataset.marca] = el.value; render(); return; }
+  if (el.id === 'tCli') { db.actual = el.value; iniciarTitular(); render(); return; }
+  if (el.id === 'tForm') { iniciarTitular(el.value); render(); return; }
+  if (el.id === 'tDecl') { T.pol.declarada = el.checked; $('tSig2').disabled = !el.checked; return; }
+  if (el.dataset.tfin) { T.marcas[el.dataset.tfin] = el.checked; el.closest('.fin').classList.toggle('marcada', el.checked); return; }
+  if (el.dataset.trev) { T.rev.sel[el.dataset.trev] = el.checked; return; }
+});
+document.addEventListener('input', (ev) => { if (ev.target.id === 'buscarTit') { filtroTit = ev.target.value; const pos = ev.target.selectionStart; render(); const b = $('buscarTit'); b.focus(); b.setSelectionRange(pos, pos); } });
+document.addEventListener('scroll', (ev) => { if (ev.target.id === 'polCaja') revisarScroll(); }, true);
+
+db = cargar();
+// Enlaces directos para la demostración: #titular abre el formulario; #fiscal, el panel del fiscalizador.
+const inicial = location.hash.replace('#', '');
+if (inicial === 'titular') { modo = 'titular'; iniciarTitular(); } else if (inicial === 'fiscal') modo = 'fiscal';
+render();
+</script>
+</body>
+</html>
