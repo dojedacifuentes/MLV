@@ -98,6 +98,7 @@
   .caja + .caja { margin-top: 16px; }
   .dos { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 16px; align-items: start; }
   @media (max-width: 980px) { .dos { grid-template-columns: 1fr; } }
+  @media (min-width: 981px) { .dos.ancha { grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); } }
   .nota { font-size: 12.5px; color: var(--suave); }
   .franja { margin: 0 0 18px; background: var(--acento-claro); border: 1px solid var(--acento-borde); color: var(--acento-osc); border-radius: var(--radio-s); padding: 10px 14px; font-size: 14px; }
   .alerta { border-radius: var(--radio-s); padding: 10px 14px 10px 40px; font-size: 13.5px; border: 1px solid; margin: 0 0 10px; position: relative; }
@@ -338,7 +339,7 @@ const BASES = {
 const BASE_CORTA = { consentimiento: 'Consentimiento', ley: 'Ley', contrato: 'Contrato', interes: 'Interés legítimo', defensa: 'Defensa de derechos', laboral_sensible: 'Laboral (art. 16)', medicina_laboral: 'Medicina laboral' };
 const SENS = { no: 'No sensibles', sensible: 'Sensibles (art. 16)', salud: 'Salud o perfil biológico (art. 16 bis)', biometrico: 'Biométricos (art. 16 ter)', ninos: 'De niños y niñas menores de 14 (art. 16 quáter)', adolescentes: 'De adolescentes de 14 a 17 (art. 16 quáter)' };
 const TITULARES = { trabajadores: 'Trabajadores', postulantes: 'Postulantes', extrabajadores: 'Ex trabajadores', clientes: 'Clientes', pacientes: 'Pacientes', proveedores: 'Proveedores', visitas: 'Visitas' };
-const TIPOS = { consentimiento: 'Consentimiento', revocacion: 'Revocación', politica: 'Política publicada', formulario: 'Formulario publicado', rat: 'Inventario (RAT)', acceso: 'Acceso del fiscalizador' };
+const TIPOS = { consentimiento: 'Consentimiento', revocacion: 'Revocación', politica: 'Política publicada', formulario: 'Formulario publicado', rat: 'Inventario (RAT)', acceso: 'Acceso del fiscalizador', usuario: 'Usuarios y permisos' };
 
 /* ¿Corresponde pedir consentimiento para este tratamiento? Devuelve un semáforo con las razones y su artículo. */
 function evaluar(t) {
@@ -428,7 +429,7 @@ function semilla() {
     politicas: [], formularios: [], titulares: [], eventos: [],
     accesoFiscal: { nombre: 'Fiscalizador (demostración)', organismo: 'Agencia de Protección de Datos Personales', desde: '2026-10-19', hasta: '2026-10-26' },
   };
-  const db = { version: 1, actual: 'c1', clientes: [c1, c2] };
+  const db = { version: 1, actual: 'c1', clientes: [c1, c2], usuarios: usuariosSemilla() };
 
   // Transportes Cordillera: política 1.0 (sin convenios) y 1.1 (agrega convenios con terceros).
   // Los hechos se arman con su fecha y se anotan en orden cronológico (la cadena debe seguir el orden real).
@@ -560,8 +561,110 @@ let db, sinGuardar = false;
 function cargar() {
   let crudo = null;
   try { crudo = localStorage.getItem(CLAVE); } catch { sinGuardar = true; }
-  if (crudo) { try { const d = JSON.parse(crudo); if (d && Array.isArray(d.clientes) && d.clientes.length) return d; } catch { /* dañado: se parte de nuevo */ } }
+  if (crudo) { try { const d = JSON.parse(crudo); if (d && Array.isArray(d.clientes) && d.clientes.length) { if (!Array.isArray(d.usuarios)) d.usuarios = usuariosSemilla(); return d; } } catch { /* dañado: se parte de nuevo */ } }
   return semilla();
+}
+
+const hoyISO = () => ahora().slice(0, 10);
+const esFecha = (s) => /^\d{4}-\d{2}-\d{2}$/.test(String(s || ''));
+const sumarDias = (iso, n) => { const d = new Date(iso + 'T12:00:00'); d.setDate(d.getDate() + n); return `${d.getFullYear()}-${dos(d.getMonth() + 1)}-${dos(d.getDate())}`; };
+
+/* ───────── Usuarios y permisos (demostración: muestra cómo quedaría; no hay cuentas reales) ───────── */
+const ROLES = {
+  mlv_admin: { nombre: 'Administrador MLV', quien: 'Socio o encargado de la plataforma en MLV', color: '#1D5FD6' },
+  mlv_abogado: { nombre: 'Abogado MLV', quien: 'Abogado del estudio a cargo de uno o más clientes', color: '#0EA5E9' },
+  cliente_admin: { nombre: 'Encargado del cliente', quien: 'Persona de RR. HH. o cumplimiento en la empresa cliente', color: '#15803D' },
+  cliente_lectura: { nombre: 'Lectura del cliente', quien: 'Gerencia o auditoría interna del cliente', color: '#64748B' },
+  fiscalizador: { nombre: 'Fiscalizador (temporal)', quien: 'Agencia de Protección de Datos u otro órgano, con vencimiento', color: '#B45309' },
+};
+/* Qué puede hacer cada rol. ✓ sí · ◐ solo sus clientes · — no */
+const PERMISOS = [
+  ['Ver el panel de todos los clientes', ['✓', '◐', '—', '—', '—']],
+  ['Editar el inventario (RAT) y el semáforo', ['✓', '✓', '◐', '—', '—']],
+  ['Publicar la política y los formularios', ['✓', '✓', '—', '—', '—']],
+  ['Ver titulares y anotar revocaciones', ['✓', '✓', '✓', '◐', '—']],
+  ['Descargar el registro probatorio', ['✓', '✓', '✓', '✓', '✓']],
+  ['Consultar expedientes por RUT', ['✓', '✓', '✓', '✓', '✓']],
+  ['Crear accesos temporales para fiscalizadores', ['✓', '✓', '✓', '—', '—']],
+  ['Administrar usuarios y permisos', ['✓', '—', '◐', '—', '—']],
+  ['Ajustar las reglas del semáforo', ['✓', '—', '—', '—', '—']],
+];
+function usuariosSemilla() {
+  return [
+    { id: 'u1', nombre: 'Cristóbal L.', correo: 'cl@mlv.ejemplo', rol: 'mlv_admin', cliente: '', estado: 'activo', dosFactor: true, ultimo: '2026-10-19 09:12' },
+    { id: 'u2', nombre: 'Abogada MLV (ficticia)', correo: 'abogada@mlv.ejemplo', rol: 'mlv_abogado', cliente: 'c1', estado: 'activo', dosFactor: true, ultimo: '2026-10-18 17:40' },
+    { id: 'u3', nombre: 'Abogado MLV (ficticio)', correo: 'abogado@mlv.ejemplo', rol: 'mlv_abogado', cliente: 'c2', estado: 'activo', dosFactor: false, ultimo: '2026-10-15 11:05' },
+    { id: 'u4', nombre: 'Jefa de Personas (ficticia)', correo: 'personas@cordillera.ejemplo', rol: 'cliente_admin', cliente: 'c1', estado: 'activo', dosFactor: true, ultimo: '2026-10-19 08:30' },
+    { id: 'u5', nombre: 'Auditoría interna (ficticia)', correo: 'auditoria@cordillera.ejemplo', rol: 'cliente_lectura', cliente: 'c1', estado: 'pendiente', dosFactor: false, ultimo: '' },
+    { id: 'u6', nombre: 'Administradora (ficticia)', correo: 'admin@losaromos.ejemplo', rol: 'cliente_admin', cliente: 'c2', estado: 'activo', dosFactor: true, ultimo: '2026-10-17 16:22' },
+  ];
+}
+function vUsuarios(c) {
+  const nomCli = (id) => (id ? (db.clientes.find((k) => k.id === id) || {}).nombre || id : 'Todos los clientes');
+  const chipEst = (u) => (u.estado === 'activo' ? chip('verde', 'Activo') : u.estado === 'pendiente' ? chip('ambar', 'Invitación pendiente') : chip('gris', 'Suspendido'));
+  const filas = db.usuarios.filter((u) => !u.cliente || u.cliente === c.id).map((u) => `<tr>
+    <td class="cab" data-et="Usuario"><b>${esc(u.nombre)}</b><span class="mini">${esc(u.correo)}</span></td>
+    <td data-et="Rol"><span class="chip" style="background:${ROLES[u.rol].color}14;border-color:${ROLES[u.rol].color}55;color:${ROLES[u.rol].color}">${esc(ROLES[u.rol].nombre)}</span></td>
+    <td data-et="Alcance">${esc(nomCli(u.cliente))}</td>
+    <td data-et="Estado">${chipEst(u)}</td>
+    <td data-et="Doble factor">${u.dosFactor ? chip('verde', 'Activado') : chip('ambar', 'Falta')}</td>
+    <td data-et="Último acceso">${u.ultimo ? fFechaHora(u.ultimo) : '—'}</td>
+    <td data-et=""><button class="btn-txt" data-usuario="${esc(u.id)}">Editar</button></td></tr>`).join('');
+  const a = c.accesoFiscal;
+  const roles = Object.entries(ROLES);
+  const matriz = `<table class="tabla" style="min-width:620px"><thead><tr><th style="min-width:220px">Permiso</th>${roles.map(([k, r]) => `<th style="text-align:center;font-size:10.5px">${esc(r.nombre)}</th>`).join('')}</tr></thead><tbody>${PERMISOS.map(([p, v]) => `<tr><td style="font-size:13px">${esc(p)}</td>${v.map((x) => `<td style="text-align:center;font-weight:600;color:${x === '✓' ? 'var(--verde)' : x === '◐' ? 'var(--ambar)' : 'var(--suave)'}">${x}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+  return `<div class="sec-cab"><div><h1>Usuarios y permisos</h1><p>Quién entra a la plataforma y qué puede hacer. Cinco roles: dos de MLV, dos del cliente y uno temporal para el fiscalizador. Cada acción queda ligada al usuario que la hizo.</p></div>
+    <div class="fila-btn"><button class="btn" data-acc="verIngreso">Ver la pantalla de ingreso</button><button class="btn" data-acc="accesoFiscal">Crear acceso temporal</button><button class="btn primario" data-acc="invitar">Invitar usuario</button></div></div>
+  <div class="franja"><b>Demostración.</b> Aquí se muestra cómo quedaría la administración de cuentas. En el prototipo no hay claves ni inicio de sesión real: las cuentas, el doble factor y los permisos se activan en producción.</div>
+  <div class="tabla-env"><table class="tabla resp"><thead><tr><th>Usuario</th><th>Rol</th><th>Alcance</th><th>Estado</th><th>Doble factor</th><th>Último acceso</th><th><span class="sr">Acción</span></th></tr></thead><tbody>${filas}</tbody></table></div>
+  <div class="dos ancha" style="margin-top:16px">
+    <div class="caja"><h2>Qué puede hacer cada rol</h2><div class="tabla-env">${matriz}</div><p class="nota">✓ puede · ◐ solo en los clientes o datos que tiene asignados · — no puede. Las reglas del semáforo solo las cambia el Administrador MLV: es el criterio jurídico del estudio.</p></div>
+    <div class="caja"><h2>Accesos temporales del fiscalizador</h2>
+      <table class="tabla"><thead><tr><th>Quién</th><th>Vigencia</th><th>Estado</th></tr></thead><tbody>
+        <tr><td><b>${esc(a.nombre)}</b><span class="mini">${esc(a.organismo)}</span></td><td>${fFecha(a.desde)} al ${fFecha(a.hasta)}</td><td>${chip('verde', 'Vigente')}</td></tr>
+        <tr><td><b>Fiscalizador (demostración anterior)</b><span class="mini">${esc(a.organismo)}</span></td><td>2 jun. 2026 al 9 jun. 2026</td><td>${chip('gris', 'Vencido')}</td></tr>
+      </tbody></table>
+      <p class="nota">El acceso es de solo lectura, personal, con fecha de término y queda anotado en el registro cada vez que se usa (${c.eventos.filter((e) => e.tipo === 'acceso').length} consultas registradas para este cliente). Lo crea el encargado del cliente o MLV cuando la Agencia lo pide.</p>
+      <h3 style="margin-top:16px">Seguridad de las cuentas (producción)</h3>
+      <ul style="margin:0;padding-left:18px;font-size:13.5px;line-height:1.6;color:var(--tinta2)"><li>Clave individual más doble factor obligatorio para MLV y encargados.</li><li>Sesión que se cierra sola a los 30 minutos sin uso.</li><li>Registro de inicios de sesión y de cada acción, con usuario, fecha e IP.</li><li>Baja inmediata de un usuario: sus accesos se cierran al momento.</li></ul></div>
+  </div>`;
+}
+function dialogoUsuario(id) {
+  const u = db.usuarios.find((x) => x.id === id) || { id: 'u' + (db.usuarios.length + 1), nombre: '', correo: '', rol: 'cliente_admin', cliente: db.actual, estado: 'pendiente', dosFactor: false, ultimo: '' };
+  const nuevo = !db.usuarios.includes(u);
+  abrirDialogo(nuevo ? 'Invitar usuario' : `Editar: ${u.nombre}`, `<p class="nota">${nuevo ? 'En producción la persona recibe un correo con un enlace para crear su clave y activar el doble factor.' : 'Los cambios de rol quedan anotados en el registro.'}</p>
+    <div class="rejilla" style="margin-top:10px"><label class="campo"><span>Nombre</span><input name="nombre" value="${esc(u.nombre)}"></label><label class="campo"><span>Correo</span><input name="correo" value="${esc(u.correo)}"></label>
+      <label class="campo"><span>Rol</span><select name="rol">${Object.entries(ROLES).filter(([k]) => k !== 'fiscalizador').map(([k, r]) => `<option value="${k}" ${k === u.rol ? 'selected' : ''}>${esc(r.nombre)}</option>`).join('')}</select></label>
+      <label class="campo"><span>Alcance</span><select name="cliente"><option value="" ${!u.cliente ? 'selected' : ''}>Todos los clientes (solo MLV)</option>${db.clientes.map((k) => `<option value="${k.id}" ${k.id === u.cliente ? 'selected' : ''}>${esc(k.nombre)}</option>`).join('')}</select></label></div>
+    <div style="display:grid;gap:8px;margin-top:14px"><label class="marca"><input type="checkbox" name="dosFactor" ${u.dosFactor ? 'checked' : ''}> Doble factor activado</label>${nuevo ? '' : `<label class="marca"><input type="checkbox" name="suspender" ${u.estado === 'suspendido' ? 'checked' : ''}> Suspender el acceso</label>`}</div>`,
+  [['cancelar', 'Cancelar'], ['ok', nuevo ? 'Enviar invitación' : 'Guardar', 'primario']], (f) => {
+    const v = leerForm(f); if (!v.nombre.trim() || !v.correo.trim()) return false;
+    Object.assign(u, { nombre: v.nombre.trim(), correo: v.correo.trim(), rol: v.rol, cliente: v.cliente, dosFactor: !!v.dosFactor });
+    if (nuevo) db.usuarios.push(u); else u.estado = v.suspender ? 'suspendido' : (u.estado === 'suspendido' ? 'activo' : u.estado);
+    registrar(cli(), 'usuario', { accion: nuevo ? 'Invitación enviada' : 'Usuario modificado', nombre: u.nombre, rol: ROLES[u.rol].nombre });
+    render();
+  });
+}
+function dialogoAccesoFiscal() {
+  const c = cli(), hoy = hoyISO(), hasta = sumarDias(hoy, 7);
+  abrirDialogo('Crear acceso temporal para un fiscalizador', `<p class="nota">Enlace personal, de solo lectura, que vence solo. En producción se envía por correo al fiscalizador y se avisa a MLV.</p>
+    <div class="rejilla" style="margin-top:10px"><label class="campo"><span>Nombre del fiscalizador</span><input name="nombre" value="Fiscalizador (demostración)"></label><label class="campo"><span>Organismo</span><input name="organismo" value="Agencia de Protección de Datos Personales"></label>
+      <label class="campo"><span>Desde</span><input type="date" name="desde" value="${hoy}"></label><label class="campo"><span>Hasta</span><input type="date" name="hasta" value="${hasta}"></label></div>
+    <div class="comprobante" style="margin-top:14px"><div class="mini">Enlace que recibiría (ejemplo)</div><div class="mono" style="word-break:break-all">https://consentimientos.mlv.ejemplo/fiscal/${esc(c.sigla.toLowerCase())}/${codigo()}${codigo()}</div></div>`,
+  [['cancelar', 'Cancelar'], ['ok', 'Crear acceso', 'primario']], (f) => {
+    const v = leerForm(f); if (!esFecha(v.desde) || !esFecha(v.hasta)) return false;
+    c.accesoFiscal = { nombre: v.nombre.trim() || 'Fiscalizador', organismo: v.organismo.trim(), desde: v.desde, hasta: v.hasta };
+    registrar(c, 'usuario', { accion: 'Acceso temporal de fiscalizador creado', nombre: c.accesoFiscal.nombre, rol: `vigente del ${v.desde} al ${v.hasta}` });
+    render();
+  });
+}
+function dialogoIngreso() {
+  const c = cli();
+  abrirDialogo('Pantalla de ingreso (demostración)', `<div style="max-width:380px;margin:6px auto 0;padding:26px 24px;border:1px solid var(--linea);border-radius:14px;background:var(--papel2)">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px"><span class="logo" style="width:34px;height:34px;font-size:12px">MLV</span><div><b>Plataforma de consentimientos</b><span class="mini">${esc(c.nombre)}</span></div></div>
+      <div style="display:grid;gap:10px"><label class="campo"><span>Correo</span><input value="personas@cordillera.ejemplo" readonly></label><label class="campo"><span>Clave</span><input type="password" value="••••••••••" readonly></label><label class="campo"><span>Código del doble factor (aplicación o SMS)</span><input value="483 920" readonly></label></div>
+      <button type="button" class="btn primario" style="width:100%;margin-top:14px" disabled>Entrar</button>
+      <p class="nota" style="text-align:center;margin:12px 0 0">Solo de muestra: en el prototipo no hay inicio de sesión.</p></div>`, [['ok', 'Cerrar', 'primario']]);
 }
 function guardar() {
   try { localStorage.setItem(CLAVE, JSON.stringify(db)); sinGuardar = false; } catch { sinGuardar = true; }
@@ -588,10 +691,10 @@ function render() {
   const c = cli(), r = resumen(c);
   const tabs = modo === 'fiscal'
     ? [['fiscal', 'Panel del fiscalizador']]
-    : [['panel', 'Panel'], ['rat', 'Inventario (RAT)', r.rojos.length ? ['rojo', r.rojos.length] : r.ambar.length ? ['ambar', r.ambar.length] : null], ['formularios', 'Formularios y política'], ['titulares', 'Titulares', r.reconf.length ? ['ambar', r.reconf.length] : null], ['bitacora', 'Registro probatorio'], ['como', 'Cómo funciona']];
+    : [['panel', 'Panel'], ['rat', 'Inventario (RAT)', r.rojos.length ? ['rojo', r.rojos.length] : r.ambar.length ? ['ambar', r.ambar.length] : null], ['formularios', 'Formularios y política'], ['titulares', 'Titulares', r.reconf.length ? ['ambar', r.reconf.length] : null], ['bitacora', 'Registro probatorio'], ['usuarios', 'Usuarios y permisos', db.usuarios.some((u) => u.estado === 'pendiente') ? ['ambar', db.usuarios.filter((u) => u.estado === 'pendiente').length] : null], ['como', 'Cómo funciona']];
   if (modo === 'fiscal') ruta = 'fiscal'; else if (ruta === 'fiscal') ruta = 'panel';
   $('vistas').innerHTML = tabs.map(([k, e, n]) => `<button type="button" data-ruta="${k}" ${k === ruta ? 'aria-current="page"' : ''}>${e}${n ? `<span class="cuenta-p ${n[0]}">${n[1]}</span>` : ''}</button>`).join('');
-  const vistas = { panel: vPanel, rat: vRat, formularios: vFormularios, titulares: vTitulares, bitacora: vBitacora, como: vComo, fiscal: vFiscal };
+  const vistas = { panel: vPanel, rat: vRat, formularios: vFormularios, titulares: vTitulares, bitacora: vBitacora, usuarios: vUsuarios, como: vComo, fiscal: vFiscal };
   $('main').innerHTML = (vistas[ruta] || vPanel)(c, r);
   guardar();
 }
@@ -650,6 +753,7 @@ function describir(c, e) {
     case 'formulario': return `Se publicó el formulario «${esc(e.det.nombre)}» v${e.det.version} con: ${e.det.finalidades.map(nom).join(', ')}.`;
     case 'rat': return `Inventario: ${esc(e.det.accion)}${e.det.id ? ` ${esc(e.det.id)} «${esc(e.det.nombre)}» (${esc(BASE_CORTA[e.det.base] || '')})` : ''}${e.det.cantidad ? ` (${e.det.cantidad} tratamientos)` : ''}.`;
     case 'acceso': return `${esc(e.det.quien)}: ${esc(e.det.accion)}.`;
+    case 'usuario': return `${esc(e.det.accion)}: <b>${esc(e.det.nombre)}</b> (${esc(e.det.rol)}).`;
     default: return esc(e.tipo);
   }
 }
@@ -1013,7 +1117,7 @@ function accionTitular(k, el) {
 
 /* ───────── Eventos ───────── */
 document.addEventListener('click', (ev) => {
-  const el = ev.target.closest('[data-modo],[data-ruta],[data-cli],[data-acc],[data-trat],[data-ficha],[data-expediente],[data-abrir-form],[data-t],[data-verpol],[data-rutdemo]');
+  const el = ev.target.closest('[data-modo],[data-ruta],[data-cli],[data-acc],[data-trat],[data-ficha],[data-expediente],[data-abrir-form],[data-t],[data-verpol],[data-rutdemo],[data-usuario]');
   if (!el) return;
   const c = cli(), d = el.dataset;
   if (d.modo) {
@@ -1033,6 +1137,7 @@ document.addEventListener('click', (ev) => {
   if (d.t) { accionTitular(d.t, el); return; }
   if (d.verpol) { verPolitica(c, c.politicas.find((p) => p.version === d.verpol)); return; }
   if (d.rutdemo) { $('fiscRut').value = d.rutdemo; return; }
+  if (d.usuario) { dialogoUsuario(d.usuario); return; }
   switch (d.acc) {
     case 'reiniciar': if (confirm('¿Borrar los cambios y volver a los datos de ejemplo?')) { db = semilla(); fichaId = null; render(); } break;
     case 'nuevoTrat': editarTrat(null); break;
@@ -1063,6 +1168,9 @@ document.addEventListener('click', (ev) => {
       render(); break;
     }
     case 'descVerificador': descargar('como-verificar.txt', `Cómo verificar el registro de consentimientos\n\n1. Abra el archivo JSON del registro.\n2. Para cada anotación, en orden, una con "|" estos campos: prev, n, fecha, tipo, titular (vacío si no hay) y det (como JSON compacto, sin espacios).\n3. Calcule el SHA-256 de ese texto (UTF-8). Debe ser igual a "hash".\n4. El "prev" de cada anotación debe ser igual al "hash" de la anterior. La primera usa 64 ceros.\n5. Si una sola anotación fue cambiada, borrada o intercalada, la verificación falla desde ahí.\n6. Cada política publicada tiene su huella: SHA-256 del texto completo.\n`, 'text/plain'); break;
+    case 'invitar': dialogoUsuario(null); break;
+    case 'accesoFiscal': dialogoAccesoFiscal(); break;
+    case 'verIngreso': dialogoIngreso(); break;
     case 'fiscBuscar': {
       fiscConsulta = $('fiscRut').value; const rut = limpiarRut(fiscConsulta), t = c.titulares.find((x) => x.rut === rut);
       fiscExp = t || null;
@@ -1097,7 +1205,7 @@ db = cargar();
 // Enlaces directos para la demostración: #titular abre el formulario; #fiscal, el panel del fiscalizador.
 const inicial = location.hash.replace('#', '');
 if (inicial === 'titular') { modo = 'titular'; iniciarTitular(); } else if (inicial === 'fiscal') modo = 'fiscal';
-else if (['rat', 'formularios', 'titulares', 'bitacora', 'como'].includes(inicial)) ruta = inicial;
+else if (['rat', 'formularios', 'titulares', 'bitacora', 'usuarios', 'como'].includes(inicial)) ruta = inicial;
 render();
 </script>
 </body>
