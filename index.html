@@ -3,121 +3,163 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; img-src 'self' data:; font-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="robots" content="noindex">
-<title>Herramientas · MLV Abogados</title>
+<title>MLV Abogados · Plataforma y herramientas</title>
 <style>
+  @font-face { font-family: 'Manrope'; src: url(herramientas/fuentes/manrope.woff2) format('woff2'); font-weight: 400 800; font-display: swap; }
+  @font-face { font-family: 'Inter'; src: url(herramientas/fuentes/inter.woff2) format('woff2'); font-weight: 400 700; font-display: swap; }
+  @font-face { font-family: 'JetBrains Mono'; src: url(herramientas/fuentes/jetbrains-mono.woff2) format('woff2'); font-weight: 400 700; font-display: swap; }
   :root {
-    --fondo: #f6f5f1; --papel: #ffffff; --hundido: #efede6;
-    --tinta: #1a2636; --tinta2: #3b4859; --suave: #5f6873; --linea: #dddbd2;
-    --acento: #0d5c68; --acento-claro: #e3eef0; --acento-borde: #c3dbde;
-    --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", serif;
-    --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --marca: #0E4C5C; --marca-osc: #0A3A47; --marca-claro: #E3EEF1; --marca-borde: #B7D1D8; --marca-tenue: rgba(14, 76, 92, .12);
+    --realce: #E3B23C; --fondo: #F2F5F6; --papel: #FFFFFF; --papel2: #F7FAFA; --hundido: #E6EDEF;
+    --tinta: #121C21; --tinta2: #3A4A52; --suave: #66767E; --linea: #D7E0E3; --linea2: #E6EDEF;
+    --verde: #15803D; --verde-f: #ECFDF3; --verde-b: #A7E4BB;
+    --sans-tit: 'Manrope', 'Segoe UI', system-ui, sans-serif; --sans: 'Inter', 'Segoe UI', system-ui, sans-serif; --mono: 'JetBrains Mono', Consolas, monospace;
+    --radio: 12px; --sombra: 0 1px 2px rgba(18,28,33,.05), 0 1px 1px rgba(18,28,33,.03); --sombra-2: 0 24px 60px -28px rgba(18,28,33,.45);
   }
   * { box-sizing: border-box; }
-  body { margin: 0; background: var(--fondo); color: var(--tinta); font: 17px/1.55 var(--sans); padding: 0 16px; }
-  main { max-width: 800px; margin: 0 auto; padding: 56px 0 40px; }
-  :focus-visible { outline: 2px solid var(--acento); outline-offset: 3px; }
-  h1 { font: 600 34px/1.15 var(--serif); margin: 0 0 6px; }
-  .sub { color: var(--suave); letter-spacing: .12em; font-size: 13px; text-transform: uppercase; margin: 0 0 24px; }
-  p.lead { color: var(--tinta2); margin: 0 0 20px; max-width: 680px; }
-  .garantias { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 8px; padding: 0; list-style: none; }
-  .garantias li { display: inline-flex; align-items: center; gap: 7px; font-size: 14px; color: var(--tinta2); background: var(--papel); border: 1px solid var(--linea); border-radius: 999px; padding: 5px 12px; }
-  .garantias .ico { color: var(--acento); }
-  h2.seccion { font: 600 13px/1.4 var(--sans); letter-spacing: .1em; text-transform: uppercase; color: var(--suave); margin: 34px 0 12px; }
-  .ico { width: 1.1em; height: 1.1em; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-  a.card { display: grid; grid-template-columns: 48px minmax(0, 1fr); gap: 4px 18px; align-items: start; background: var(--papel); border: 1px solid var(--linea); border-radius: 14px; padding: 22px 24px; margin-bottom: 14px; color: inherit; text-decoration: none; transition: border-color .15s, box-shadow .15s; }
-  a.card:hover { border-color: var(--acento); box-shadow: 0 6px 20px rgba(20, 30, 45, .07); }
-  .card .icono { grid-row: span 3; width: 48px; height: 48px; border-radius: 12px; display: grid; place-items: center; background: var(--acento-claro); color: var(--acento); }
-  .card .icono .ico { width: 24px; height: 24px; }
-  .card h3 { display: flex; align-items: center; gap: 6px; font: 600 21px/1.25 var(--serif); margin: 0; color: var(--acento); }
-  .card h3 .ico { width: 20px; height: 20px; transition: transform .15s; }
-  a.card:hover h3 .ico { transform: translateX(3px); }
-  .card p { margin: 0; color: var(--tinta2); font-size: 16px; }
-  .card .para { font-size: 13px; color: var(--suave); }
-  a.card.destacada { border-color: var(--acento-borde); background: linear-gradient(0deg, var(--papel), var(--papel)) padding-box; box-shadow: inset 4px 0 0 var(--acento); }
-  .card .para b { font-weight: 600; color: var(--tinta2); }
-  footer { max-width: 800px; margin: 0 auto 48px; color: var(--suave); font-size: 14px; border-top: 1px solid var(--linea); padding-top: 14px; }
-  @media (max-width: 560px) {
-    main { padding-top: 36px; }
-    h1 { font-size: 29px; }
-    a.card { grid-template-columns: 1fr; padding: 18px; }
-    .card .icono { grid-row: auto; width: 40px; height: 40px; margin-bottom: 6px; }
-  }
-  @media (prefers-reduced-motion: reduce) { a.card, .card h3 .ico { transition: none; } }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; background: var(--fondo); color: var(--tinta); font: 15px/1.55 var(--sans); font-feature-settings: "tnum", "cv11"; }
+  a { color: var(--marca); }
+  :focus-visible { outline: 2px solid var(--marca); outline-offset: 3px; border-radius: 4px; }
+  .ico { width: 18px; height: 18px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .cont { max-width: 1180px; margin: 0 auto; padding: 0 28px; }
+
+  /* Barra */
+  .barra { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--papel) 88%, transparent); backdrop-filter: blur(10px); border-bottom: 1px solid var(--linea); }
+  .barra .cont { display: flex; align-items: center; justify-content: space-between; height: 60px; gap: 20px; }
+  .marca-app { display: flex; align-items: center; gap: 11px; text-decoration: none; color: var(--tinta); }
+  .sello-logo { width: 34px; height: 34px; }
+  .firma { font: 700 16px/1.1 var(--sans-tit); letter-spacing: -.02em; display: block; }
+  .sub { display: block; color: var(--suave); font-size: 11px; letter-spacing: .04em; margin-top: 2px; }
+  .barra nav { display: flex; gap: 4px; }
+  .barra nav a { font-size: 13.5px; font-weight: 500; color: var(--tinta2); text-decoration: none; padding: 7px 11px; border-radius: 7px; }
+  .barra nav a:hover { background: var(--hundido); color: var(--tinta); }
+  .barra nav a.btn { background: var(--marca); color: #fff; }
+  .barra nav a.btn:hover { background: var(--marca-osc); }
+  @media (max-width: 640px) { .barra nav a:not(.btn) { display: none; } .sub { display: none; } }
+
+  /* Portada: producto primero */
+  .hero { padding: 64px 0 24px; display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 40px; align-items: center; }
+  .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--marca); background: var(--marca-claro); border: 1px solid var(--marca-borde); border-radius: 999px; padding: 5px 12px 5px 8px; }
+  .eyebrow i { width: 8px; height: 8px; border-radius: 50%; background: var(--marca); display: inline-block; }
+  h1 { font: 800 clamp(34px, 4.2vw, 52px)/1.05 var(--sans-tit); letter-spacing: -.035em; margin: 18px 0 14px; color: var(--tinta); }
+  h1 em { font-style: normal; color: var(--marca); }
+  .lead { font-size: 17px; color: var(--tinta2); margin: 0 0 24px; max-width: 480px; }
+  .acciones { display: flex; flex-wrap: wrap; gap: 10px; }
+  .btn { display: inline-flex; align-items: center; gap: 8px; font: 600 14.5px/1.2 var(--sans); padding: 12px 18px; border-radius: 9px; text-decoration: none; border: 1px solid var(--linea); background: var(--papel); color: var(--tinta); box-shadow: var(--sombra); transition: transform .12s, background .15s, border-color .15s; }
+  .btn:hover { border-color: var(--marca-borde); background: var(--papel2); }
+  .btn:active { transform: translateY(1px); }
+  .btn.primario { background: var(--marca); border-color: var(--marca); color: #fff; }
+  .btn.primario:hover { background: var(--marca-osc); border-color: var(--marca-osc); }
+  .pruebas { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 28px; padding-top: 22px; border-top: 1px solid var(--linea); }
+  @media (max-width: 520px) { .pruebas { grid-template-columns: 1fr 1fr; } }
+  .prueba b { display: block; font: 700 24px/1 var(--sans-tit); letter-spacing: -.02em; }
+  .prueba span { font-size: 12.5px; color: var(--suave); }
+  .marco { position: relative; border-radius: 16px; background: var(--papel); border: 1px solid var(--linea); box-shadow: var(--sombra-2), 0 0 0 1px rgba(14,76,92,.04); overflow: hidden; transform: perspective(1600px) rotateY(-4deg) rotateX(1deg); transition: transform .5s ease; }
+  .marco:hover { transform: perspective(1600px) rotateY(0) rotateX(0); }
+  .marco img { display: block; width: 100%; height: auto; }
+  .marco::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(180deg, rgba(255,255,255,0) 70%, rgba(242,245,246,.9)); }
+  .vistas { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 26px 0 0; }
+  .vista { display: flex; gap: 12px; align-items: flex-start; background: var(--papel); border: 1px solid var(--linea); border-radius: var(--radio); padding: 14px 16px; text-decoration: none; color: inherit; box-shadow: var(--sombra); transition: box-shadow .2s, border-color .2s, transform .15s; }
+  .vista:hover { box-shadow: var(--sombra-2); border-color: var(--marca-borde); transform: translateY(-2px); }
+  .vista .ic { width: 36px; height: 36px; border-radius: 9px; background: var(--marca-claro); color: var(--marca); display: grid; place-items: center; flex: none; }
+  .vista b { display: block; font-size: 14px; }
+  .vista span { font-size: 12.5px; color: var(--suave); }
+  @media (max-width: 920px) { .hero { grid-template-columns: 1fr; padding-top: 40px; } .marco { transform: none; } .vistas { grid-template-columns: 1fr; } }
+
+  /* Capacidades */
+  .capas { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin: 56px 0 0; }
+  .capa { background: var(--papel); border: 1px solid var(--linea); border-radius: var(--radio); padding: 22px; box-shadow: var(--sombra); }
+  .capa .ic { width: 38px; height: 38px; border-radius: 10px; background: var(--marca); color: #fff; display: grid; place-items: center; margin-bottom: 14px; }
+  .capa h3 { font: 700 16px/1.25 var(--sans-tit); margin: 0 0 6px; letter-spacing: -.01em; }
+  .capa p { margin: 0; color: var(--tinta2); font-size: 14px; }
+  .capa code { font-family: var(--mono); font-size: 11.5px; color: var(--marca); background: var(--marca-claro); padding: 1px 6px; border-radius: 5px; }
+  @media (max-width: 920px) { .capas { grid-template-columns: 1fr; } }
+
+  /* Ecosistema */
+  .seccion { margin: 64px 0 16px; display: flex; align-items: baseline; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  .seccion h2 { font: 700 22px/1.2 var(--sans-tit); letter-spacing: -.02em; margin: 0; }
+  .seccion p { margin: 0; color: var(--suave); font-size: 13.5px; }
+  .grupo { font-size: 11.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--suave); margin: 26px 0 10px; }
+  .mods { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  .mod { display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 2px 12px; background: var(--papel); border: 1px solid var(--linea); border-radius: var(--radio); padding: 15px 16px; text-decoration: none; color: inherit; box-shadow: var(--sombra); transition: box-shadow .2s, border-color .2s, transform .15s; }
+  .mod:hover { box-shadow: var(--sombra-2); border-color: var(--marca-borde); transform: translateY(-2px); }
+  .mod .ic { grid-row: span 2; width: 34px; height: 34px; border-radius: 9px; background: var(--marca-claro); color: var(--marca); display: grid; place-items: center; }
+  .mod b { font-size: 14px; display: flex; align-items: center; gap: 6px; }
+  .mod b .ico { width: 14px; height: 14px; opacity: 0; transition: opacity .15s, transform .15s; }
+  .mod:hover b .ico { opacity: 1; transform: translateX(2px); }
+  .mod span { font-size: 12.5px; color: var(--suave); line-height: 1.45; }
+  .mod.destacado { grid-column: span 3; grid-template-columns: 34px minmax(0, 1fr) auto; align-items: center; background: var(--marca); border-color: var(--marca); color: #fff; }
+  .mod.destacado .ic { background: rgba(255,255,255,.14); color: #fff; }
+  .mod.destacado span { color: rgba(255,255,255,.75); }
+  .mod.destacado > span:not(.ic):not(.btn) { grid-column: 2; }
+  .mod.destacado .btn { grid-column: 3; grid-row: 1 / span 2; align-self: center; background: #fff; color: var(--marca); border-color: #fff; }
+  @media (max-width: 920px) { .mods { grid-template-columns: 1fr; } .mod.destacado { grid-column: auto; grid-template-columns: 34px minmax(0, 1fr); } .mod.destacado .btn { grid-column: span 2; grid-row: auto; justify-content: center; margin-top: 8px; } }
+
+  footer { margin: 64px 0 40px; padding-top: 18px; border-top: 1px solid var(--linea); color: var(--suave); font-size: 13px; display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  @media (prefers-reduced-motion: reduce) { .marco, .vista, .mod, .btn { transition: none; } .marco { transform: none; } }
 </style>
 </head>
 <body>
-<main>
-  <h1>MLV Abogados</h1>
-  <p class="sub">Herramientas del estudio</p>
-  <p class="lead">Demos de trabajo con datos ficticios. Se abren en el navegador y la primera vez muestran una guía corta de cómo se usan.</p>
-  <ul class="garantias" aria-label="Cómo funcionan">
-    <li><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>Nada sale del computador</li>
-    <li><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 12 2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>Sin instalar nada</li>
-    <li><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>Guía al entrar</li>
-  </ul>
+<header class="barra"><div class="cont">
+  <a class="marca-app" href="index.html"><svg class="sello-logo" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="18" fill="#0E4C5C"/><circle cx="20" cy="20" r="12.5" fill="none" stroke="rgba(255,255,255,.38)" stroke-width="1.5" stroke-dasharray="3 2.2"/><path d="M13.5 20.5l4.2 4.2L27 15.5" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span><span class="firma">MLV Abogados</span><span class="sub">Plataforma y herramientas · Ley 21.719</span></span></a>
+  <nav aria-label="Secciones"><a href="#plataforma">Plataforma</a><a href="#modulos">Módulos</a><a class="btn" href="herramientas/consentimientos-mlv.html">Abrir la demostración</a></nav>
+</div></header>
 
-  <h2 class="seccion">Claude en el estudio</h2>
-  <a class="card destacada" href="herramientas/claude-en-el-estudio.html">
-    <span class="icono"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18"/><path d="M3 7h18"/><path d="m6 7-3 7a3 3 0 0 0 6 0Z"/><path d="m18 7-3 7a3 3 0 0 0 6 0Z"/><path d="M8 21h8"/></svg></span>
-    <h3>La propuesta: de uso individual a sistema <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></h3>
-    <p>Cómo organizar y gestionar el uso de Claude en MLV: las seis piezas, quién hace qué, el calendario de gestión, cómo se configura Claude, las recetas por área, el control de calidad medido, la capacitación y el plan en cuatro fases. Empiece por aquí.</p>
-    <span class="para"><b>Para:</b> los socios y la dirección del estudio</span>
-  </a>
-  <a class="card" href="herramientas/diagnostico.html">
-    <span class="icono"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect width="8" height="4" x="8" y="2" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></svg></span>
-    <h3>Diagnóstico de herramientas <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></h3>
-    <p>Una encuesta anónima de 10 minutos para todo el equipo: qué programas e IA se usan, qué ha armado cada persona y dónde lo guarda, en qué se va el tiempo y qué riesgos hay con los datos de los clientes. Se responde en Microsoft Forms y aquí se ve el informe, con lo que hay que atender y por dónde empezar.</p>
-    <span class="para"><b>Para:</b> la dirección del estudio</span>
-  </a>
-  <a class="card" href="herramientas/sistema-de-trabajo.html">
-    <span class="icono"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect width="8" height="8" x="3" y="3" rx="2"/><path d="M7 11v4a2 2 0 0 0 2 2h4"/><rect width="8" height="8" x="13" y="13" rx="2"/></svg></span>
-    <h3>Sistema de trabajo <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></h3>
-    <p>Cada proceso del estudio paso a paso: quién lo hace, en qué plazo y qué entrega, con un dueño y una fecha de revisión. Un tablero para seguir los casos de cada proceso (por ejemplo, investigaciones Ley Karin) y las instrucciones para trabajarlo con Claude.</p>
-    <span class="para"><b>Para:</b> abogados y equipo del estudio</span>
-  </a>
-  <a class="card" href="herramientas/protocolo-ia.html">
-    <span class="icono"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg></span>
-    <h3>Protocolo de uso de IA <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></h3>
-    <p>Las reglas del estudio para usar Claude y otras IA, deducidas del perfil del estudio y de la Ley 21.719: semáforo, medidas técnicas, organizativas y de gestión, y cómo se trabaja hoy con Claude Code. Borrador para revisión.</p>
-    <span class="para"><b>Para:</b> todo el estudio</span>
-  </a>
-  <a class="card" href="herramientas/bitacora-ia.html">
-    <span class="icono"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="m19 9-5 5-4-4-3 3"/></svg></span>
-    <h3>Bitácora de IA y control de calidad <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></h3>
-    <p>Cada uso de Claude anotado en un minuto: horas ahorradas medidas, borradores útiles y errores. Verificación de citas con constancia antes de entregar, recetas a corregir e informe mensual para la dirección.</p>
-    <span class="para"><b>Para:</b> abogados, encargado de IA y dirección</span>
-  </a>
+<main class="cont">
+  <section class="hero" id="plataforma">
+    <div>
+      <span class="eyebrow"><i></i>Plataforma de consentimientos</span>
+      <h1>El consentimiento, <em>probado</em>.</h1>
+      <p class="lead">Inventario, formulario con la marca de cada cliente, registro que delata cualquier alteración y un panel para el fiscalizador. Un solo flujo, bajo la Ley 21.719.</p>
+      <div class="acciones">
+        <a class="btn primario" href="herramientas/consentimientos-mlv.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></svg>Recorrido guiado</a>
+        <a class="btn" href="herramientas/consentimientos-mlv.html#titular">Ver como trabajador</a>
+        <a class="btn" href="herramientas/consentimientos-mlv.html#fiscal">Ver como fiscalizador</a>
+      </div>
+      <div class="pruebas">
+        <div class="prueba"><b>3</b><span>vistas: MLV, titular, fiscalizador</span></div>
+        <div class="prueba"><b>SHA-256</b><span>registro encadenado y verificable</span></div>
+        <div class="prueba"><b>0</b><span>errores en la auditoría contra la ley</span></div>
+      </div>
+    </div>
+    <a class="marco" href="herramientas/consentimientos-mlv.html" aria-label="Abrir el panel de la plataforma"><img src="herramientas/capturas/panel.webp" width="1440" height="860" alt="Panel de la plataforma de consentimientos: cartera de clientes, indicadores, alertas y últimos movimientos"></a>
+  </section>
 
-  <h2 class="seccion">Ley 21.719 de protección de datos</h2>
-  <a class="card" href="herramientas/consentimientos-mlv.html">
-    <span class="icono"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span>
-    <h3>Consentimientos MLV · prototipo <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></h3>
-    <p>Formulario con la marca de cada cliente, solo cuando el consentimiento es la base que corresponde; registro probatorio encadenado con huellas; panel de solo lectura para el fiscalizador; unido al inventario (RAT). Foco en relaciones laborales.</p>
-    <span class="para"><b>Para:</b> MLV, sus empresas clientes, sus trabajadores y el fiscalizador</span>
-  </a>
-  <a class="card" href="herramientas/panel-clientes.html">
-    <span class="icono"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg></span>
-    <h3>Panel de clientes <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></h3>
-    <p>El estado de la adecuación de cada cliente: etapa, avance por obligación, solicitudes de titulares con su plazo, incidentes, tareas e informe para el cliente.</p>
-    <span class="para"><b>Para:</b> abogados del estudio</span>
-  </a>
-  <a class="card" href="herramientas/derechos-y-consentimientos.html">
-    <span class="icono"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg></span>
-    <h3>Derechos y consentimientos <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></h3>
-    <p>Cada uso de datos con su base legal, las solicitudes de las personas con sus plazos y cartas en borrador, los consentimientos y sus revocaciones, y un historial que delata cualquier alteración.</p>
-    <span class="para"><b>Para:</b> la empresa cliente (RR. HH., administración)</span>
-  </a>
+  <div class="vistas">
+    <a class="vista" href="herramientas/consentimientos-mlv.html"><span class="ic"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg></span><div><b>Equipo MLV</b><span>Inventario con semáforo, política con versiones, titulares, registro y usuarios.</span></div></a>
+    <a class="vista" href="herramientas/consentimientos-mlv.html#titular"><span class="ic"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect width="14" height="20" x="5" y="2" rx="2"/><path d="M12 18h.01"/></svg></span><div><b>Trabajador o titular</b><span>Formulario con la marca de su empresa; comprobante y revocación por el mismo medio.</span></div></a>
+    <a class="vista" href="herramientas/consentimientos-mlv.html#fiscal"><span class="ic"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></svg></span><div><b>Fiscalizador</b><span>Solo lectura: política, bases de licitud, integridad y expediente por RUT.</span></div></a>
+  </div>
 
-  <h2 class="seccion">Antes de consultar a una IA</h2>
-  <a class="card" href="herramientas/tachar.html">
-    <span class="icono"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21"/><path d="M22 21H7"/><path d="m5 11 9 9"/></svg></span>
-    <h3>Tachar antes de pegar <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></h3>
-    <p>Cambia nombres, RUT, direcciones, fechas y montos por etiquetas antes de pegar un escrito en una IA, y después pone los datos de vuelta en la respuesta.</p>
-    <span class="para"><b>Para:</b> abogados del estudio</span>
-  </a>
+  <div class="capas">
+    <div class="capa"><span class="ic"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5"/><path d="M3 12a9 3 0 0 0 18 0"/></svg></span><h3>Solo cuando corresponde</h3><p>El inventario manda: el semáforo dice cuándo pedir consentimiento y cuándo no. Lo que la ley prohíbe con consentimiento, queda en rojo. <code>art. 12 · 13 · 16 bis</code></p></div>
+    <div class="capa"><span class="ic"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg></span><h3>Prueba que no se altera</h3><p>Quién, cuándo, qué versión de la política, qué leyó y qué autorizó: cada anotación encadenada con la anterior. Cambiar una rompe la cadena. <code>art. 12 inc. 8</code></p></div>
+    <div class="capa"><span class="ic"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span><h3>Hecho para el ámbito laboral</h3><p>Autorizaciones aparte del contrato, sin consecuencias, con alternativa real. Biometría con la información exigida; salud de trabajadores fuera del formulario. <code>art. 12 inc. 6 · 16 ter</code></p></div>
+  </div>
+
+  <div class="seccion" id="modulos"><h2>Módulos del ecosistema</h2><p>Demostraciones con datos ficticios. Nada sale del computador.</p></div>
+
+  <div class="grupo">Ley 21.719 de protección de datos</div>
+  <div class="mods">
+    <a class="mod destacado" href="herramientas/consentimientos-mlv.html"><span class="ic"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span><b>Consentimientos</b><span>Inventario, formulario por cliente, registro probatorio, revocación, usuarios y permisos, panel del fiscalizador.</span><span class="btn">Abrir</span></a>
+    <a class="mod" href="herramientas/panel-clientes.html"><span class="ic"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg></span><b>Panel de clientes <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></b><span>Estado de la adecuación de cada cliente: etapa, avance por obligación, plazos, incidentes, informe.</span></a>
+    <a class="mod" href="herramientas/derechos-y-consentimientos.html"><span class="ic"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg></span><b>Derechos de los titulares <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></b><span>Solicitudes de acceso, rectificación y supresión con sus plazos, cartas en borrador e historial.</span></a>
+    <a class="mod" href="herramientas/tachar.html"><span class="ic"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21"/><path d="M22 21H7"/><path d="m5 11 9 9"/></svg></span><b>Tachar antes de pegar <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></b><span>Reemplaza nombres, RUT, fechas y montos por etiquetas antes de usar una IA, y los devuelve después.</span></a>
+  </div>
+
+  <div class="grupo">Claude en el estudio</div>
+  <div class="mods">
+    <a class="mod" href="herramientas/claude-en-el-estudio.html"><span class="ic"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18"/><path d="M3 7h18"/><path d="m6 7-3 7a3 3 0 0 0 6 0Z"/><path d="m18 7-3 7a3 3 0 0 0 6 0Z"/><path d="M8 21h8"/></svg></span><b>La propuesta <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></b><span>De uso individual a sistema: roles, calendario, configuración, recetas, control de calidad y plan en fases.</span></a>
+    <a class="mod" href="herramientas/sistema-de-trabajo.html"><span class="ic"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect width="8" height="8" x="3" y="3" rx="2"/><path d="M7 11v4a2 2 0 0 0 2 2h4"/><rect width="8" height="8" x="13" y="13" rx="2"/></svg></span><b>Sistema de trabajo <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></b><span>Cada proceso del estudio paso a paso, con dueño y revisión; tablero de casos e instrucciones para Claude.</span></a>
+    <a class="mod" href="herramientas/protocolo-ia.html"><span class="ic"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg></span><b>Protocolo de uso de IA <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></b><span>Las reglas del estudio para usar Claude y otras IA: semáforo, medidas técnicas y de gestión.</span></a>
+    <a class="mod" href="herramientas/bitacora-ia.html"><span class="ic"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="m19 9-5 5-4-4-3 3"/></svg></span><b>Bitácora de IA <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></b><span>Cada uso anotado en un minuto; horas ahorradas, verificación de citas e informe mensual.</span></a>
+    <a class="mod" href="herramientas/diagnostico.html"><span class="ic"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect width="8" height="4" x="8" y="2" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></svg></span><b>Diagnóstico de herramientas <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></b><span>Encuesta anónima al equipo y el informe con lo que hay que atender y por dónde empezar.</span></a>
+  </div>
+
+  <footer><span>MLV Abogados · demostraciones con datos ficticios · no reemplazan la revisión de la ley vigente.</span><span>Íconos: Lucide (ISC) · Fuentes: Manrope, Inter, JetBrains Mono (OFL).</span></footer>
 </main>
-<footer>Demos con datos ficticios. No reemplazan la revisión de la ley vigente. Íconos: Lucide (licencia ISC).</footer>
 </body>
 </html>

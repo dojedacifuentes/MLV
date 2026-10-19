@@ -4,88 +4,146 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <!-- Prototipo: la página no puede conectarse a nada. Todo queda en este navegador. -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; connect-src 'none'; form-action 'none'; base-uri 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; font-src 'self'; connect-src 'none'; form-action 'none'; base-uri 'none'">
 <title>Consentimientos MLV · prototipo</title>
 <style>
+  /* Fuentes propias (subconjunto latino, licencia OFL): la página sigue sin conectarse a ningún servidor externo. */
+  @font-face { font-family: 'Manrope'; src: url(fuentes/manrope.woff2) format('woff2'); font-weight: 400 800; font-display: swap; }
+  @font-face { font-family: 'Inter'; src: url(fuentes/inter.woff2) format('woff2'); font-weight: 400 700; font-display: swap; }
+  @font-face { font-family: 'JetBrains Mono'; src: url(fuentes/jetbrains-mono.woff2) format('woff2'); font-weight: 400 700; font-display: swap; }
+  @font-face { font-family: 'Fraunces'; src: url(fuentes/fraunces.woff2) format('woff2'); font-weight: 400 700; font-display: swap; }
+  @font-face { font-family: 'Space Grotesk'; src: url(fuentes/space-grotesk.woff2) format('woff2'); font-weight: 400 700; font-display: swap; }
+
+  /* ───── Tokens. Tres estilos intercambiables (selector en la franja de demostración). Los colores de estado
+     (verde · ámbar · rojo · gris) son el lenguaje del producto y no cambian con el estilo. ───── */
+  :root, :root[data-tema="sello"] {
+    --marca: #0E4C5C; --marca-osc: #0A3A47; --marca-claro: #E3EEF1; --marca-borde: #B7D1D8; --marca-tenue: rgba(14, 76, 92, .12); --marca-texto: #FFFFFF;
+    --accion: #0E4C5C; --accion-osc: #0A3A47; --accion-texto: #FFFFFF; --realce: #E3B23C; --realce-f: #FBF3DD;
+    --fondo: #F2F5F6; --papel: #FFFFFF; --papel2: #F7FAFA; --hundido: #E6EDEF;
+    --tinta: #121C21; --tinta2: #3A4A52; --suave: #66767E; --linea: #D7E0E3; --linea2: #E6EDEF; --campo: #9BAAB1;
+    --sans-tit: 'Manrope', 'Segoe UI', system-ui, sans-serif; --sans: 'Inter', 'Segoe UI', system-ui, sans-serif; --mono: 'JetBrains Mono', Consolas, ui-monospace, monospace;
+    --radio: 10px; --radio-s: 7px; --peso-tit: 700; --esp-tit: -.02em;
+    --sombra: 0 1px 2px rgba(18, 28, 33, .05), 0 1px 1px rgba(18, 28, 33, .03); --sombra-2: 0 12px 32px -16px rgba(18, 28, 33, .28);
+  }
+  :root[data-tema="tinta"] {
+    --marca: #0F3D3E; --marca-osc: #0A2C2D; --marca-claro: #E4ECEA; --marca-borde: #BBCFCB; --marca-tenue: rgba(15, 61, 62, .12); --marca-texto: #FFFFFF;
+    --accion: #B8743A; --accion-osc: #96592A; --accion-texto: #FFFFFF; --realce: #B8743A; --realce-f: #F6EBDF;
+    --fondo: #F6F5F1; --papel: #FFFFFF; --papel2: #FBFAF6; --hundido: #ECEAE2;
+    --tinta: #17201F; --tinta2: #3F4A49; --suave: #6B7573; --linea: #DBD7CC; --linea2: #EAE7DE; --campo: #A39F93;
+    --sans-tit: 'Fraunces', Georgia, serif; --sans: 'Inter', 'Segoe UI', system-ui, sans-serif;
+    --radio: 8px; --radio-s: 6px; --peso-tit: 600; --esp-tit: -.01em;
+  }
+  :root[data-tema="instrumento"] {
+    --marca: #111318; --marca-osc: #000000; --marca-claro: #ECECEF; --marca-borde: #C9CBD2; --marca-tenue: rgba(17, 19, 24, .1); --marca-texto: #FFFFFF;
+    --accion: #D9480F; --accion-osc: #B33A0A; --accion-texto: #FFFFFF; --realce: #D9480F; --realce-f: #FCEAE1;
+    --fondo: #F4F4F5; --papel: #FFFFFF; --papel2: #F8F8F9; --hundido: #E9E9EC;
+    --tinta: #111318; --tinta2: #3B3E46; --suave: #6E727C; --linea: #DCDDE2; --linea2: #EAEAEE; --campo: #9A9DA7;
+    --sans-tit: 'Space Grotesk', 'Segoe UI', system-ui, sans-serif; --sans: 'Inter', 'Segoe UI', system-ui, sans-serif;
+    --radio: 5px; --radio-s: 4px; --peso-tit: 700; --esp-tit: -.01em;
+  }
   :root {
-    /* Base técnica: grises fríos, un acento azul eléctrico y un verde/ámbar/rojo de estado. */
-    --fondo: #f1f4f8; --papel: #ffffff; --papel2: #f7f9fc; --hundido: #e9edf3;
-    --tinta: #0f172a; --tinta2: #334155; --suave: #64748b; --linea: #dbe2ea; --linea2: #e8edf3; --campo: #a4afbd;
-    --acento: #1d5fd6; --acento-osc: #164bb0; --acento-claro: #e8f0ff; --acento-borde: #bcd0f7; --acento-tenue: rgba(29, 95, 214, .12);
-    --navy: #0b1220; --navy2: #121c31; --navy-texto: #c7d2e3;
-    --verde: #15803d; --verde-f: #ecfdf3; --verde-b: #a7e4bb; --verde-v: #22c55e;
-    --ambar: #b45309; --ambar-f: #fff7e6; --ambar-b: #f5d48a; --ambar-v: #f59e0b;
-    --rojo: #b91c1c; --rojo-f: #fef2f2; --rojo-b: #f5b5b5; --rojo-v: #ef4444;
-    --gris-f: #eef2f6;
-    --sans: "Inter", "Segoe UI Variable", "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif;
-    --mono: "JetBrains Mono", "Cascadia Code", "Cascadia Mono", Consolas, ui-monospace, monospace;
-    --radio: 12px; --radio-s: 8px;
-    --sombra: 0 1px 2px rgba(15, 23, 42, .04), 0 1px 3px rgba(15, 23, 42, .06);
-    --sombra-2: 0 10px 30px -12px rgba(15, 23, 42, .25);
+    --verde: #15803D; --verde-f: #ECFDF3; --verde-b: #A7E4BB; --verde-v: #22C55E;
+    --ambar: #B45309; --ambar-f: #FFF7E6; --ambar-b: #F5D48A; --ambar-v: #F59E0B;
+    --rojo: #B91C1C; --rojo-f: #FEF2F2; --rojo-b: #F5B5B5; --rojo-v: #EF4444;
+    --gris-f: var(--hundido);
+    /* compatibilidad con nombres anteriores */
+    --acento: var(--accion); --acento-osc: var(--accion-osc); --acento-claro: var(--marca-claro); --acento-borde: var(--marca-borde); --acento-tenue: var(--marca-tenue);
+    --navy: var(--marca); --navy2: var(--marca-osc); --navy-texto: #CFE0E5;
   }
   * { box-sizing: border-box; }
   html { -webkit-text-size-adjust: 100%; }
-  body { margin: 0; background: var(--fondo); color: var(--tinta); font: 14.5px/1.5 var(--sans); font-feature-settings: "tnum", "cv11"; }
-  .app { max-width: 1320px; margin: 0 auto; padding: 0 28px 44px; }
-  a { color: var(--acento); }
-  h1, h2, h3 { font-family: var(--sans); font-weight: 650; color: var(--tinta); letter-spacing: -.01em; }
-  h2 { font-size: 17px; margin: 0 0 12px; }
-  h3 { font-size: 15px; margin: 0 0 8px; }
-  :focus-visible { outline: 2px solid var(--acento); outline-offset: 2px; }
+  body { margin: 0; background: var(--fondo); color: var(--tinta); font: 14px/1.5 var(--sans); font-feature-settings: "tnum", "cv11", "ss01"; min-height: 100vh; display: flex; flex-direction: column; }
+  a { color: var(--accion); }
+  h1, h2, h3 { font-family: var(--sans-tit); font-weight: var(--peso-tit); color: var(--tinta); letter-spacing: var(--esp-tit); }
+  h2 { font-size: 16px; margin: 0 0 12px; }
+  h3 { font-size: 14.5px; margin: 0 0 8px; }
+  :focus-visible { outline: 2px solid var(--accion); outline-offset: 2px; border-radius: 3px; }
   [hidden] { display: none !important; }
   .sr { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
-  code, .mono { font-family: var(--mono); font-size: 12.5px; }
+  code, .mono { font-family: var(--mono); font-size: 12px; }
+  svg.ico { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex: none; }
 
-  .demo-aviso { background: var(--navy); color: var(--navy-texto); font-size: 12.5px; text-align: center; padding: 6px 16px; letter-spacing: .01em; border-bottom: 1px solid rgba(255,255,255,.06); }
+  /* Franja de demostración */
+  .demo-aviso { background: var(--tinta); color: #CBD5DB; font-size: 12.5px; padding: 6px 20px; display: flex; justify-content: center; align-items: center; gap: 10px 24px; flex-wrap: wrap; }
   .demo-aviso b { color: #fff; font-weight: 600; }
+  .tema-sel { display: inline-flex; align-items: center; gap: 6px; color: #9FB0B8; }
+  .tema-sel select { font: inherit; font-size: 12px; padding: 2px 6px; border-radius: 5px; background: rgba(255,255,255,.08); color: #fff; border: 1px solid rgba(255,255,255,.18); }
 
-  /* Barra superior oscura, a todo el ancho */
-  .barra-app { background: linear-gradient(180deg, var(--navy2), var(--navy)); color: #fff; border-bottom: 1px solid rgba(255,255,255,.08); }
-  .barra-app .interior { max-width: 1320px; margin: 0 auto; padding: 14px 28px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px 24px; }
-  .marca-app { display: flex; align-items: center; gap: 12px; text-decoration: none; color: #fff; }
-  .logo { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, #3b82f6, #1d5fd6 60%, #0ea5e9); display: grid; place-items: center; font: 700 13px/1 var(--sans); letter-spacing: .04em; color: #fff; box-shadow: 0 0 0 1px rgba(255,255,255,.12), 0 6px 16px -6px rgba(59,130,246,.8); }
-  .firma { font-weight: 650; font-size: 16px; letter-spacing: -.01em; }
-  .sub { color: #8b9bb4; font-size: 11.5px; letter-spacing: .12em; text-transform: uppercase; margin-top: 2px; }
-  .cab-der { display: flex; align-items: center; flex-wrap: wrap; gap: 10px 16px; }
-  .modo { display: inline-flex; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12); border-radius: 10px; padding: 3px; }
-  .modo button { font: inherit; font-size: 13px; font-weight: 500; border: 0; background: none; padding: 7px 13px; cursor: pointer; color: #c7d2e3; border-radius: 7px; }
-  .modo button:hover { color: #fff; }
-  .modo button[aria-pressed="true"] { background: #fff; color: var(--navy); font-weight: 600; box-shadow: 0 1px 2px rgba(0,0,0,.3); }
-  .guardado { font-size: 12px; color: #8b9bb4; display: inline-flex; align-items: center; gap: 6px; }
-  .guardado::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--verde-v); box-shadow: 0 0 0 3px rgba(34,197,94,.2); }
-  .guardado.mal { color: #fbbf24; }
-  .guardado.mal::before { background: var(--ambar-v); box-shadow: 0 0 0 3px rgba(245,158,11,.2); }
+  /* Barra superior */
+  .barra-app { background: var(--papel); border-bottom: 1px solid var(--linea); height: 58px; display: flex; align-items: center; padding: 0 20px; gap: 24px; position: sticky; top: 0; z-index: 20; }
+  .marca-app { display: flex; align-items: center; gap: 11px; text-decoration: none; color: var(--tinta); min-width: 0; }
+  .sello-logo { width: 34px; height: 34px; flex: none; }
+  .firma { display: block; font-family: var(--sans-tit); font-weight: var(--peso-tit); font-size: 16px; letter-spacing: var(--esp-tit); line-height: 1.1; }
+  .sub { display: block; color: var(--suave); font-size: 11px; letter-spacing: .04em; margin-top: 2px; }
+  .cab-centro { flex: 1; display: flex; justify-content: center; min-width: 0; }
+  .sel-cli { display: inline-flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--suave); background: var(--papel2); border: 1px solid var(--linea); border-radius: var(--radio-s); padding: 4px 6px 4px 12px; max-width: 100%; }
+  .sel-cli select { font: inherit; font-size: 13.5px; font-weight: 600; color: var(--tinta); border: 0; background: transparent; padding: 4px 4px; max-width: 320px; }
+  .cab-der { display: flex; align-items: center; gap: 14px; }
+  .modo { display: inline-flex; background: var(--hundido); border-radius: var(--radio-s); padding: 3px; }
+  .modo button { font: inherit; font-size: 12.5px; font-weight: 500; border: 0; background: none; padding: 6px 11px; cursor: pointer; color: var(--tinta2); border-radius: calc(var(--radio-s) - 2px); white-space: nowrap; }
+  .modo button:hover { color: var(--tinta); }
+  .modo button[aria-pressed="true"] { background: var(--papel); color: var(--tinta); font-weight: 600; box-shadow: var(--sombra); }
+  .guardado { font-size: 12px; color: var(--suave); display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+  .guardado::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--verde-v); }
+  .guardado.mal { color: var(--ambar); }
+  .guardado.mal::before { background: var(--ambar-v); }
+  .avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--marca); color: var(--marca-texto); display: grid; place-items: center; font-size: 12px; font-weight: 700; letter-spacing: .02em; flex: none; }
+  @media (max-width: 900px) {
+    .cab-centro { display: none; } .guardado { display: none; } .sub { display: none; }
+    .barra-app { height: auto; min-height: 52px; padding: 8px 14px; gap: 8px 12px; flex-wrap: wrap; }
+    .cab-der { width: 100%; justify-content: space-between; }
+    .modo { flex: 1; } .modo button { flex: 1; padding: 7px 6px; font-size: 12px; text-align: center; }
+  }
+  @media (max-width: 480px) { .avatar { display: none; } }
 
-  .vistas { display: flex; flex-wrap: wrap; gap: 4px; margin: 18px 0 22px; padding: 4px; background: var(--hundido); border-radius: 11px; width: fit-content; max-width: 100%; }
-  .vistas button { font: inherit; background: none; border: 0; padding: 8px 13px; color: var(--tinta2); border-radius: 8px; font-weight: 500; font-size: 13.5px; cursor: pointer; }
-  .vistas button:hover { color: var(--tinta); }
-  .vistas button[aria-current="page"] { color: var(--tinta); background: var(--papel); box-shadow: var(--sombra); font-weight: 600; }
-  .vistas .cuenta-p { display: inline-block; min-width: 19px; padding: 0 6px; margin-left: 6px; border-radius: 999px; background: var(--papel); color: var(--tinta2); font-size: 11.5px; text-align: center; font-weight: 600; border: 1px solid var(--linea); }
-  .vistas .cuenta-p.rojo { background: var(--rojo-f); color: var(--rojo); border-color: var(--rojo-b); }
-  .vistas .cuenta-p.ambar { background: var(--ambar-f); color: var(--ambar); border-color: var(--ambar-b); }
-  @media (max-width: 700px) {
-    .vistas { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); width: auto; }
-    .vistas button { min-height: 42px; padding: 6px 4px; font-size: 12.5px; line-height: 1.2; }
+  /* Cuerpo: barra lateral + contenido */
+  .cuerpo { display: flex; flex: 1; min-height: 0; }
+  .lateral { width: 232px; flex: none; border-right: 1px solid var(--linea); background: var(--papel); padding: 14px 10px; position: sticky; top: 58px; align-self: flex-start; height: calc(100vh - 58px); overflow: auto; display: flex; flex-direction: column; }
+  .lateral nav { display: flex; flex-direction: column; gap: 2px; }
+  .lateral nav button { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; font: inherit; font-size: 13.5px; font-weight: 500; color: var(--tinta2); background: none; border: 0; border-radius: var(--radio-s); padding: 9px 10px; cursor: pointer; }
+  .lateral nav button:hover { background: var(--hundido); color: var(--tinta); }
+  .lateral nav button[aria-current="page"] { background: var(--marca-claro); color: var(--marca); font-weight: 600; }
+  .lateral nav button .ico { color: var(--suave); }
+  .lateral nav button[aria-current="page"] .ico { color: var(--marca); }
+  .lateral nav .cuenta-p { margin-left: auto; min-width: 20px; padding: 0 6px; border-radius: 999px; background: var(--hundido); color: var(--tinta2); font-size: 11px; font-weight: 600; text-align: center; line-height: 18px; }
+  .lateral nav .cuenta-p.rojo { background: var(--rojo-f); color: var(--rojo); }
+  .lateral nav .cuenta-p.ambar { background: var(--ambar-f); color: var(--ambar); }
+  .lateral-pie { margin-top: auto; padding: 12px 10px 4px; font-size: 11.5px; color: var(--suave); line-height: 1.5; border-top: 1px solid var(--linea2); }
+  .sel-cli-lat { display: none; }
+  main#main { flex: 1; min-width: 0; padding: 24px 32px 48px; max-width: 1360px; }
+  @media (max-width: 900px) {
+    .cuerpo { flex-direction: column; }
+    .lateral { width: 100%; align-self: stretch; height: auto; position: static; border-right: 0; border-bottom: 1px solid var(--linea); padding: 8px 10px; min-width: 0; }
+    .lateral nav { min-width: 0; }
+    .sel-cli-lat select { max-width: 100%; flex: 1; }
+    .lateral nav { flex-direction: row; overflow-x: auto; gap: 4px; padding-bottom: 2px; }
+    .lateral nav button { width: auto; white-space: nowrap; padding: 8px 10px; font-size: 13px; }
+    .lateral nav button .ico { display: none; }
+    .lateral-pie { display: none; }
+    .sel-cli-lat { display: flex; margin: 0 0 8px; }
+    main#main { padding: 16px 16px 32px; }
   }
 
   /* Botones y campos */
-  .btn { font: inherit; font-size: 13.5px; font-weight: 500; line-height: 1.3; color: var(--tinta); background: var(--papel); border: 1px solid var(--linea); border-radius: var(--radio-s); padding: 8px 14px; cursor: pointer; text-decoration: none; display: inline-block; box-shadow: var(--sombra); }
-  .btn:hover { border-color: var(--acento); color: var(--acento); }
-  .btn.primario { background: var(--acento); border-color: var(--acento); color: #fff; box-shadow: 0 1px 2px rgba(29,95,214,.3), 0 6px 14px -8px rgba(29,95,214,.8); }
-  .btn.primario:hover { background: var(--acento-osc); color: #fff; }
+  .btn { font: inherit; font-size: 13.5px; font-weight: 500; line-height: 1.3; color: var(--tinta); background: var(--papel); border: 1px solid var(--linea); border-radius: var(--radio-s); padding: 8px 14px; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 7px; box-shadow: var(--sombra); transition: background .15s, border-color .15s, color .15s; }
+  .btn:hover { border-color: var(--campo); background: var(--papel2); }
+  .btn.primario { background: var(--accion); border-color: var(--accion); color: var(--accion-texto); box-shadow: 0 1px 2px rgba(0,0,0,.12); }
+  .btn.primario:hover { background: var(--accion-osc); border-color: var(--accion-osc); color: var(--accion-texto); }
   .btn.peligro { color: var(--rojo); }
   .btn.peligro:hover { border-color: var(--rojo); }
   .btn.chico { font-size: 12.5px; padding: 5px 10px; }
   .btn:disabled { opacity: .5; cursor: not-allowed; }
-  .btn-txt { font: inherit; font-size: 13px; font-weight: 500; background: none; border: 0; color: var(--acento); cursor: pointer; padding: 2px 0; text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--acento-borde); }
-  .btn-txt:hover { text-decoration-color: var(--acento); }
+  .btn-txt { font: inherit; font-size: 13px; font-weight: 500; background: none; border: 0; color: var(--accion); cursor: pointer; padding: 2px 0; text-decoration: underline; text-underline-offset: 3px; text-decoration-color: color-mix(in srgb, var(--accion) 35%, transparent); }
+  .btn-txt:hover { text-decoration-color: var(--accion); }
+  .ayuda { width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--linea); background: var(--papel); color: var(--suave); font: 600 12px/1 var(--sans); cursor: pointer; display: inline-grid; place-items: center; flex: none; }
+  .ayuda:hover { color: var(--marca); border-color: var(--marca-borde); background: var(--marca-claro); }
   input, select, textarea { font: inherit; font-size: 14px; color: var(--tinta); background: var(--papel); border: 1px solid var(--campo); border-radius: var(--radio-s); padding: 8px 11px; min-width: 0; max-width: 100%; }
-  input:focus, select:focus, textarea:focus { border-color: var(--acento); outline: none; box-shadow: 0 0 0 3px var(--acento-tenue); }
+  input:focus, select:focus, textarea:focus { border-color: var(--accion); outline: none; box-shadow: 0 0 0 3px color-mix(in srgb, var(--accion) 18%, transparent); }
   input[aria-invalid="true"] { border-color: var(--rojo); }
-  input[type=checkbox], input[type=radio] { width: 17px; height: 17px; accent-color: var(--acento); margin: 0; flex: none; }
+  input[type=checkbox], input[type=radio] { width: 17px; height: 17px; accent-color: var(--accion); margin: 0; flex: none; }
   textarea { resize: vertical; min-height: 70px; width: 100%; }
   label.campo { display: flex; flex-direction: column; gap: 5px; font-size: 12px; color: var(--suave); min-width: 0; }
-  label.campo > span { font-weight: 600; letter-spacing: .02em; }
+  label.campo > span { font-weight: 600; letter-spacing: .01em; }
   label.campo input, label.campo select, label.campo textarea { width: 100%; }
   label.marca { display: flex; align-items: flex-start; gap: 9px; font-size: 14px; color: var(--tinta2); cursor: pointer; line-height: 1.4; }
   label.marca input { margin-top: 2px; }
@@ -100,42 +158,41 @@
   @media (max-width: 980px) { .dos { grid-template-columns: 1fr; } }
   @media (min-width: 981px) { .dos.ancha { grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); } }
   .nota { font-size: 12.5px; color: var(--suave); }
-  .franja { margin: 0 0 18px; background: var(--acento-claro); border: 1px solid var(--acento-borde); color: var(--acento-osc); border-radius: var(--radio-s); padding: 10px 14px; font-size: 14px; }
-  .alerta { border-radius: var(--radio-s); padding: 10px 14px 10px 40px; font-size: 13.5px; border: 1px solid; margin: 0 0 10px; position: relative; }
-  .alerta::before { content: ""; position: absolute; left: 14px; top: 15px; width: 14px; height: 14px; border-radius: 50%; border: 2px solid currentColor; box-sizing: border-box; }
-  .alerta.rojo { background: var(--rojo-f); border-color: var(--rojo-b); color: #7f1d1d; }
-  .alerta.rojo::before { background: var(--rojo-v); border-color: var(--rojo-v); box-shadow: 0 0 0 3px rgba(239,68,68,.18); }
-  .alerta.ambar { background: var(--ambar-f); border-color: var(--ambar-b); color: #713f12; }
-  .alerta.ambar::before { background: var(--ambar-v); border-color: var(--ambar-v); box-shadow: 0 0 0 3px rgba(245,158,11,.18); }
-  .alerta.verde { background: var(--verde-f); border-color: var(--verde-b); color: #14532d; }
-  .alerta.verde::before { background: var(--verde-v); border-color: var(--verde-v); box-shadow: 0 0 0 3px rgba(34,197,94,.18); }
+  .franja { margin: 0 0 18px; background: var(--marca-claro); border: 1px solid var(--marca-borde); color: var(--marca-osc); border-radius: var(--radio-s); padding: 10px 14px; font-size: 13.5px; }
+  .alerta { border-radius: var(--radio-s); padding: 10px 14px 10px 38px; font-size: 13.5px; border: 1px solid; margin: 0 0 10px; position: relative; }
+  .alerta::before { content: ""; position: absolute; left: 14px; top: 15px; width: 12px; height: 12px; border-radius: 50%; }
+  .alerta.rojo { background: var(--rojo-f); border-color: var(--rojo-b); color: #7F1D1D; }
+  .alerta.rojo::before { background: var(--rojo-v); }
+  .alerta.ambar { background: var(--ambar-f); border-color: var(--ambar-b); color: #713F12; }
+  .alerta.ambar::before { background: var(--ambar-v); }
+  .alerta.verde { background: var(--verde-f); border-color: var(--verde-b); color: #14532D; }
+  .alerta.verde::before { background: var(--verde-v); }
   .alerta b { color: inherit; }
 
-  .sec-cab { display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 10px 20px; margin-bottom: 16px; }
-  .sec-cab h1 { font-size: 24px; line-height: 1.15; margin: 0; letter-spacing: -.02em; }
-  .sec-cab p { margin: 6px 0 0; color: var(--tinta2); max-width: 780px; font-size: 14px; }
+  .sec-cab { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px 20px; margin-bottom: 18px; }
+  .sec-tit { display: flex; align-items: center; gap: 10px; }
+  .sec-cab h1 { font-size: 22px; line-height: 1.2; margin: 0; }
+  .sec-cab p { margin: 6px 0 0; color: var(--tinta2); max-width: 780px; font-size: 13.5px; }
 
   /* Indicadores */
   .resumen { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; margin: 0 0 20px; }
-  .kpi { background: var(--papel); border: 1px solid var(--linea); border-radius: var(--radio); padding: 14px 16px 13px; min-width: 0; box-shadow: var(--sombra); position: relative; overflow: hidden; }
-  .kpi::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: linear-gradient(90deg, var(--acento), #38bdf8); opacity: .9; }
-  .kpi .eti { font-size: 11.5px; color: var(--suave); text-transform: uppercase; letter-spacing: .08em; font-weight: 600; }
-  .kpi .num { font: 650 30px/1.1 var(--sans); margin-top: 8px; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+  .kpi { background: var(--papel); border: 1px solid var(--linea); border-radius: var(--radio); padding: 14px 16px; min-width: 0; box-shadow: var(--sombra); }
+  .kpi .eti { font-size: 11px; color: var(--suave); text-transform: uppercase; letter-spacing: .07em; font-weight: 600; }
+  .kpi .num { font: var(--peso-tit) 30px/1.1 var(--sans-tit); margin-top: 8px; letter-spacing: var(--esp-tit); font-variant-numeric: tabular-nums; }
   .kpi .num small { font-size: 15px; font-weight: 500; color: var(--suave); }
   .kpi .det { font-size: 12.5px; color: var(--tinta2); margin-top: 4px; }
-  .kpi.oscuro { background: linear-gradient(135deg, var(--navy2), var(--navy)); border-color: var(--navy); color: #fff; }
-  .kpi.oscuro::after { background: linear-gradient(90deg, #38bdf8, #a78bfa); }
-  .kpi.oscuro .eti, .kpi.oscuro .det { color: #9fb0c8; }
-  .kpi.oscuro .num { color: #fff; }
+  .kpi.oscuro { background: var(--marca); border-color: var(--marca); color: var(--marca-texto); }
+  .kpi.oscuro .eti, .kpi.oscuro .det { color: color-mix(in srgb, var(--marca-texto) 70%, var(--marca)); }
+  .kpi.oscuro .num { color: var(--marca-texto); }
   @media (max-width: 1050px) { .resumen { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 
   /* Cartera de clientes */
   .cartera { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 12px; margin-bottom: 20px; }
   .cli { background: var(--papel); border: 1px solid var(--linea); border-radius: var(--radio); padding: 15px 17px; cursor: pointer; text-align: left; font: inherit; color: inherit; width: 100%; box-shadow: var(--sombra); transition: border-color .15s, box-shadow .15s; }
-  .cli:hover { border-color: var(--acento-borde); box-shadow: var(--sombra-2); }
-  .cli[aria-pressed="true"] { border-color: var(--acento); box-shadow: 0 0 0 3px var(--acento-tenue); }
+  .cli:hover { border-color: var(--campo); box-shadow: var(--sombra-2); }
+  .cli[aria-pressed="true"] { border-color: var(--marca); box-shadow: 0 0 0 3px var(--marca-tenue); }
   .cli .top { display: flex; gap: 11px; align-items: center; }
-  .sello { width: 38px; height: 38px; border-radius: 10px; color: #fff; display: grid; place-items: center; font: 700 13px/1 var(--sans); flex: none; letter-spacing: .04em; }
+  .sello { width: 38px; height: 38px; border-radius: var(--radio-s); color: #fff; display: grid; place-items: center; font: 700 13px/1 var(--sans-tit); flex: none; letter-spacing: .03em; }
   .cli b { display: block; font-size: 14.5px; }
   .cli .mini { font-size: 12.5px; color: var(--suave); }
   .cli .cifras { display: flex; gap: 8px 14px; margin-top: 12px; font-size: 12.5px; color: var(--tinta2); flex-wrap: wrap; align-items: center; }
@@ -143,20 +200,18 @@
 
   /* Tablas */
   .tabla { width: 100%; border-collapse: separate; border-spacing: 0; background: var(--papel); border: 1px solid var(--linea); border-radius: var(--radio); font-variant-numeric: tabular-nums; box-shadow: var(--sombra); }
-  .tabla th { text-align: left; font-size: 11px; font-weight: 650; color: var(--suave); letter-spacing: .08em; text-transform: uppercase; padding: 10px 12px; border-bottom: 1px solid var(--linea); background: var(--papel2); }
+  .tabla th { text-align: left; font-size: 11px; font-weight: 600; color: var(--suave); letter-spacing: .07em; text-transform: uppercase; padding: 9px 12px; border-bottom: 1px solid var(--linea); background: var(--papel2); }
   .tabla th:first-child { border-top-left-radius: var(--radio); }
   .tabla th:last-child { border-top-right-radius: var(--radio); }
-  .tabla td { padding: 11px 12px; border-bottom: 1px solid var(--linea2); vertical-align: top; font-size: 13.5px; }
+  .tabla td { padding: 10px 12px; border-bottom: 1px solid var(--linea2); vertical-align: top; font-size: 13.5px; }
   .tabla tbody tr:last-child td { border-bottom: 0; }
   .tabla tr.clic { cursor: pointer; }
   .tabla tr.clic:hover td { background: var(--papel2); }
   .tabla tr.mal td { background: var(--rojo-f); }
   .mini { display: block; font-size: 12.5px; color: var(--suave); }
-  .vacio { padding: 30px 20px; text-align: center; color: var(--suave); background: var(--papel); border: 1px dashed var(--linea); border-radius: var(--radio); }
+  .vacio { padding: 36px 20px; text-align: center; color: var(--suave); background: var(--papel); border: 1px dashed var(--linea); border-radius: var(--radio); }
   .tabla-env { overflow-x: auto; }
   @media screen and (max-width: 760px) {
-    .app { padding: 0 16px 28px; }
-    .barra-app .interior { padding: 12px 16px; }
     .tabla.resp, .tabla.resp tbody, .tabla.resp tr, .tabla.resp td { display: block; width: 100%; }
     .tabla.resp thead { display: none; }
     .tabla.resp { background: none; border: 0; box-shadow: none; }
@@ -171,70 +226,110 @@
   }
 
   /* Chips de estado */
-  .chip { display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; font-weight: 600; padding: 2px 9px 2px 7px; border-radius: 999px; border: 1px solid; white-space: nowrap; line-height: 1.5; letter-spacing: .01em; }
+  .chip { display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; font-weight: 600; padding: 2px 9px 2px 7px; border-radius: 999px; border: 1px solid; white-space: nowrap; line-height: 1.5; }
   .chip::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
   .chip.verde { background: var(--verde-f); border-color: var(--verde-b); color: var(--verde); }
   .chip.ambar { background: var(--ambar-f); border-color: var(--ambar-b); color: var(--ambar); }
   .chip.rojo { background: var(--rojo-f); border-color: var(--rojo-b); color: var(--rojo); }
   .chip.gris { background: var(--gris-f); border-color: var(--linea); color: var(--suave); }
-  .chip.azul { background: var(--acento-claro); border-color: var(--acento-borde); color: var(--acento-osc); }
+  .chip.azul { background: var(--marca-claro); border-color: var(--marca-borde); color: var(--marca-osc); }
   .razones { margin: 6px 0 0; padding-left: 18px; font-size: 12.5px; color: var(--tinta2); }
   .razones li + li { margin-top: 3px; }
 
   /* Línea de tiempo */
   .tiempo { list-style: none; margin: 0; padding: 0; border-left: 2px solid var(--linea); }
   .tiempo li { position: relative; padding: 0 0 14px 18px; font-size: 13.5px; }
-  .tiempo li::before { content: ""; position: absolute; left: -7px; top: 5px; width: 12px; height: 12px; border-radius: 50%; background: var(--papel); border: 2px solid var(--acento); box-shadow: 0 0 0 3px var(--papel); }
+  .tiempo li::before { content: ""; position: absolute; left: -7px; top: 5px; width: 12px; height: 12px; border-radius: 50%; background: var(--papel); border: 2px solid var(--marca); box-shadow: 0 0 0 3px var(--papel); }
   .tiempo li.revoca::before { border-color: var(--rojo-v); }
   .tiempo li.acceso::before { border-color: var(--suave); }
-  .tiempo .cuando { font-size: 12px; color: var(--suave); font-family: var(--mono); }
+  .tiempo .cuando { font-size: 11.5px; color: var(--suave); font-family: var(--mono); }
   .huella { font-family: var(--mono); font-size: 11.5px; color: var(--suave); word-break: break-all; }
+
+  /* Aviso flotante */
+  .aviso-flot { position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%) translateY(10px); background: var(--tinta); color: #fff; font-size: 13px; padding: 10px 16px; border-radius: 999px; box-shadow: var(--sombra-2); opacity: 0; transition: opacity .18s, transform .18s; pointer-events: none; z-index: 50; display: flex; align-items: center; gap: 8px; max-width: calc(100vw - 32px); }
+  .aviso-flot.ver { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .aviso-flot .ico { color: var(--verde-v); }
+
+  /* Recorrido guiado: una banda integrada bajo la barra, no una ventana emergente. Se puede cerrar en cualquier momento. */
+  .recorrido { position: sticky; top: 58px; z-index: 30; background: var(--marca); color: var(--marca-texto); padding: 12px 24px; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 8px 22px; box-shadow: 0 8px 24px -12px rgba(0,0,0,.45); animation: rec-entra .28s ease-out; font-family: var(--sans); }
+  #titular:not([hidden]) ~ .recorrido, body:has(#titular:not([hidden])) .recorrido { top: 0; }
+  .recorrido .rec-num { font: 700 26px/1 var(--sans-tit); letter-spacing: -.02em; opacity: .95; display: flex; align-items: baseline; gap: 4px; }
+  .recorrido .rec-num small { font: 600 11px/1 var(--sans); letter-spacing: .1em; text-transform: uppercase; opacity: .7; }
+  .recorrido h3 { font-size: 15px; margin: 0 0 2px; color: var(--marca-texto); }
+  .recorrido p { margin: 0; font-size: 13px; line-height: 1.45; color: color-mix(in srgb, var(--marca-texto) 82%, var(--marca)); max-width: 880px; }
+  .rec-der { display: flex; align-items: center; gap: 10px; }
+  .rec-puntos { display: flex; gap: 5px; margin-right: 6px; }
+  .rec-puntos i { width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,.28); display: block; transition: background .2s, transform .2s; }
+  .rec-puntos i.hecho { background: var(--marca-texto); }
+  .rec-puntos i.actual { transform: scale(1.35); }
+  .recorrido .btn { background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.22); color: var(--marca-texto); box-shadow: none; }
+  .recorrido .btn:hover { background: rgba(255,255,255,.2); border-color: rgba(255,255,255,.35); }
+  .recorrido .btn.primario { background: var(--marca-texto); color: var(--marca); border-color: var(--marca-texto); }
+  .recorrido .btn.primario:hover { background: #fff; }
+  .rec-x { font: 400 22px/1 var(--sans); background: none; border: 0; color: var(--marca-texto); opacity: .7; cursor: pointer; padding: 0 2px; }
+  .rec-x:hover { opacity: 1; }
+  .foco-rec { position: relative; box-shadow: 0 0 0 3px var(--papel), 0 0 0 6px var(--realce), 0 12px 32px -12px color-mix(in srgb, var(--realce) 60%, transparent) !important; border-radius: var(--radio); animation: foco-pulso 1.6s ease-out 1; transition: box-shadow .3s; }
+  tr.foco-rec { box-shadow: none !important; }
+  tr.foco-rec td { background: var(--realce-f) !important; box-shadow: inset 3px 0 0 var(--realce); }
+  @keyframes foco-pulso { 0% { box-shadow: 0 0 0 3px var(--papel), 0 0 0 14px color-mix(in srgb, var(--realce) 0%, transparent); } 100% { box-shadow: 0 0 0 3px var(--papel), 0 0 0 6px var(--realce); } }
+  @keyframes rec-entra { from { transform: translateY(-8px); opacity: 0; } to { transform: none; opacity: 1; } }
+  @media (max-width: 700px) { .recorrido { grid-template-columns: 1fr; padding: 10px 14px; } .recorrido .rec-num { display: none; } .rec-der { justify-content: space-between; } }
+
+  /* Movimiento con sentido: entrada de cada vista, botones y tarjetas */
+  .vista-entra { animation: vista-entra .22s ease-out; }
+  @keyframes vista-entra { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  .btn:active { transform: translateY(1px); }
+  .lateral nav button { transition: background .15s, color .15s; }
+  .caja, .kpi { transition: box-shadow .2s, border-color .2s; }
+  .kpi:hover { box-shadow: var(--sombra-2); }
+  @media (prefers-reduced-motion: reduce) { .vista-entra, .recorrido, .foco-rec { animation: none; } * { transition: none !important; } }
 
   /* Diálogo */
   dialog { border: 1px solid var(--linea); border-radius: 14px; padding: 0; width: min(760px, calc(100vw - 24px)); max-height: calc(100vh - 40px); color: var(--tinta); background: var(--papel); box-shadow: var(--sombra-2); }
-  dialog::backdrop { background: rgba(11, 18, 32, .55); backdrop-filter: blur(2px); }
+  dialog::backdrop { background: rgba(18, 28, 33, .5); backdrop-filter: blur(2px); }
   dialog .d-cab { padding: 16px 20px 6px; }
   dialog .d-cuerpo { padding: 8px 20px 16px; overflow: auto; max-height: calc(100vh - 190px); }
   dialog .d-pie { padding: 12px 20px; border-top: 1px solid var(--linea2); display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap; background: var(--papel2); border-radius: 0 0 14px 14px; }
+  .logo { width: 34px; height: 34px; border-radius: 9px; background: var(--marca); color: var(--marca-texto); display: grid; place-items: center; font: 700 12px/1 var(--sans-tit); }
 
   /* ───── Vista del titular (formulario con la marca del cliente) ───── */
-  .titular-fondo { background: radial-gradient(1200px 500px at 50% -10%, color-mix(in srgb, var(--marca, #234) 22%, transparent), transparent 70%), #eef1f5; min-height: 100vh; padding: 0 0 40px; }
-  .barra-demo { background: #fffbeb; border-bottom: 1px solid var(--ambar-b); color: #713f12; font-size: 13px; padding: 8px 16px; display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; justify-content: center; }
+  .titular-fondo { background: radial-gradient(1100px 480px at 50% -8%, color-mix(in srgb, var(--marca-cli, #234) 20%, transparent), transparent 70%), #EEF1F4; min-height: 100vh; padding: 0 0 40px; font-family: var(--sans); }
+  .barra-demo { background: #FFFBEB; border-bottom: 1px solid var(--ambar-b); color: #713F12; font-size: 13px; padding: 8px 16px; display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; justify-content: center; }
   .barra-demo select { font-size: 13px; padding: 4px 8px; }
   .t-marco { max-width: 660px; margin: 28px auto 0; padding: 0 16px; }
-  .t-cab { background: var(--marca, #234); color: #fff; border-radius: 16px 16px 0 0; padding: 20px 22px; display: flex; align-items: center; gap: 14px; }
+  .t-cab { background: var(--marca-cli, #234); color: #fff; border-radius: 16px 16px 0 0; padding: 20px 22px; display: flex; align-items: center; gap: 14px; }
   .t-cab .sello { background: rgba(255,255,255,.18); width: 46px; height: 46px; font-size: 16px; }
-  .t-cab b { display: block; font-size: 17px; }
+  .t-cab b { display: block; font-size: 17px; font-family: var(--sans-tit); }
   .t-cab span { font-size: 13px; opacity: .85; }
-  .t-cuerpo { background: #fff; border: 1px solid #d9dde3; border-top: 0; border-radius: 0 0 16px 16px; padding: 22px; box-shadow: var(--sombra-2); }
+  .t-cuerpo { background: #fff; border: 1px solid #D9DDE3; border-top: 0; border-radius: 0 0 16px 16px; padding: 22px; box-shadow: var(--sombra-2); }
   .t-pasos { display: flex; gap: 6px; margin: 0 0 18px; }
-  .t-pasos span { flex: 1; height: 5px; border-radius: 3px; background: #e2e6eb; }
-  .t-pasos span.hecho { background: var(--marca, #234); }
-  .t-cuerpo h2 { font-size: 19px; margin: 0 0 6px; }
-  .t-cuerpo .lead { color: #4a5563; font-size: 14.5px; margin: 0 0 16px; }
-  .t-btn { font: inherit; font-weight: 600; font-size: 15px; background: var(--marca, #234); color: #fff; border: 0; border-radius: 10px; padding: 11px 18px; cursor: pointer; box-shadow: 0 4px 12px -6px color-mix(in srgb, var(--marca, #234) 70%, transparent); }
+  .t-pasos span { flex: 1; height: 5px; border-radius: 3px; background: #E2E6EB; }
+  .t-pasos span.hecho { background: var(--marca-cli, #234); }
+  .t-cuerpo h2 { font-size: 20px; margin: 0 0 6px; }
+  .t-cuerpo .lead { color: #4A5563; font-size: 14.5px; margin: 0 0 16px; }
+  .t-btn { font: inherit; font-weight: 600; font-size: 15px; background: var(--marca-cli, #234); color: #fff; border: 0; border-radius: 10px; padding: 12px 18px; cursor: pointer; min-height: 44px; box-shadow: 0 4px 12px -6px color-mix(in srgb, var(--marca-cli, #234) 70%, transparent); }
   .t-btn:disabled { opacity: .45; cursor: not-allowed; box-shadow: none; }
-  .t-btn.sec { background: #fff; color: #2a3440; border: 1px solid #c9ced5; font-weight: 500; box-shadow: none; }
-  .pol-caja { border: 1px solid #d9dde3; border-radius: 10px; height: 300px; overflow-y: auto; padding: 14px 16px; font-size: 13.5px; line-height: 1.55; color: #2a3440; background: #fafbfc; }
+  .t-btn.sec { background: #fff; color: #2A3440; border: 1px solid #C9CED5; font-weight: 500; box-shadow: none; }
+  .pol-caja { border: 1px solid #D9DDE3; border-radius: 10px; height: 300px; overflow-y: auto; padding: 14px 16px; font-size: 13.5px; line-height: 1.55; color: #2A3440; background: #FAFBFC; }
   .pol-caja h4 { margin: 12px 0 4px; font-size: 14px; }
   .pol-caja p { margin: 0 0 8px; }
-  .pol-avance { font-size: 12.5px; color: #5d6773; margin: 6px 0 12px; }
-  .fin { border: 1px solid #d9dde3; border-radius: 12px; padding: 13px 15px; margin-bottom: 10px; transition: border-color .15s, box-shadow .15s; }
-  .fin.marcada { border-color: var(--marca, #234); box-shadow: 0 0 0 1px var(--marca, #234); background: color-mix(in srgb, var(--marca, #234) 4%, #fff); }
-  .fin .det { font-size: 12.8px; color: #5d6773; margin: 6px 0 0 26px; }
+  .pol-avance { font-size: 12.5px; color: #5D6773; margin: 6px 0 12px; }
+  .fin { border: 1px solid #D9DDE3; border-radius: 12px; padding: 13px 15px; margin-bottom: 10px; transition: border-color .15s, box-shadow .15s; }
+  .fin.marcada { border-color: var(--marca-cli, #234); box-shadow: 0 0 0 1px var(--marca-cli, #234); background: color-mix(in srgb, var(--marca-cli, #234) 4%, #fff); }
+  .fin .det { font-size: 12.8px; color: #5D6773; margin: 6px 0 0 26px; }
   .fin .det div + div { margin-top: 2px; }
-  .aviso-lab { background: #f3f6f9; border-left: 3px solid var(--marca, #234); padding: 9px 12px; font-size: 13.2px; color: #33404d; border-radius: 0 8px 8px 0; margin: 0 0 14px; }
-  .t-pie { text-align: center; font-size: 12px; color: #6b7480; margin-top: 14px; }
-  .t-tabs { display: flex; gap: 4px; margin: 0 0 18px; border-bottom: 1px solid #e2e6eb; }
-  .t-tabs button { font: inherit; font-size: 14px; background: none; border: 0; padding: 9px 12px; cursor: pointer; color: #4a5563; border-bottom: 2px solid transparent; margin-bottom: -1px; }
-  .t-tabs button[aria-current="page"] { color: #1b2530; border-color: var(--marca, #234); font-weight: 600; }
-  .comprobante { border: 1px dashed #b9c0c8; border-radius: 12px; padding: 14px 16px; background: #fafbfc; font-size: 13.5px; }
-  .codigo { font: 700 22px/1.2 var(--mono); letter-spacing: .08em; color: #1b2530; }
+  .aviso-lab { background: #F3F6F9; border-left: 3px solid var(--marca-cli, #234); padding: 9px 12px; font-size: 13.2px; color: #33404D; border-radius: 0 8px 8px 0; margin: 0 0 14px; }
+  .t-pie { text-align: center; font-size: 12px; color: #6B7480; margin-top: 14px; }
+  .t-tabs { display: flex; gap: 4px; margin: 0 0 18px; border-bottom: 1px solid #E2E6EB; }
+  .t-tabs button { font: inherit; font-size: 14px; background: none; border: 0; padding: 9px 12px; cursor: pointer; color: #4A5563; border-bottom: 2px solid transparent; margin-bottom: -1px; min-height: 44px; }
+  .t-tabs button[aria-current="page"] { color: #1B2530; border-color: var(--marca-cli, #234); font-weight: 600; }
+  .comprobante { border: 1px dashed #B9C0C8; border-radius: 12px; padding: 14px 16px; background: #FAFBFC; font-size: 13.5px; }
+  .codigo { font: 700 22px/1.2 var(--mono); letter-spacing: .08em; color: #1B2530; }
 
   /* ───── Vista del fiscalizador ───── */
-  .fisc-banda { background: linear-gradient(135deg, var(--navy2), var(--navy)); color: #e2e8f0; border-radius: var(--radio); padding: 18px 22px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px 24px; margin-bottom: 16px; border: 1px solid rgba(255,255,255,.06); }
-  .fisc-banda b { color: #fff; }
-  .fisc-banda .mini { color: #9fb0c8; }
+  .fisc-banda { background: var(--marca); color: color-mix(in srgb, var(--marca-texto) 85%, var(--marca)); border-radius: var(--radio); padding: 18px 22px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px 24px; margin-bottom: 16px; }
+  .fisc-banda b { color: var(--marca-texto); }
+  .fisc-banda .mini { color: color-mix(in srgb, var(--marca-texto) 65%, var(--marca)); }
   .fisc-banda .estado { display: flex; align-items: center; gap: 12px; }
   .semaforo { width: 14px; height: 14px; border-radius: 50%; background: var(--verde-v); box-shadow: 0 0 0 4px rgba(34,197,94,.22), 0 0 18px rgba(34,197,94,.6); flex: none; }
   .semaforo.mal { background: var(--rojo-v); box-shadow: 0 0 0 4px rgba(239,68,68,.25), 0 0 18px rgba(239,68,68,.6); }
@@ -252,8 +347,8 @@
   /* Impresión: solo el expediente */
   #imprimible { display: none; }
   @media print {
-    body { background: #fff; }
-    .app, .barra-app, .demo-aviso, #titular { display: none !important; }
+    body { background: #fff; display: block; }
+    .cuerpo, .barra-app, .demo-aviso, #titular, .aviso-flot { display: none !important; }
     #imprimible { display: block; font: 11.5pt/1.45 var(--sans); color: #000; padding: 0 6mm; }
     #imprimible h1 { font-size: 18pt; margin: 0 0 4pt; }
     #imprimible h2 { font-size: 13pt; margin: 14pt 0 5pt; }
@@ -265,26 +360,33 @@
 </style>
 </head>
 <body>
-<div class="demo-aviso" id="demoAviso"><b>Prototipo con datos ficticios.</b> Todo se guarda solo en este navegador; ninguna empresa, persona ni RUT es real.</div>
+<div class="demo-aviso" id="demoAviso"><span><b>Prototipo con datos ficticios.</b> Todo se guarda solo en este navegador; ninguna empresa, persona ni RUT es real.</span>
+  <label class="tema-sel">Estilo <select id="selTema"><option value="sello">Sello · petróleo</option><option value="tinta">Tinta y papel</option><option value="instrumento">Instrumento</option></select></label></div>
 
 <header class="barra-app" id="barraApp">
-  <div class="interior">
-    <a class="marca-app" href="../index.html"><span class="logo">MLV</span><span><span class="firma">MLV Abogados</span><div class="sub">Consentimientos · registro trazable · prototipo</div></span></a>
-    <div class="cab-der">
-      <div class="modo" role="group" aria-label="Ver como">
-        <button type="button" data-modo="mlv">Equipo MLV</button>
-        <button type="button" data-modo="titular">Trabajador o titular</button>
-        <button type="button" data-modo="fiscal">Fiscalizador</button>
-      </div>
-      <span class="guardado" id="guardado"></span>
+  <a class="marca-app" href="../index.html"><svg class="sello-logo" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="18" fill="var(--marca)"/><circle cx="20" cy="20" r="12.5" fill="none" stroke="rgba(255,255,255,.38)" stroke-width="1.5" stroke-dasharray="3 2.2"/><path d="M13.5 20.5l4.2 4.2L27 15.5" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span><span class="firma">Consentimientos</span><span class="sub">Plataforma de MLV Abogados · Ley 21.719</span></span></a>
+  <div class="cab-centro"><label class="sel-cli"><span>Cliente</span><select id="selCli" aria-label="Cliente"></select></label></div>
+  <div class="cab-der">
+    <div class="modo" role="group" aria-label="Ver como">
+      <button type="button" data-modo="mlv">Equipo MLV</button>
+      <button type="button" data-modo="titular">Trabajador o titular</button>
+      <button type="button" data-modo="fiscal">Fiscalizador</button>
     </div>
+    <span class="guardado" id="guardado"></span>
+    <span class="avatar" title="Cristóbal L. · Administrador MLV (ficticio)">CL</span>
   </div>
 </header>
+<aside class="recorrido" id="recorrido" hidden aria-live="polite"></aside>
 
-<div class="app" id="app">
-  <nav class="vistas" id="vistas" aria-label="Secciones"></nav>
+<div class="cuerpo" id="app">
+  <aside class="lateral">
+    <label class="sel-cli sel-cli-lat"><span>Cliente</span><select id="selCliLat" aria-label="Cliente"></select></label>
+    <nav id="vistas" aria-label="Secciones"></nav>
+    <div class="lateral-pie">Plataforma de consentimientos<br>Prototipo v0.3 · Ley 21.719<br>Registro probatorio con SHA-256</div>
+  </aside>
   <main id="main"></main>
 </div>
+<div class="aviso-flot" id="avisoFlot" role="status" aria-live="polite"></div>
 
 <div id="titular" hidden></div>
 <section id="imprimible" aria-hidden="true"></section>
@@ -613,7 +715,7 @@ function vUsuarios(c) {
   const a = c.accesoFiscal;
   const roles = Object.entries(ROLES);
   const matriz = `<table class="tabla" style="min-width:620px"><thead><tr><th style="min-width:220px">Permiso</th>${roles.map(([k, r]) => `<th style="text-align:center;font-size:10.5px">${esc(r.nombre)}</th>`).join('')}</tr></thead><tbody>${PERMISOS.map(([p, v]) => `<tr><td style="font-size:13px">${esc(p)}</td>${v.map((x) => `<td style="text-align:center;font-weight:600;color:${x === '✓' ? 'var(--verde)' : x === '◐' ? 'var(--ambar)' : 'var(--suave)'}">${x}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
-  return `<div class="sec-cab"><div><h1>Usuarios y permisos</h1><p>Quién entra a la plataforma y qué puede hacer. Cinco roles: dos de MLV, dos del cliente y uno temporal para el fiscalizador. Cada acción queda ligada al usuario que la hizo.</p></div>
+  return `<div class="sec-cab"><div class="sec-tit"><h1>Usuarios y permisos</h1><button type="button" class="ayuda" data-ayuda="usuarios" aria-label="Qué es esta sección" title="Qué es esta sección">?</button></div>
     <div class="fila-btn"><button class="btn" data-acc="verIngreso">Ver la pantalla de ingreso</button><button class="btn" data-acc="accesoFiscal">Crear acceso temporal</button><button class="btn primario" data-acc="invitar">Invitar usuario</button></div></div>
   <div class="franja"><b>Demostración.</b> Aquí se muestra cómo quedaría la administración de cuentas. En el prototipo no hay claves ni inicio de sesión real: las cuentas, el doble factor y los permisos se activan en producción.</div>
   <div class="tabla-env"><table class="tabla resp"><thead><tr><th>Usuario</th><th>Rol</th><th>Alcance</th><th>Estado</th><th>Doble factor</th><th>Último acceso</th><th><span class="sr">Acción</span></th></tr></thead><tbody>${filas}</tbody></table></div>
@@ -678,6 +780,80 @@ function descargar(nombre, contenido, tipo = 'application/json') {
   setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
 }
 
+/* Iconos (Lucide, licencia ISC) */
+const ICONOS = {
+  panel: '<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>',
+  rat: '<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5"/><path d="M3 12a9 3 0 0 0 18 0"/></svg>',
+  formularios: '<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>',
+  titulares: '<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+  bitacora: '<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>',
+  usuarios: '<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.586 17.414A2 2 0 0 0 2 18.828V21a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h1a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h.172a2 2 0 0 0 1.414-.586l.814-.814a6.5 6.5 0 1 0-4-4z"/><circle cx="16.5" cy="7.5" r=".5"/></svg>',
+  como: '<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>',
+  fiscal: '<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></svg>',
+  check: '<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>',
+};
+const AYUDA = {
+  usuarios: `Quién entra a la plataforma y qué puede hacer. Cinco roles: dos de MLV, dos del cliente y uno temporal para el fiscalizador. Cada acción queda ligada al usuario que la hizo.`,
+  panel: `Cada cliente tiene su inventario, su política con versiones, sus formularios y un registro de consentimientos que no se puede alterar sin que se note. Elige un cliente:`,
+  rat: `Es el registro de actividades de tratamiento. Cada tratamiento dice su base de licitud; el formulario solo ofrece los que tienen el consentimiento como base y luz verde. La columna «ID consentimiento» es el enlace con el registro (equivale al campo «ID Consentimiento asociado» de la planilla RAT).`,
+  formularios: `Cada cliente tiene su marca, su política de privacidad con fecha y versión (art. 14 ter letra a) y uno o más formularios. Cada versión se guarda con su huella: se puede probar qué texto exacto vio cada persona.`,
+  titulares: `Estado de cada finalidad por persona. Haz clic en una persona para ver su historial completo, anotar una revocación recibida por otro medio o imprimir su expediente.`,
+  bitacora: `Cada anotación lleva la huella SHA-256 de la anterior. Si alguien cambia, borra o intercala una anotación, la cadena se rompe desde ese punto y se nota. Sirve para cumplir el art. 12 inc. 8: «corresponde al responsable probar que contó con el consentimiento».`,
+  como: `Una plataforma de MLV, con la marca de cada cliente, que se usa solo cuando el consentimiento es la base que corresponde.`,
+};
+
+/* Estilo visual elegido (demostración): se recuerda en este navegador. */
+function aplicarTema(t) { document.documentElement.dataset.tema = t; try { localStorage.setItem('mlv-tema', t); } catch { /* nada */ } const sel = $('selTema'); if (sel) sel.value = t; }
+let avisoTemp = null;
+function aviso(texto) {
+  const el = $('avisoFlot'); el.innerHTML = `${ICONOS.check}<span>${esc(texto)}</span>`; el.classList.add('ver');
+  clearTimeout(avisoTemp); avisoTemp = setTimeout(() => el.classList.remove('ver'), 2600);
+}
+let ultimoRegistro = { id: null, n: 0 };
+
+/* Simula una alteración del registro sin guardarla: sirve para ver cómo se rompe la cadena. */
+function simularAlteracion(c) {
+  const copia = JSON.parse(JSON.stringify(c.eventos));
+  const obj = copia.find((e) => e.tipo === 'revocacion') || copia[Math.floor(copia.length / 2)];
+  if (obj.tipo === 'revocacion') obj.fecha = obj.fecha.replace(/^2026-10/, '2026-11');
+  else obj.fecha = obj.fecha.replace(/:\d\d$/, ':00');
+  simulacion = { eventos: copia, n: obj.n, que: obj.tipo === 'revocacion' ? 'se corrió un mes la fecha de una revocación' : 'se cambió la hora' };
+}
+
+/* ───────── Recorrido guiado (siete pasos por la plataforma) ───────── */
+const RECORRIDO = [
+  { t: 'Un panel por cliente', x: 'MLV ve a todos sus clientes en un lugar: consentimientos vigentes, revocados, versión de la política y si el registro está íntegro. Las alertas dicen qué hay que arreglar.', foco: '.cartera', ir: () => { modo = 'mlv'; ruta = 'panel'; } },
+  { t: 'El inventario manda', x: 'Cada tratamiento con su base legal. El semáforo dice si corresponde pedir consentimiento: verde sí, gris se informa en la política, ámbar revisar, rojo no sirve aunque se pida. T-07 es salud de trabajadores: prohibido con consentimiento (art. 16 bis inc. 3).', foco: '[data-trat="T-07"]', ir: () => { modo = 'mlv'; ruta = 'rat'; } },
+  { t: 'El semáforo cambia mientras escribes', x: 'Abre T-03 (huella digital). Marca «Una ley lo exige» o cambia la base y mira cómo cambia el veredicto y sus razones. Cierra el editor para seguir.', foco: '[data-trat="T-03"]', ir: () => { modo = 'mlv'; ruta = 'rat'; } },
+  { t: 'Lo que ve el trabajador', x: 'La marca es la del cliente, no la de MLV. Prueba: «Rellenar con datos ficticios», lee la política hasta el final, marca una casilla y envía. Recibirás un comprobante con código.', foco: '.t-cuerpo', ir: () => { modo = 'titular'; iniciarTitular(); } },
+  { t: 'Una cadena que delata cambios', x: 'Cada anotación lleva la huella de la anterior. Acabamos de simular que alguien corrió un mes la fecha de una revocación: la verificación falla desde ahí y las filas afectadas quedan en rojo. Nada se guardó.', foco: '.alerta.rojo', ir: () => { modo = 'mlv'; ruta = 'bitacora'; simularAlteracion(cli()); } },
+  { t: 'Lo que ve la Agencia', x: 'Acceso de solo lectura con vencimiento. Ya consultamos el expediente de una persona: finalidades, política que vio, lectura medida, huellas. Cada consulta del fiscalizador queda anotada.', foco: '#fiscConsulta', ir: () => { const c = cli(); modo = 'fiscal'; const t = c.titulares[2]; fiscConsulta = t.rut; fiscExp = t; registrar(c, 'acceso', { quien: c.accesoFiscal.nombre, accion: `Consultó el expediente de ${t.id} (recorrido guiado)` }); } },
+  { t: 'Eso es la plataforma', x: 'Inventario, política, formulario, registro probatorio, revocación y fiscalizador: un solo flujo. En producción se agregan cuentas con doble factor, servidor en Chile, comprobantes por correo y sello de tiempo diario.', foco: '.resumen', ir: () => { modo = 'mlv'; ruta = 'panel'; } },
+];
+let pasoRec = -1, focoTemp = null;
+function irPaso(i) {
+  pasoRec = i; simulacion = null; fichaId = null;
+  document.querySelectorAll('.foco-rec').forEach((e) => e.classList.remove('foco-rec'));
+  if (i !== 5) fiscExp = null;
+  RECORRIDO[i].ir();
+  history.replaceState(null, '', modo === 'mlv' ? location.pathname : '#' + modo);
+  render(); pintarRecorrido();
+  clearTimeout(focoTemp);
+  focoTemp = setTimeout(() => { const f = document.querySelector(RECORRIDO[i].foco); if (f) { f.classList.add('foco-rec'); f.scrollIntoView({ block: 'center', behavior: 'smooth' }); } else window.scrollTo({ top: 0, behavior: 'smooth' }); }, 120);
+}
+function cerrarRecorrido() { pasoRec = -1; simulacion = null; pintarRecorrido(); if (modo !== 'mlv') { modo = 'mlv'; ruta = 'panel'; history.replaceState(null, '', location.pathname); } render(); }
+function pintarRecorrido() {
+  const el = $('recorrido');
+  if (pasoRec < 0) { el.hidden = true; return; }
+  const p = RECORRIDO[pasoRec], ult = pasoRec === RECORRIDO.length - 1;
+  el.hidden = false;
+  el.innerHTML = `<div class="rec-num">${dos(pasoRec + 1)}<small>/ ${dos(RECORRIDO.length)}</small></div>
+    <div><h3>${esc(p.t)}</h3><p>${esc(p.x)}</p></div>
+    <div class="rec-der"><div class="rec-puntos">${RECORRIDO.map((_, j) => `<i class="${j <= pasoRec ? 'hecho' : ''} ${j === pasoRec ? 'actual' : ''}"></i>`).join('')}</div>
+      ${pasoRec > 0 ? '<button type="button" class="btn chico" data-acc="recAnt">Anterior</button>' : ''}<button type="button" class="btn chico primario" data-acc="recSig">${ult ? 'Terminar' : 'Siguiente'}</button>
+      <button type="button" class="rec-x" data-acc="recCerrar" aria-label="Salir del recorrido" title="Salir del recorrido">×</button></div>`;
+}
+
 /* ───────── Estado de la pantalla ───────── */
 let modo = 'mlv', ruta = 'panel', fichaId = null, filtroTit = '', fiscConsulta = '', fiscExp = null, simulacion = null;
 let T = null; // flujo del formulario del titular
@@ -693,9 +869,13 @@ function render() {
     ? [['fiscal', 'Panel del fiscalizador']]
     : [['panel', 'Panel'], ['rat', 'Inventario (RAT)', r.rojos.length ? ['rojo', r.rojos.length] : r.ambar.length ? ['ambar', r.ambar.length] : null], ['formularios', 'Formularios y política'], ['titulares', 'Titulares', r.reconf.length ? ['ambar', r.reconf.length] : null], ['bitacora', 'Registro probatorio'], ['usuarios', 'Usuarios y permisos', db.usuarios.some((u) => u.estado === 'pendiente') ? ['ambar', db.usuarios.filter((u) => u.estado === 'pendiente').length] : null], ['como', 'Cómo funciona']];
   if (modo === 'fiscal') ruta = 'fiscal'; else if (ruta === 'fiscal') ruta = 'panel';
-  $('vistas').innerHTML = tabs.map(([k, e, n]) => `<button type="button" data-ruta="${k}" ${k === ruta ? 'aria-current="page"' : ''}>${e}${n ? `<span class="cuenta-p ${n[0]}">${n[1]}</span>` : ''}</button>`).join('');
+  $('vistas').innerHTML = tabs.map(([k, e, n]) => `<button type="button" data-ruta="${k}" ${k === ruta ? 'aria-current="page"' : ''}><span class="ico">${ICONOS[k] || ''}</span><span>${e}</span>${n ? `<span class="cuenta-p ${n[0]}">${n[1]}</span>` : ''}</button>`).join('');
+  const opciones = db.clientes.map((k) => `<option value="${k.id}" ${k.id === c.id ? 'selected' : ''}>${esc(k.nombre)}</option>`).join('');
+  $('selCli').innerHTML = opciones; $('selCliLat').innerHTML = opciones;
   const vistas = { panel: vPanel, rat: vRat, formularios: vFormularios, titulares: vTitulares, bitacora: vBitacora, usuarios: vUsuarios, como: vComo, fiscal: vFiscal };
-  $('main').innerHTML = (vistas[ruta] || vPanel)(c, r);
+  $('main').innerHTML = `<div class="vista-entra">${(vistas[ruta] || vPanel)(c, r)}</div>`;
+  if (ultimoRegistro.id === c.id && c.eventos.length > ultimoRegistro.n) aviso(`Anotado en el registro probatorio · N° ${c.eventos.length}`);
+  ultimoRegistro = { id: c.id, n: c.eventos.length };
   guardar();
 }
 
@@ -716,8 +896,8 @@ function vPanel(c, r) {
     r.reconf.length ? `<div class="alerta ambar"><b>${r.reconf.length} titulares</b> respondieron antes de que su formulario agregara una finalidad: hay que pedirles esa autorización aparte (lo ya autorizado sigue vigente). <button class="btn-txt" data-ruta="titulares">Ver quiénes</button></div>` : '',
     r.roto ? `<div class="alerta rojo"><b>El registro probatorio fue alterado</b> desde la anotación N° ${r.roto}.</div>` : '',
   ].join('');
-  return `<div class="sec-cab"><div><h1>Panel de MLV</h1><p>Cada cliente tiene su inventario, su política con versiones, sus formularios y un registro de consentimientos que no se puede alterar sin que se note. Elige un cliente:</p></div>
-    <button class="btn" data-acc="reiniciar">Volver a los datos de ejemplo</button></div>
+  return `<div class="sec-cab"><div class="sec-tit"><h1>Panel de MLV</h1><button type="button" class="ayuda" data-ayuda="panel" aria-label="Qué es esta sección" title="Qué es esta sección">?</button></div>
+    <div class="fila-btn"><button class="btn" data-acc="reiniciar">Volver a los datos de ejemplo</button><button class="btn primario" data-acc="recorrido">${ICONOS.fiscal}Recorrido guiado</button></div></div>
   <div class="cartera">${cartera}</div>
   <div class="resumen">
     <div class="kpi oscuro"><div class="eti">${esc(c.nombre)}</div><div class="num">${r.tits}</div><div class="det">titulares con respuesta registrada</div></div>
@@ -767,7 +947,7 @@ function vRat(c) {
     <td data-et="Base">${esc(BASE_CORTA[t.base])}</td>
     <td data-et="¿Consentimiento?">${chip(ev.nivel, ev.eti)}<ul class="razones">${ev.r.map((x) => `<li>${esc(x)}</li>`).join('')}</ul></td>
     <td data-et="ID consentimiento">${fs.length ? `<span class="mono">C-${esc(t.id)}</span><span class="mini">${fs.map(esc).join(', ')}</span>` : '—'}</td></tr>`; }).join('');
-  return `<div class="sec-cab"><div><h1>Inventario y RAT</h1><p>Es el registro de actividades de tratamiento. Cada tratamiento dice su base de licitud; el formulario solo ofrece los que tienen el consentimiento como base y luz verde. La columna «ID consentimiento» es el enlace con el registro (equivale al campo «ID Consentimiento asociado» de la planilla RAT).</p></div>
+  return `<div class="sec-cab"><div class="sec-tit"><h1>Inventario y RAT</h1><button type="button" class="ayuda" data-ayuda="rat" aria-label="Qué es esta sección" title="Qué es esta sección">?</button></div>
     <div class="fila-btn"><button class="btn primario" data-acc="nuevoTrat">Agregar tratamiento</button><button class="btn" data-acc="csvPlantilla">Exportar a Excel (CSV)</button><label class="btn">Importar CSV<input type="file" accept=".csv,text/csv" id="csvImport" hidden></label></div></div>
   <div class="tabla-env"><table class="tabla resp"><thead><tr><th>Tratamiento</th><th>Datos</th><th>Base</th><th>¿Pedir consentimiento?</th><th>ID consentimiento</th></tr></thead><tbody>${filas}</tbody></table></div>
   <p class="nota">Haz clic en un tratamiento para editarlo. El semáforo es una ayuda para el abogado, no reemplaza su análisis. Cada cambio queda anotado en el registro probatorio.</p>`;
@@ -860,7 +1040,7 @@ function vFormularios(c) {
     <p style="margin:0 0 8px"><b>${esc(f.titulo)}</b><br><span class="nota">${esc(f.intro)}</span></p>
     <div style="display:grid;gap:7px">${aptos.map((t) => { const ev = evaluar(t), bloq = ev.nivel === 'rojo'; return `<label class="marca"><input type="checkbox" data-fin="${esc(f.id)}|${esc(t.id)}" ${f.finalidades.includes(t.id) ? 'checked' : ''} ${bloq ? 'disabled' : ''}><span>${esc(t.id)} · ${esc(t.nombre)} ${chip(ev.nivel, ev.eti)}<small>${bloq ? esc(ev.r[0]) : esc(t.finalidad)}</small></span></label>`; }).join('')}</div>
     <p class="nota" style="margin:10px 0 0">Solo aparecen los tratamientos del inventario cuya base es el consentimiento. Al agregar una finalidad se publica una nueva versión del formulario y a los titulares anteriores hay que pedirles esa autorización aparte.</p></div>`).join('');
-  return `<div class="sec-cab"><div><h1>Formularios y política</h1><p>Cada cliente tiene su marca, su política de privacidad con fecha y versión (art. 14 ter letra a) y uno o más formularios. Cada versión se guarda con su huella: se puede probar qué texto exacto vio cada persona.</p></div></div>
+  return `<div class="sec-cab"><div class="sec-tit"><h1>Formularios y política</h1><button type="button" class="ayuda" data-ayuda="formularios" aria-label="Qué es esta sección" title="Qué es esta sección">?</button></div></div>
   <div class="dos"><div>${forms}</div>
   <div><div class="caja"><h2>Marca del cliente</h2><div class="rejilla">
       <label class="campo"><span>Nombre</span><input data-marca="nombre" value="${esc(c.nombre)}"></label>
@@ -898,7 +1078,7 @@ function vTitulares(c) {
     <td class="cab" data-et="Titular"><b>${esc(t.nombre)}</b><span class="mini">${esc(t.rut)} · ${esc(TITULARES[t.relacion] || '')} · ${esc(t.id)}</span></td>
     ${fins.map((id) => `<td data-et="${esc(id)}">${m[id] ? chipEstado(m[id].estado) : chip('gris', '—')}</td>`).join('')}
     <td data-et="Última respuesta">${u ? fFecha(u.fecha) + `<span class="mini">política v${esc(u.det.politica.version)}</span>` : '—'}${rc ? ' ' + chip('ambar', 'Finalidad nueva') : ''}</td></tr>`; }).join('');
-  return `<div class="sec-cab"><div><h1>Titulares</h1><p>Estado de cada finalidad por persona. Haz clic en una persona para ver su historial completo, anotar una revocación recibida por otro medio o imprimir su expediente.</p></div>
+  return `<div class="sec-cab"><div class="sec-tit"><h1>Titulares</h1><button type="button" class="ayuda" data-ayuda="titulares" aria-label="Qué es esta sección" title="Qué es esta sección">?</button></div>
     <input type="search" id="buscarTit" placeholder="Buscar por nombre o RUT" value="${esc(filtroTit)}" style="min-width:260px"></div>
   <div class="tabla-env"><table class="tabla resp"><thead><tr><th>Titular</th>${fins.map((id) => `<th title="${esc((c.rat.find((t) => t.id === id) || {}).nombre)}">${esc(id)}</th>`).join('')}<th>Última respuesta</th></tr></thead><tbody>${filas || `<tr><td colspan="9"><div class="vacio">Sin resultados.</div></td></tr>`}</tbody></table></div>
   <p class="nota">${fins.map((id) => `<b>${esc(id)}</b> ${esc((c.rat.find((t) => t.id === id) || {}).nombre)}`).join(' · ')}</p>`;
@@ -919,7 +1099,7 @@ function vBitacora(c, r) {
   const eventos = simulacion ? simulacion.eventos : c.eventos;
   const roto = simulacion ? verificar(eventos) : r.roto;
   const filas = eventos.slice().reverse().map((e) => `<tr class="${roto && e.n >= roto ? 'mal' : ''}"><td data-et="N°">${e.n}</td><td data-et="Fecha">${fFechaHora(e.fecha)}</td><td data-et="Tipo">${esc(TIPOS[e.tipo] || e.tipo)}</td><td class="cab" data-et="Anotación">${describir(c, e)}</td><td data-et="Huella"><span class="huella" title="Anterior: ${esc(e.prev)}">${esc(e.hash.slice(0, 24))}…</span></td></tr>`).join('');
-  return `<div class="sec-cab"><div><h1>Registro probatorio</h1><p>Cada anotación lleva la huella SHA-256 de la anterior. Si alguien cambia, borra o intercala una anotación, la cadena se rompe desde ese punto y se nota. Sirve para cumplir el art. 12 inc. 8: «corresponde al responsable probar que contó con el consentimiento».</p></div>
+  return `<div class="sec-cab"><div class="sec-tit"><h1>Registro probatorio</h1><button type="button" class="ayuda" data-ayuda="bitacora" aria-label="Qué es esta sección" title="Qué es esta sección">?</button></div>
     <div class="fila-btn"><button class="btn" data-acc="verificar">Verificar la cadena</button><button class="btn" data-acc="${simulacion ? 'finSim' : 'simular'}">${simulacion ? 'Terminar la simulación' : 'Simular una alteración'}</button><button class="btn" data-acc="descCadena">Descargar el registro (JSON)</button></div></div>
   ${simulacion ? `<div class="alerta rojo"><b>Simulación:</b> se cambió la anotación N° ${simulacion.n} (${esc(simulacion.que)}) sin tocar las huellas. La verificación falla desde la N° ${roto}. Nada de esto se guardó.</div>` : roto ? `<div class="alerta rojo">La cadena está rota desde la anotación N° ${roto}.</div>` : `<div class="alerta verde"><b>Cadena íntegra:</b> ${eventos.length} anotaciones verificadas. Huella de cierre: <span class="huella">${esc(eventos[eventos.length - 1].hash)}</span></div>`}
   <div class="tabla-env"><table class="tabla resp"><thead><tr><th>N°</th><th>Fecha</th><th>Tipo</th><th>Anotación</th><th>Huella</th></tr></thead><tbody>${filas}</tbody></table></div>
@@ -928,7 +1108,7 @@ function vBitacora(c, r) {
 
 /* ───── Cómo funciona ───── */
 function vComo() {
-  return `<div class="sec-cab"><div><h1>Cómo funciona</h1><p>Una plataforma de MLV, con la marca de cada cliente, que se usa solo cuando el consentimiento es la base que corresponde.</p></div></div>
+  return `<div class="sec-cab"><div class="sec-tit"><h1>Cómo funciona</h1><button type="button" class="ayuda" data-ayuda="como" aria-label="Qué es esta sección" title="Qué es esta sección">?</button></div></div>
   <div class="fisc-grid">
     <div class="caja"><h3>1. Inventario (RAT)</h3><p>Cada tratamiento con su base de licitud. El semáforo avisa cuándo el consentimiento no es la base (ley, contrato, interés legítimo) o no sirve (salud de trabajadores, art. 16 bis inc. 3).</p></div>
     <div class="caja"><h3>2. Política y formularios</h3><p>La política se arma desde el inventario y se publica con fecha, versión y huella. El formulario muestra una casilla por finalidad, sin marcar, con datos, plazo y destinatarios.</p></div>
@@ -970,7 +1150,7 @@ function vFiscal(c, r) {
   </div>
   <div class="caja"><h3>Tratamientos y bases de licitud (art. 14 ter d)</h3><div class="tabla-env"><table class="tabla resp"><thead><tr><th>Tratamiento</th><th>Titulares</th><th>Base</th><th>Conservación</th></tr></thead><tbody>${c.rat.map((t) => `<tr><td class="cab" data-et="Tratamiento">${esc(t.id)} · ${esc(t.nombre)}</td><td data-et="Titulares">${esc(TITULARES[t.titulares] || '')}</td><td data-et="Base">${esc(BASES[t.base])}</td><td data-et="Conservación">${esc(t.conservacion)}</td></tr>`).join('')}</tbody></table></div></div>
   <div class="dos" style="margin-top:16px">
-    <div class="caja"><h3>Consulta por titular (art. 12 inc. 8)</h3><p class="nota" style="margin-top:0">Escriba el RUT de la persona para ver la prueba de su consentimiento.</p>
+    <div class="caja" id="fiscConsulta"><h3>Consulta por titular (art. 12 inc. 8)</h3><p class="nota" style="margin-top:0">Escriba el RUT de la persona para ver la prueba de su consentimiento.</p>
       <div class="fila-btn"><input id="fiscRut" placeholder="12.345.678-5" value="${esc(fiscConsulta)}"><button class="btn primario" data-acc="fiscBuscar">Consultar</button></div>
       <p class="nota">Para probar: ${c.titulares.slice(0, 3).map((t) => `<button class="btn-txt" data-rutdemo="${esc(t.rut)}">${esc(t.rut)}</button>`).join(' · ')}</p>
       ${fiscExp ? expedienteHtml(c, fiscExp, true) : ''}</div>
@@ -1060,7 +1240,7 @@ function pintarTitular() {
       <p class="nota" style="color:var(--rojo)">${esc(R.error)}</p>
       <div class="fila-btn"><button class="t-btn" data-t="revBuscar">Continuar</button>${c.titulares[0] ? `<button class="t-btn sec" data-t="revDemo">Usar un titular de ejemplo</button>` : ''}</div>`;
   }
-  $('titular').innerHTML = `<div class="titular-fondo" style="--marca:${esc(c.color)}">
+  $('titular').innerHTML = `<div class="titular-fondo" style="--marca-cli:${esc(c.color)}">
     <div class="barra-demo"><span>Así lo ve el trabajador o titular (desde un enlace o código QR).</span>
       <label>Cliente <select id="tCli">${db.clientes.map((k) => `<option value="${k.id}" ${k.id === c.id ? 'selected' : ''}>${esc(k.nombre)}</option>`).join('')}</select></label>
       <label>Formulario <select id="tForm">${c.formularios.map((x) => `<option value="${x.id}" ${x.id === f.id ? 'selected' : ''}>${esc(x.nombre)}</option>`).join('')}</select></label>
@@ -1117,7 +1297,7 @@ function accionTitular(k, el) {
 
 /* ───────── Eventos ───────── */
 document.addEventListener('click', (ev) => {
-  const el = ev.target.closest('[data-modo],[data-ruta],[data-cli],[data-acc],[data-trat],[data-ficha],[data-expediente],[data-abrir-form],[data-t],[data-verpol],[data-rutdemo],[data-usuario]');
+  const el = ev.target.closest('[data-modo],[data-ruta],[data-cli],[data-acc],[data-trat],[data-ficha],[data-expediente],[data-abrir-form],[data-t],[data-verpol],[data-rutdemo],[data-usuario],[data-ayuda]');
   if (!el) return;
   const c = cli(), d = el.dataset;
   if (d.modo) {
@@ -1138,8 +1318,13 @@ document.addEventListener('click', (ev) => {
   if (d.verpol) { verPolitica(c, c.politicas.find((p) => p.version === d.verpol)); return; }
   if (d.rutdemo) { $('fiscRut').value = d.rutdemo; return; }
   if (d.usuario) { dialogoUsuario(d.usuario); return; }
+  if (d.ayuda) { abrirDialogo(el.closest('.sec-tit').querySelector('h1').textContent, `<p style="font-size:14.5px;line-height:1.55;margin:0">${AYUDA[d.ayuda] || ''}</p>`, [['ok', 'Entendido', 'primario']]); return; }
   switch (d.acc) {
     case 'reiniciar': if (confirm('¿Borrar los cambios y volver a los datos de ejemplo?')) { db = semilla(); fichaId = null; render(); } break;
+    case 'recorrido': irPaso(0); break;
+    case 'recAnt': irPaso(Math.max(0, pasoRec - 1)); break;
+    case 'recSig': if (pasoRec < RECORRIDO.length - 1) irPaso(pasoRec + 1); else cerrarRecorrido(); break;
+    case 'recCerrar': cerrarRecorrido(); break;
     case 'nuevoTrat': editarTrat(null); break;
     case 'csvPlantilla': exportarCsv(); break;
     case 'nuevaPol': nuevaPolitica(); break;
@@ -1153,14 +1338,7 @@ document.addEventListener('click', (ev) => {
       break;
     }
     case 'verificar': { const n = verificar(c.eventos); alert(n ? `La cadena está rota desde la anotación N° ${n}.` : `Cadena íntegra: ${c.eventos.length} anotaciones verificadas.`); break; }
-    case 'simular': {
-      const copia = JSON.parse(JSON.stringify(c.eventos));
-      const obj = copia.find((e) => e.tipo === 'revocacion') || copia[Math.floor(copia.length / 2)];
-      if (obj.tipo === 'revocacion') { obj.fecha = obj.fecha.replace(/^2026-10/, '2026-11'); }
-      else obj.fecha = obj.fecha.replace(/:\d\d$/, ':00');
-      simulacion = { eventos: copia, n: obj.n, que: obj.tipo === 'revocacion' ? 'se corrió un mes la fecha de una revocación' : 'se cambió la hora' };
-      render(); break;
-    }
+    case 'simular': simularAlteracion(c); render(); break;
     case 'finSim': simulacion = null; render(); break;
     case 'descCadena': {
       if (modo === 'fiscal') registrar(c, 'acceso', { quien: c.accesoFiscal.nombre, accion: 'Descargó el registro completo' });
@@ -1192,6 +1370,8 @@ document.addEventListener('change', (ev) => {
     render(); return;
   }
   if (el.dataset.marca) { c[el.dataset.marca] = el.value; render(); return; }
+  if (el.id === 'selCli' || el.id === 'selCliLat') { db.actual = el.value; fichaId = null; fiscExp = null; render(); return; }
+  if (el.id === 'selTema') { aplicarTema(el.value); return; }
   if (el.id === 'tCli') { db.actual = el.value; iniciarTitular(); render(); return; }
   if (el.id === 'tForm') { iniciarTitular(el.value); render(); return; }
   if (el.id === 'tDecl') { T.pol.declarada = el.checked; $('tSig2').disabled = !el.checked; return; }
@@ -1202,6 +1382,7 @@ document.addEventListener('input', (ev) => { if (ev.target.id === 'buscarTit') {
 document.addEventListener('scroll', (ev) => { if (ev.target.id === 'polCaja') revisarScroll(); }, true);
 
 db = cargar();
+try { aplicarTema(localStorage.getItem('mlv-tema') || 'sello'); } catch { aplicarTema('sello'); }
 // Enlaces directos para la demostración: #titular abre el formulario; #fiscal, el panel del fiscalizador.
 const inicial = location.hash.replace('#', '');
 if (inicial === 'titular') { modo = 'titular'; iniciarTitular(); } else if (inicial === 'fiscal') modo = 'fiscal';
