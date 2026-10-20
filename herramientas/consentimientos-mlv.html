@@ -29,7 +29,7 @@
   }
   :root[data-tema="tinta"] {
     --marca: #0F3D3E; --marca-osc: #0A2C2D; --marca-claro: #E4ECEA; --marca-borde: #BBCFCB; --marca-tenue: rgba(15, 61, 62, .12); --marca-texto: #FFFFFF;
-    --accion: #B8743A; --accion-osc: #96592A; --accion-texto: #FFFFFF; --realce: #B8743A; --realce-f: #F6EBDF;
+    --accion: #8F5524; --accion-osc: #74431B; --accion-texto: #FFFFFF; --realce: #B8743A; --realce-f: #F6EBDF;
     --fondo: #F6F5F1; --papel: #FFFFFF; --papel2: #FBFAF6; --hundido: #ECEAE2;
     --tinta: #17201F; --tinta2: #3F4A49; --suave: #5B6563; --linea: #DBD7CC; --linea2: #EAE7DE; --campo: #8A8679;
     --sans-tit: 'Fraunces', Georgia, serif; --sans: 'Inter', 'Segoe UI', system-ui, sans-serif;
@@ -37,7 +37,7 @@
   }
   :root[data-tema="instrumento"] {
     --marca: #111318; --marca-osc: #000000; --marca-claro: #ECECEF; --marca-borde: #C9CBD2; --marca-tenue: rgba(17, 19, 24, .1); --marca-texto: #FFFFFF;
-    --accion: #D9480F; --accion-osc: #B33A0A; --accion-texto: #FFFFFF; --realce: #D9480F; --realce-f: #FCEAE1;
+    --accion: #B83C0B; --accion-osc: #96300A; --accion-texto: #FFFFFF; --realce: #D9480F; --realce-f: #FCEAE1;
     --fondo: #F4F4F5; --papel: #FFFFFF; --papel2: #F8F8F9; --hundido: #E9E9EC;
     --tinta: #111318; --tinta2: #3B3E46; --suave: #5E626B; --linea: #DCDDE2; --linea2: #EAEAEE; --campo: #80838D;
     --sans-tit: 'Space Grotesk', 'Segoe UI', system-ui, sans-serif; --sans: 'Inter', 'Segoe UI', system-ui, sans-serif;
@@ -237,6 +237,7 @@
   .chip.ambar { background: var(--ambar-f); border-color: var(--ambar-b); color: var(--ambar); }
   .chip.rojo { background: var(--rojo-f); border-color: var(--rojo-b); color: var(--rojo); }
   .chip.gris { background: var(--gris-f); border-color: var(--linea); color: var(--suave); }
+  .chip.rol { background: color-mix(in srgb, var(--rol) 8%, var(--papel)); border-color: color-mix(in srgb, var(--rol) 35%, transparent); color: color-mix(in srgb, var(--rol) 60%, var(--tinta)); }
   .chip.azul { background: var(--marca-claro); border-color: var(--marca-borde); color: var(--marca-osc); }
   .razones { margin: 6px 0 0; padding-left: 18px; font-size: var(--t-meta); color: var(--tinta2); }
   .razones li + li { margin-top: 3px; }
@@ -320,6 +321,41 @@
   /* Modo presentación: letra y cifras más grandes para proyector o pantalla compartida */
   :root[data-presentar="si"] { --t-eti: 13.5px; --t-meta: 15px; --t-base: 16px; --t-lead: 18px; --t-tit: 19px; --t-h2: 22px; --t-h1: 28px; }
   :root[data-presentar="si"] .kpi .num { font-size: 38px; }
+
+  /* ───── Modo oscuro (vista de MLV y del fiscalizador; el formulario del titular conserva la marca del cliente en claro:
+     por eso los tokens van en body, salvo cuando body lleva .en-titular).
+     Mismo orden de tokens que el modo claro; cada pareja texto/fondo medida a 4,5:1 o más. ───── */
+  :root[data-oscuro="si"] body:not(.en-titular) {
+    color-scheme: dark; background: var(--fondo); color: var(--tinta);
+    --marca: #17596A; --marca-osc: #9BD3E0; --marca-claro: #173A44; --marca-borde: #2E6372; --marca-tenue: rgba(110, 190, 210, .16); --marca-texto: #FFFFFF;
+    --accion: #7CC7D9; --accion-osc: #A9DCE8; --accion-texto: #0B1A1F; --realce: #E3B23C; --realce-f: #3A3014;
+    --fondo: #0E1417; --papel: #151D21; --papel2: #1A2429; --hundido: #243035;
+    --tinta: #E6EDF0; --tinta2: #BCC8CE; --suave: #97A6AE; --linea: #2E3A40; --linea2: #243035; --campo: #71828A;
+    --verde: #5BE08F; --verde-f: #12291C; --verde-b: #22583A; --verde-v: #22C55E;
+    --ambar: #FBC14D; --ambar-f: #2C2210; --ambar-b: #6B4F17; --ambar-v: #F59E0B;
+    --rojo: #FF8A8A; --rojo-f: #331818; --rojo-b: #7A2E2E; --rojo-v: #EF4444;
+    --sombra: 0 1px 2px rgba(0, 0, 0, .45), 0 1px 1px rgba(0, 0, 0, .3); --sombra-2: 0 14px 34px -14px rgba(0, 0, 0, .75);
+    /* alias que en :root se calculan con los valores claros: se repiten aquí para que tomen los oscuros */
+    --gris-f: var(--hundido); --acento: var(--accion); --acento-osc: var(--accion-osc); --acento-claro: var(--marca-claro); --acento-borde: var(--marca-borde); --acento-tenue: var(--marca-tenue); --navy: var(--marca); --navy2: var(--marca-osc);
+  }
+  :root[data-oscuro="si"][data-tema="tinta"] body:not(.en-titular) { --marca: #1F5556; --marca-osc: #A8D5CF; --marca-claro: #1C3536; --marca-borde: #34605F; --accion: #E3A673; --accion-osc: #F0C29C; --accion-texto: #1C1208; --realce: #E3A673; --fondo: #12110E; --papel: #1B1A16; --papel2: #22211C; --hundido: #2B2A24; --linea: #38362E; --linea2: #2B2A24; }
+  :root[data-oscuro="si"][data-tema="instrumento"] body:not(.en-titular) { --marca: #3A3F4B; --marca-osc: #D5D8DF; --marca-claro: #262A33; --marca-borde: #454B58; --accion: #FF8F5E; --accion-osc: #FFB08C; --accion-texto: #1A0C05; --realce: #FF8F5E; --fondo: #0F1013; --papel: #17191E; --papel2: #1D2026; --hundido: #262A31; --linea: #31353E; --linea2: #262A31; }
+  :root[data-oscuro="si"] body:not(.en-titular) .demo-aviso { background: #05080A; }
+  :root[data-oscuro="si"] body:not(.en-titular) .aviso-flot { background: #2B373D; color: #FFFFFF; }
+  :root[data-oscuro="si"] body:not(.en-titular) .presentar[aria-pressed="true"] { color: #0E1417; }
+  :root[data-oscuro="si"] body:not(.en-titular) .e-num { color: #0E1417; }
+  :root[data-oscuro="si"] body:not(.en-titular) .alerta.rojo { color: #FFD4D4; }
+  :root[data-oscuro="si"] body:not(.en-titular) .alerta.ambar { color: #FCE3A6; }
+  :root[data-oscuro="si"] body:not(.en-titular) .alerta.verde { color: #C6F5D6; }
+  :root[data-oscuro="si"] body:not(.en-titular) .filtros button[aria-pressed="true"],
+  :root[data-oscuro="si"] body:not(.en-titular) .lateral nav button[aria-current="page"],
+  :root[data-oscuro="si"] body:not(.en-titular) .lateral nav button[aria-current="page"] .ico,
+  :root[data-oscuro="si"] body:not(.en-titular) .ayuda:hover { color: var(--marca-osc); }
+  :root[data-oscuro="si"] body:not(.en-titular) .fisc-banda .mini { color: color-mix(in srgb, var(--marca-texto) 80%, var(--marca)); }
+  :root[data-oscuro="si"] body:not(.en-titular) .hoja-fondo { background: rgba(0, 0, 0, .55); }
+  :root[data-oscuro="si"] body:not(.en-titular) .g-linea, :root[data-oscuro="si"] body:not(.en-titular) .g-punto { stroke: var(--accion); }
+  :root[data-oscuro="si"] body:not(.en-titular) .g-linea.rojo, :root[data-oscuro="si"] body:not(.en-titular) .g-punto.rojo { stroke: var(--rojo); }
+  :root[data-oscuro="si"]:has(body:not(.en-titular)) { background: #0E1417; color-scheme: dark; }
   /* La barra superior y el menú lateral quedan en su tamaño: solo crece el contenido */
   :root[data-presentar="si"] .barra-app, :root[data-presentar="si"] .lateral, :root[data-presentar="si"] .demo-aviso { --t-eti: 12px; --t-meta: 13px; --t-base: 13.5px; --t-lead: 15px; --t-tit: 16px; --t-h2: 18px; --t-h1: 22px; }
 
@@ -358,7 +394,7 @@
   .fin .det { font-size: var(--t-meta); color: #5D6773; margin: 6px 0 0 26px; }
   .fin .det div + div { margin-top: 2px; }
   .aviso-lab { background: #F3F6F9; border-left: 3px solid var(--marca-cli, #234); padding: 9px 12px; font-size: var(--t-meta); color: #33404D; border-radius: 0 8px 8px 0; margin: 0 0 14px; }
-  .t-pie { text-align: center; font-size: var(--t-eti); color: #6B7480; margin-top: 14px; }
+  .t-pie { text-align: center; font-size: var(--t-eti); color: #5D6773; margin-top: 14px; }
   .t-tabs { display: flex; gap: 4px; margin: 0 0 18px; border-bottom: 1px solid #E2E6EB; }
   .t-tabs button { font: inherit; font-size: var(--t-base); background: none; border: 0; padding: 9px 12px; cursor: pointer; color: #4A5563; border-bottom: 2px solid transparent; margin-bottom: -1px; min-height: 44px; }
   .t-tabs button[aria-current="page"] { color: #1B2530; border-color: var(--marca-cli, #234); font-weight: 600; }
@@ -503,6 +539,7 @@
 </head>
 <body>
 <div class="demo-aviso" id="demoAviso"><span><b>Prototipo con datos ficticios.</b> Todo se guarda solo en este navegador; ninguna empresa, persona ni RUT es real.</span>
+  <button type="button" class="presentar" id="btnOscuro" aria-pressed="false" title="Fondo oscuro para la vista de MLV y del fiscalizador">Modo oscuro</button>
   <button type="button" class="presentar" id="btnPresentar" aria-pressed="false" title="Letra y cifras más grandes, para proyector o pantalla compartida">Letra grande</button>
   <label class="tema-sel">Estilo <select id="selTema"><option value="sello">Sello · petróleo</option><option value="tinta">Tinta y papel</option><option value="instrumento">Instrumento</option></select></label></div>
 
@@ -862,7 +899,7 @@ function vUsuarios(c) {
   const chipEst = (u) => (u.estado === 'activo' ? chip('verde', 'Activo') : u.estado === 'pendiente' ? chip('ambar', 'Invitación pendiente') : chip('gris', 'Suspendido'));
   const filas = db.usuarios.filter((u) => !u.cliente || u.cliente === c.id).map((u) => `<tr>
     <td class="cab" data-et="Usuario"><b>${esc(u.nombre)}</b><span class="mini">${esc(u.correo)}</span></td>
-    <td data-et="Rol"><span class="chip" style="background:${ROLES[u.rol].color}14;border-color:${ROLES[u.rol].color}55;color:${ROLES[u.rol].color}">${esc(ROLES[u.rol].nombre)}</span></td>
+    <td data-et="Rol"><span class="chip rol" style="--rol:${ROLES[u.rol].color}">${esc(ROLES[u.rol].nombre)}</span></td>
     <td data-et="Alcance">${esc(nomCli(u.cliente))}</td>
     <td data-et="Estado">${chipEst(u)}</td>
     <td data-et="Doble factor">${u.dosFactor ? chip('verde', 'Activado') : chip('ambar', 'Falta')}</td>
@@ -987,6 +1024,11 @@ const AYUDA = {
 };
 
 /* Estilo visual elegido (demostración): se recuerda en este navegador. */
+function aplicarOscuro(si) {
+  document.documentElement.dataset.oscuro = si ? 'si' : 'no';
+  try { localStorage.setItem('mlv-oscuro', si ? 'si' : 'no'); } catch { /* nada */ }
+  const b = $('btnOscuro'); if (b) b.setAttribute('aria-pressed', String(si));
+}
 function aplicarPresentar(si) {
   document.documentElement.dataset.presentar = si ? 'si' : 'no';
   try { localStorage.setItem('mlv-presentar', si ? 'si' : 'no'); } catch { /* nada */ }
@@ -1071,6 +1113,7 @@ function render() {
   document.querySelectorAll('[data-modo]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.modo === modo)));
   const enTitular = modo === 'titular';
   $('app').hidden = enTitular; $('barraApp').hidden = enTitular; $('titular').hidden = !enTitular; $('demoAviso').hidden = enTitular;
+  document.body.classList.toggle('en-titular', enTitular);
   if (enTitular) { $('hoja').hidden = true; $('hojaFondo').hidden = true; pintarTitular(); return; }
   const c = cli(), r = resumen(c);
   const tabs = modo === 'fiscal'
@@ -1797,6 +1840,7 @@ function opcionesPaleta(q) {
   add('Acción', 'Verificar la cadena', 'registro probatorio', () => { modo = 'mlv'; ruta = 'bitacora'; setTimeout(() => aviso(verificar(cli().eventos) ? 'La cadena está rota' : `Cadena íntegra: ${cli().eventos.length} anotaciones`), 80); });
   add('Acción', 'Simular una alteración', 'registro probatorio', () => { modo = 'mlv'; ruta = 'bitacora'; simularAlteracion(cli()); });
   add('Acción', 'Agregar tratamiento', 'inventario', () => { modo = 'mlv'; ruta = 'rat'; setTimeout(() => editarTrat(null), 80); });
+  add('Acción', 'Modo oscuro', 'activa o desactiva', () => { aplicarOscuro(document.documentElement.dataset.oscuro !== 'si'); });
   add('Acción', 'Letra grande (modo presentación)', 'activa o desactiva', () => { aplicarPresentar(document.documentElement.dataset.presentar !== 'si'); });
   add('Acción', 'Preparar demo', 'datos de ejemplo, sin filtros, panel desde arriba', () => { prepararDemo(); });
   add('Acción', 'Volver a los datos de ejemplo', 'borra los cambios de este navegador', () => { if (confirm('¿Borrar los cambios y volver a los datos de ejemplo?')) { db = semilla(); fichaId = null; modo = 'mlv'; ruta = 'panel'; } });
@@ -1844,6 +1888,8 @@ document.addEventListener('scroll', (ev) => { if (ev.target.id === 'polCaja') re
 db = cargar();
 try { aplicarTema(localStorage.getItem('mlv-tema') || 'sello'); } catch { aplicarTema('sello'); }
 try { aplicarPresentar(localStorage.getItem('mlv-presentar') === 'si'); } catch { aplicarPresentar(false); }
+try { aplicarOscuro(localStorage.getItem('mlv-oscuro') === 'si'); } catch { aplicarOscuro(false); } // claro por omisión: la demo se ve igual en cualquier equipo
+$('btnOscuro').addEventListener('click', () => { const si = document.documentElement.dataset.oscuro !== 'si'; aplicarOscuro(si); aviso(si ? 'Modo oscuro activado' : 'Modo claro'); });
 $('btnPresentar').addEventListener('click', () => { const si = document.documentElement.dataset.presentar !== 'si'; aplicarPresentar(si); aviso(si ? 'Letra grande activada' : 'Letra normal'); });
 // Enlaces directos para la demostración: #titular abre el formulario; #fiscal, el panel del fiscalizador; #recorrido inicia el recorrido guiado; #demo la deja lista desde cero.
 const inicial = location.hash.replace('#', '');
