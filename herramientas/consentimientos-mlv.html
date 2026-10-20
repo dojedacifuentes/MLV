@@ -69,6 +69,9 @@
   .demo-aviso { background: var(--tinta); color: #CBD5DB; font-size: var(--t-meta); padding: 6px 20px; display: flex; justify-content: center; align-items: center; gap: 10px 24px; flex-wrap: wrap; }
   .demo-aviso b { color: #fff; font-weight: 600; }
   .tema-sel { display: inline-flex; align-items: center; gap: 6px; color: #9FB0B8; }
+  .presentar { font: inherit; font-size: var(--t-eti); padding: 2px 9px; border-radius: 5px; background: rgba(255,255,255,.08); color: #fff; border: 1px solid rgba(255,255,255,.18); cursor: pointer; }
+  .presentar[aria-pressed="true"] { background: #fff; color: var(--tinta); border-color: #fff; font-weight: 600; }
+  .presentar:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
   .tema-sel select { font: inherit; font-size: var(--t-eti); padding: 2px 6px; border-radius: 5px; background: rgba(255,255,255,.08); color: #fff; border: 1px solid rgba(255,255,255,.18); }
 
   /* Barra superior */
@@ -314,6 +317,11 @@
     .tabla-env.fija .tabla th { position: sticky; top: 58px; z-index: 3; }
   }
   @media (prefers-reduced-motion: reduce) { .vista-entra, .recorrido, .foco-rec, .esqueleto { animation: none; } * { transition: none !important; } }
+  /* Modo presentación: letra y cifras más grandes para proyector o pantalla compartida */
+  :root[data-presentar="si"] { --t-eti: 13.5px; --t-meta: 15px; --t-base: 16px; --t-lead: 18px; --t-tit: 19px; --t-h2: 22px; --t-h1: 28px; }
+  :root[data-presentar="si"] .kpi .num { font-size: 38px; }
+  /* La barra superior y el menú lateral quedan en su tamaño: solo crece el contenido */
+  :root[data-presentar="si"] .barra-app, :root[data-presentar="si"] .lateral, :root[data-presentar="si"] .demo-aviso { --t-eti: 12px; --t-meta: 13px; --t-base: 13.5px; --t-lead: 15px; --t-tit: 16px; --t-h2: 18px; --t-h1: 22px; }
 
   /* Diálogo */
   dialog { border: 1px solid var(--linea); border-radius: 14px; padding: 0; width: min(760px, calc(100vw - 24px)); max-height: calc(100vh - 40px); color: var(--tinta); background: var(--papel); box-shadow: var(--sombra-2); }
@@ -495,6 +503,7 @@
 </head>
 <body>
 <div class="demo-aviso" id="demoAviso"><span><b>Prototipo con datos ficticios.</b> Todo se guarda solo en este navegador; ninguna empresa, persona ni RUT es real.</span>
+  <button type="button" class="presentar" id="btnPresentar" aria-pressed="false" title="Letra y cifras más grandes, para proyector o pantalla compartida">Letra grande</button>
   <label class="tema-sel">Estilo <select id="selTema"><option value="sello">Sello · petróleo</option><option value="tinta">Tinta y papel</option><option value="instrumento">Instrumento</option></select></label></div>
 
 <a class="saltar" href="#main">Saltar al contenido</a>
@@ -927,6 +936,34 @@ function descargar(nombre, contenido, tipo = 'application/json') {
   setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
 }
 
+// Archivo para Excel: separador «;», UTF-8 con BOM para que se vean bien las tildes; celdas que parten con = + - @ se
+// anteponen con «'» para que Excel no las tome como fórmulas.
+function celdaCsv(v) {
+  let t = String(v ?? '');
+  if (/^[=+\-@\t\r]/.test(t)) t = "'" + t;
+  return /[;"\r\n]/.test(t) ? `"${t.replace(/"/g, '""')}"` : t;
+}
+const csv = (filas) => '\uFEFF' + filas.map((f) => f.map(celdaCsv).join(';')).join('\r\n') + '\r\n';
+const textoPlano = (html) => new DOMParser().parseFromString(html, 'text/html').body.textContent.replace(/\s+/g, ' ').trim();
+const ESTADO_TXT = { otorgado: 'Vigente', revocado: 'Revocado', rechazado: 'No autorizó' };
+function excelTitulares(c) {
+  const { fins, lista } = titularesVisibles(c);
+  const filas = [['Titular', 'RUT', 'Relación', 'Código', ...fins.map((id) => `${id} · ${(c.rat.find((t) => t.id === id) || {}).nombre || ''}`), 'Última respuesta', 'Política', 'Finalidad nueva por consultar']];
+  lista.forEach((t) => {
+    const m = estados(c, t.id), u = ultimoConsent(c, t.id), rc = porReconfirmar(c, t);
+    filas.push([t.nombre, t.rut, TITULARES[t.relacion] || '', t.id, ...fins.map((id) => (m[id] ? ESTADO_TXT[m[id].estado] || m[id].estado : 'Sin respuesta')), u ? u.fecha : '', u ? 'v' + u.det.politica.version : '', rc ? 'Sí: ' + rc.faltan.join(', ') : 'No']);
+  });
+  descargar(`titulares-${c.sigla}-${ahora().slice(0, 10)}.csv`, csv(filas), 'text/csv;charset=utf-8');
+  aviso(`Descargados ${lista.length} titulares para Excel`);
+}
+function excelRegistro(c) {
+  const { visibles } = registroVisible(c);
+  const filas = [['N°', 'Fecha y hora', 'Tipo', 'Anotación', 'Huella SHA-256', 'Huella anterior']];
+  visibles.forEach((e) => filas.push([e.n, e.fecha, TIPOS[e.tipo] || e.tipo, textoPlano(describir(c, e)), e.hash, e.prev]));
+  descargar(`registro-${c.sigla}-${ahora().slice(0, 10)}.csv`, csv(filas), 'text/csv;charset=utf-8');
+  aviso(`Descargadas ${visibles.length} anotaciones para Excel`);
+}
+
 /* Iconos (Lucide, licencia ISC) */
 const ICONOS = {
   panel: '<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>',
@@ -950,6 +987,11 @@ const AYUDA = {
 };
 
 /* Estilo visual elegido (demostración): se recuerda en este navegador. */
+function aplicarPresentar(si) {
+  document.documentElement.dataset.presentar = si ? 'si' : 'no';
+  try { localStorage.setItem('mlv-presentar', si ? 'si' : 'no'); } catch { /* nada */ }
+  const b = $('btnPresentar'); if (b) b.setAttribute('aria-pressed', String(si));
+}
 function aplicarTema(t) { document.documentElement.dataset.tema = t; try { localStorage.setItem('mlv-tema', t); } catch { /* nada */ } const sel = $('selTema'); if (sel) sel.value = t; }
 let avisoTemp = null;
 function aviso(texto) {
@@ -1326,22 +1368,27 @@ const polHtml = (txt) => txt.split('\n').map((l) => (l.startsWith('## ') ? `<h4>
 /* ───── Titulares ───── */
 // Encabezado ordenable: aria-sort va en el th (así lo anuncian los lectores de pantalla); el botón cambia el orden.
 const thOrden = (tabla, k, eti, o) => `<th scope="col" aria-sort="${o.k === k ? (o.dir === 'asc' ? 'ascending' : 'descending') : 'none'}"><button type="button" class="ord" data-ord="${tabla}:${k}">${esc(eti)}</button></th>`;
-function vTitulares(c) {
+// Titulares que se ven con el filtro, la búsqueda y el orden puestos (los usan la tabla y la descarga para Excel).
+function titularesVisibles(c) {
   const fins = [...new Set(c.formularios.flatMap((f) => f.finalidades))];
-  const FILTROS = [['', 'Todos'], ['otorgado', 'Con autorización vigente'], ['revocado', 'Con revocación'], ['reconf', 'Con finalidad nueva'], ['sin', 'Sin respuesta']];
   const pasaFiltro = (t) => { if (!filtroEstado) return true; const m = Object.values(estados(c, t.id)); if (filtroEstado === 'sin') return !m.length; if (filtroEstado === 'reconf') return !!porReconfirmar(c, t); return m.some((v) => v.estado === filtroEstado); };
   const lista = c.titulares.filter((t) => pasaFiltro(t) && (!filtroTit || norm(t.nombre + ' ' + t.rut + ' ' + t.id).includes(norm(filtroTit))));
   if (ordenTit.k) {
     const val = (t) => (ordenTit.k === 'nombre' ? t.nombre : (ultimoConsent(c, t.id) || {}).fecha || '');
     lista.sort((a, b) => (ordenTit.dir === 'asc' ? 1 : -1) * val(a).localeCompare(val(b), 'es'));
   }
+  return { fins, lista };
+}
+function vTitulares(c) {
+  const { fins, lista } = titularesVisibles(c);
+  const FILTROS = [['', 'Todos'], ['otorgado', 'Con autorización vigente'], ['revocado', 'Con revocación'], ['reconf', 'Con finalidad nueva'], ['sin', 'Sin respuesta']];
   const filtros = `<div class="filtros" role="group" aria-label="Filtrar titulares">${FILTROS.map(([k, e]) => `<button type="button" data-ftr="${k}" aria-pressed="${k === filtroEstado}">${e}</button>`).join('')}</div>`;
   const filas = lista.map((t) => { const m = estados(c, t.id), rc = porReconfirmar(c, t), u = ultimoConsent(c, t.id); return `<tr class="clic" data-ficha="${esc(t.id)}">
     <td class="cab" data-et="Titular"><b>${esc(t.nombre)}</b><span class="mini">${esc(t.rut)} · ${esc(TITULARES[t.relacion] || '')} · ${esc(t.id)}</span></td>
     ${fins.map((id) => `<td data-et="${esc(id)}">${m[id] ? chipEstado(m[id].estado) : chip('gris', '—')}</td>`).join('')}
     <td data-et="Última respuesta">${u ? fFecha(u.fecha) + `<span class="mini">política v${esc(u.det.politica.version)}</span>` : '—'}${rc ? ' ' + chip('ambar', 'Finalidad nueva') : ''}</td></tr>`; }).join('');
   return `<div class="sec-cab"><div class="sec-tit"><h1>Titulares</h1><button type="button" class="ayuda" data-ayuda="titulares" aria-label="Qué es esta sección" title="Qué es esta sección">?</button></div>
-    <input type="search" id="buscarTit" aria-label="Buscar titular por nombre o RUT" placeholder="Buscar por nombre o RUT" value="${esc(filtroTit)}" style="min-width:260px"></div>
+    <div class="fila-btn"><input type="search" id="buscarTit" aria-label="Buscar titular por nombre o RUT" placeholder="Buscar por nombre o RUT" value="${esc(filtroTit)}" style="min-width:260px"><button class="btn" data-acc="excelTit" title="Descarga lo que se ve: con el filtro, la búsqueda y el orden puestos">Descargar para Excel</button></div></div>
   ${filtros}
   <div class="tabla-env fija"><table class="tabla resp"><thead><tr>${thOrden('tit', 'nombre', 'Titular', ordenTit)}${fins.map((id) => `<th scope="col" title="${esc((c.rat.find((t) => t.id === id) || {}).nombre)}">${esc(id)}</th>`).join('')}${thOrden('tit', 'fecha', 'Última respuesta', ordenTit)}</tr></thead><tbody>${filas || `<tr><td colspan="9"><div class="vacio">${filtroTit && camilaPendiente(c, norm(filtroTit)) ? `${esc(PROTAGONISTA.nombre)} todavía no responde su formulario: aparece aquí cuando lo envía. <button class="btn-txt" data-acc="recorrido">Hacerlo en el recorrido guiado</button>` : 'Ningún titular coincide con este filtro. <button class="btn-txt" data-ftr="">Ver todos los titulares</button>'}</div></td></tr>`}</tbody></table></div>
   <p class="nota">${fins.map((id) => `<b>${esc(id)}</b> ${esc((c.rat.find((t) => t.id === id) || {}).nombre)}`).join(' · ')}</p>`;
@@ -1358,22 +1405,27 @@ function vFicha(c, t) {
 }
 
 /* ───── Registro probatorio ───── */
-function vBitacora(c, r) {
+// Anotaciones que se ven con la fecha de corte, los filtros, la búsqueda y el orden puestos (tabla y descarga para Excel).
+function registroVisible(c) {
   const todos = simulacion ? simulacion.eventos : c.eventos;
   const eventos = fechaCorte ? todos.filter((e) => e.fecha.slice(0, 10) <= fechaCorte) : todos;
+  const vOrd = (e) => (ordenBit.k === 'fecha' ? e.fecha : String(e.n).padStart(8, '0'));
+  const pasaTipo = (e) => !filtroBitTipo || (filtroBitTipo === 'cambios' ? ['politica', 'formulario', 'rat', 'usuario'].includes(e.tipo) : e.tipo === filtroBitTipo);
+  const pasaTexto = (e) => !filtroBit || norm(`${e.n} ${e.fecha} ${TIPOS[e.tipo] || e.tipo} ${describir(c, e).replace(/<[^>]+>/g, ' ')}`).includes(norm(filtroBit));
+  const visibles = eventos.filter((e) => pasaTipo(e) && pasaTexto(e)).sort((x, y) => (ordenBit.dir === 'asc' ? 1 : -1) * (vOrd(x).localeCompare(vOrd(y)) || x.n - y.n));
+  return { todos, eventos, visibles };
+}
+function vBitacora(c, r) {
+  const { eventos, visibles } = registroVisible(c);
   const roto = simulacion || fechaCorte ? verificar(eventos) : r.roto;
   const rc = fechaCorte ? resumen({ ...c, eventos }) : null;
   const corte = `<label class="corte">Ver el estado al <input type="date" id="fechaCorte" value="${esc(fechaCorte)}" max="${hoyISO()}" aria-label="Fecha de corte"></label>${fechaCorte ? '<button type="button" class="btn chico" data-acc="corteHoy">Volver a hoy</button>' : ''}`;
   const banda = rc ? `<div class="corte-banda" role="status"><span>Estado al <b>${fFecha(fechaCorte)}</b></span><span><b>${rc.tits}</b> titulares con respuesta</span><span><b>${rc.vig}</b> autorizaciones vigentes</span><span><b>${rc.rev}</b> revocadas</span><span><b>${eventos.length}</b> anotaciones</span>${eventos.length ? `<span>huella de cierre <span class="huella">${esc(eventos[eventos.length - 1].hash.slice(0, 16))}…</span></span>` : '<span>sin anotaciones a esa fecha</span>'}</div>` : '';
   const TIPOS_F = [['', 'Todo'], ['consentimiento', 'Consentimientos'], ['revocacion', 'Revocaciones'], ['acceso', 'Fiscalizador'], ['cambios', 'Política, formularios e inventario']];
-  const pasaTipo = (e) => !filtroBitTipo || (filtroBitTipo === 'cambios' ? ['politica', 'formulario', 'rat', 'usuario'].includes(e.tipo) : e.tipo === filtroBitTipo);
-  const pasaTexto = (e) => !filtroBit || norm(`${e.n} ${e.fecha} ${TIPOS[e.tipo] || e.tipo} ${describir(c, e).replace(/<[^>]+>/g, ' ')}`).includes(norm(filtroBit));
-  const visibles = eventos.filter((e) => pasaTipo(e) && pasaTexto(e));
   const filtros = `<div class="filtros" role="group" aria-label="Filtrar el registro">${TIPOS_F.map(([k, e]) => `<button type="button" data-ftrb="${k}" aria-pressed="${k === filtroBitTipo}">${e}</button>`).join('')}${filtroBit || filtroBitTipo ? `<span class="mini" style="display:inline-flex;align-items:center;margin-left:4px">${visibles.length} de ${eventos.length}</span>` : ''}</div>`;
-  const vOrd = (e) => (ordenBit.k === 'fecha' ? e.fecha : String(e.n).padStart(8, '0'));
-  const filas = visibles.slice().sort((x, y) => (ordenBit.dir === 'asc' ? 1 : -1) * (vOrd(x).localeCompare(vOrd(y)) || x.n - y.n)).map((e) => `<tr class="${roto && e.n >= roto ? 'mal' : ''}"><td data-et="N°">${e.n}</td><td data-et="Fecha">${fFechaHora(e.fecha)}</td><td data-et="Tipo">${esc(TIPOS[e.tipo] || e.tipo)}</td><td class="cab" data-et="Anotación">${describir(c, e)}</td><td data-et="Huella"><span class="huella" title="Anterior: ${esc(e.prev)}">${esc(e.hash.slice(0, 24))}…</span></td></tr>`).join('');
+  const filas = visibles.map((e) => `<tr class="${roto && e.n >= roto ? 'mal' : ''}"><td data-et="N°">${e.n}</td><td data-et="Fecha">${fFechaHora(e.fecha)}</td><td data-et="Tipo">${esc(TIPOS[e.tipo] || e.tipo)}</td><td class="cab" data-et="Anotación">${describir(c, e)}</td><td data-et="Huella"><span class="huella" title="Anterior: ${esc(e.prev)}">${esc(e.hash.slice(0, 24))}…</span></td></tr>`).join('');
   return `<div class="sec-cab"><div class="sec-tit"><h1>Registro probatorio</h1><button type="button" class="ayuda" data-ayuda="bitacora" aria-label="Qué es esta sección" title="Qué es esta sección">?</button></div>
-    <div class="fila-btn"><input type="search" id="buscarBit" aria-label="Buscar en el registro" placeholder="Buscar en el registro" value="${esc(filtroBit)}" style="min-width:220px"><button class="btn" data-acc="verificar">Verificar la cadena</button><button class="btn" data-acc="${simulacion ? 'finSim' : 'simular'}">${simulacion ? 'Terminar la simulación' : 'Simular una alteración'}</button><button class="btn" data-acc="descCadena">Descargar el registro (JSON)</button></div></div>
+    <div class="fila-btn"><input type="search" id="buscarBit" aria-label="Buscar en el registro" placeholder="Buscar en el registro" value="${esc(filtroBit)}" style="min-width:220px"><button class="btn" data-acc="verificar">Verificar la cadena</button><button class="btn" data-acc="${simulacion ? 'finSim' : 'simular'}">${simulacion ? 'Terminar la simulación' : 'Simular una alteración'}</button><button class="btn" data-acc="descCadena">Descargar el registro (JSON)</button><button class="btn" data-acc="excelReg" title="Descarga lo que se ve: con la fecha de corte, los filtros, la búsqueda y el orden puestos">Descargar para Excel</button></div></div>
   <div class="fila-btn" style="margin-bottom:12px">${corte}</div>
   ${banda}${filtros}
   ${simulacion ? `<div class="alerta rojo"><b>Simulación:</b> se cambió la anotación N° ${simulacion.n} (${esc(simulacion.que)}) sin tocar las huellas. La verificación falla desde la N° ${roto}. Nada de esto se guardó.</div>` : roto ? `<div class="alerta rojo">La cadena está rota desde la anotación N° ${roto}.</div>` : `<div class="alerta verde"><b>Cadena íntegra:</b> ${eventos.length} anotaciones verificadas. Huella de cierre: <span class="huella">${esc(eventos[eventos.length - 1].hash)}</span></div>`}
@@ -1636,6 +1688,8 @@ document.addEventListener('click', (ev) => {
   if (d.ayuda) { abrirDialogo(el.closest('.sec-tit').querySelector('h1').textContent, `<p style="font-size:var(--t-lead);line-height:1.55;margin:0">${AYUDA[d.ayuda] || ''}</p>`, [['ok', 'Entendido', 'primario']]); return; }
   switch (d.acc) {
     case 'prepararDemo': prepararDemo(); break;
+    case 'excelTit': excelTitulares(c); break;
+    case 'excelReg': excelRegistro(c); break;
     case 'reiniciar': if (confirm('¿Borrar los cambios y volver a los datos de ejemplo?')) { db = semilla(); fichaId = null; render(); } break;
     case 'recorrido': irPaso(0); break;
     case 'recAnt': irPaso(Math.max(0, pasoRec - 1)); break;
@@ -1743,6 +1797,7 @@ function opcionesPaleta(q) {
   add('Acción', 'Verificar la cadena', 'registro probatorio', () => { modo = 'mlv'; ruta = 'bitacora'; setTimeout(() => aviso(verificar(cli().eventos) ? 'La cadena está rota' : `Cadena íntegra: ${cli().eventos.length} anotaciones`), 80); });
   add('Acción', 'Simular una alteración', 'registro probatorio', () => { modo = 'mlv'; ruta = 'bitacora'; simularAlteracion(cli()); });
   add('Acción', 'Agregar tratamiento', 'inventario', () => { modo = 'mlv'; ruta = 'rat'; setTimeout(() => editarTrat(null), 80); });
+  add('Acción', 'Letra grande (modo presentación)', 'activa o desactiva', () => { aplicarPresentar(document.documentElement.dataset.presentar !== 'si'); });
   add('Acción', 'Preparar demo', 'datos de ejemplo, sin filtros, panel desde arriba', () => { prepararDemo(); });
   add('Acción', 'Volver a los datos de ejemplo', 'borra los cambios de este navegador', () => { if (confirm('¿Borrar los cambios y volver a los datos de ejemplo?')) { db = semilla(); fichaId = null; modo = 'mlv'; ruta = 'panel'; } });
   db.clientes.forEach((k) => add('Cliente', k.nombre, k.rubro, () => { db.actual = k.id; modo = 'mlv'; ruta = 'panel'; }));
@@ -1788,6 +1843,8 @@ document.addEventListener('scroll', (ev) => { if (ev.target.id === 'polCaja') re
 
 db = cargar();
 try { aplicarTema(localStorage.getItem('mlv-tema') || 'sello'); } catch { aplicarTema('sello'); }
+try { aplicarPresentar(localStorage.getItem('mlv-presentar') === 'si'); } catch { aplicarPresentar(false); }
+$('btnPresentar').addEventListener('click', () => { const si = document.documentElement.dataset.presentar !== 'si'; aplicarPresentar(si); aviso(si ? 'Letra grande activada' : 'Letra normal'); });
 // Enlaces directos para la demostración: #titular abre el formulario; #fiscal, el panel del fiscalizador; #recorrido inicia el recorrido guiado; #demo la deja lista desde cero.
 const inicial = location.hash.replace('#', '');
 if (inicial === 'titular') { modo = 'titular'; iniciarTitular(); } else if (inicial === 'fiscal') modo = 'fiscal';
