@@ -339,6 +339,52 @@
   .barra i { display: block; height: 100%; }
   .leyenda { display: flex; gap: 12px; flex-wrap: wrap; font-size: 12px; color: var(--suave); margin-top: 6px; }
   .leyenda i { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 4px; vertical-align: -1px; }
+
+  /* Panel: indicadores clicables, etapas del caso y gráficos (SVG propio, sin dependencias) */
+  button.kpi { font: inherit; color: inherit; text-align: left; cursor: pointer; display: block; width: 100%; }
+  button.kpi:hover { border-color: var(--marca-borde); box-shadow: var(--sombra-2); }
+  button.kpi:focus-visible { outline: 2px solid var(--realce); outline-offset: 2px; }
+  .kpi .eti, .kpi .num, .kpi .det { display: block; }
+  .kpi .ir { display: block; font-size: 12px; color: var(--accion); margin-top: 8px; text-decoration: underline; text-underline-offset: 3px; text-decoration-color: color-mix(in srgb, var(--accion) 40%, transparent); }
+  .kpi.oscuro .ir { color: var(--marca-texto); opacity: .85; text-decoration-color: color-mix(in srgb, var(--marca-texto) 40%, transparent); }
+  .etapas { list-style: none; margin: 0 0 16px; padding: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); background: var(--papel); border: 1px solid var(--linea); border-radius: var(--radio); box-shadow: var(--sombra); overflow: hidden; }
+  .etapas li { position: relative; min-width: 0; }
+  .etapas li + li::before { content: ""; position: absolute; left: 0; top: 14px; bottom: 14px; width: 1px; background: var(--linea2); }
+  .etapas button { width: 100%; font: inherit; color: inherit; background: none; border: 0; text-align: left; padding: 14px 16px; cursor: pointer; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 1px 12px; align-items: center; }
+  .etapas button:hover { background: var(--papel2); }
+  .etapas button:focus-visible { outline: 2px solid var(--realce); outline-offset: -2px; }
+  .e-num { grid-row: span 3; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font: 700 12px/1 var(--sans-tit); color: #fff; background: var(--verde-v); }
+  .e-num.ambar { background: var(--ambar-v); } .e-num.rojo { background: var(--rojo-v); }
+  .e-tit { font-size: 11px; color: var(--suave); text-transform: uppercase; letter-spacing: .07em; font-weight: 600; }
+  .e-val { font: var(--peso-tit) 15px/1.25 var(--sans-tit); letter-spacing: var(--esp-tit); }
+  .e-det { font-size: 12px; color: var(--tinta2); }
+  @media (max-width: 1050px) { .etapas { grid-template-columns: repeat(2, minmax(0, 1fr)); } .etapas li + li::before { display: none; } .etapas li { border-top: 1px solid var(--linea2); } .etapas li:nth-child(-n+2) { border-top: 0; } }
+  @media (max-width: 600px) { .etapas { grid-template-columns: 1fr; } .etapas li:nth-child(2) { border-top: 1px solid var(--linea2); } }
+  .graficos { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr) minmax(0, .95fr); gap: 16px; margin: 0 0 16px; }
+  @media (max-width: 1050px) { .graficos { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 700px) { .graficos { grid-template-columns: 1fr; } }
+  .graficos .caja h3 { margin: 0 0 10px; font-size: 14px; }
+  .graf { width: 100%; height: auto; display: block; overflow: visible; }
+  .g-reja { stroke: var(--linea2); stroke-width: 1; }
+  .g-eje { font: 10px var(--sans); fill: var(--suave); }
+  .g-area { fill: var(--marca-tenue); }
+  .g-linea { fill: none; stroke: var(--marca); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+  .g-linea.rojo { stroke: var(--rojo-v); }
+  .g-punto { fill: var(--papel); stroke: var(--marca); stroke-width: 2; } .g-punto.rojo { stroke: var(--rojo-v); }
+  .rosca { display: flex; gap: 18px; align-items: center; }
+  .rosca svg { width: 124px; height: 124px; flex: none; }
+  .rosca .centro { font: var(--peso-tit) 28px var(--sans-tit); fill: var(--tinta); letter-spacing: var(--esp-tit); }
+  .rosca .centro-eti { font: 9.5px var(--sans); fill: var(--suave); letter-spacing: .05em; }
+  .rosca ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 7px; font-size: 12.5px; color: var(--tinta2); min-width: 0; flex: 1; }
+  .rosca li { display: flex; align-items: center; gap: 8px; } .rosca li i { width: 9px; height: 9px; border-radius: 2px; flex: none; } .rosca li b { margin-left: auto; font-variant-numeric: tabular-nums; color: var(--tinta); }
+  .fin-fila { margin-bottom: 11px; }
+  .fin-fila .cab { display: flex; justify-content: space-between; gap: 10px; font-size: 13px; margin-bottom: 5px; }
+  .fin-fila .cab span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+  .fin-fila .cab .cifra { color: var(--suave); font-variant-numeric: tabular-nums; flex: none; }
+  .filtros { display: flex; gap: 6px; flex-wrap: wrap; margin: 0 0 12px; }
+  .filtros button { font: inherit; font-size: 12.5px; font-weight: 500; padding: 5px 11px; border-radius: 999px; border: 1px solid var(--linea); background: var(--papel); color: var(--tinta2); cursor: pointer; }
+  .filtros button:hover { border-color: var(--campo); }
+  .filtros button[aria-pressed="true"] { background: var(--marca-claro); border-color: var(--marca-borde); color: var(--marca); font-weight: 600; }
   .dl { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 6px 14px; font-size: 13.5px; margin: 0; }
   .dl dt { color: var(--suave); }
   .dl dd { margin: 0; }
@@ -859,7 +905,7 @@ function pintarRecorrido() {
 }
 
 /* ───────── Estado de la pantalla ───────── */
-let modo = 'mlv', ruta = 'panel', fichaId = null, filtroTit = '', fiscConsulta = '', fiscExp = null, simulacion = null;
+let modo = 'mlv', ruta = 'panel', fichaId = null, filtroTit = '', filtroEstado = '', filtroBit = '', filtroBitTipo = '', fiscConsulta = '', fiscExp = null, simulacion = null;
 let T = null; // flujo del formulario del titular
 
 /* ───────── Pintado general ───────── */
@@ -903,24 +949,79 @@ function vPanel(c, r) {
   return `<div class="sec-cab"><div class="sec-tit"><h1>Panel de MLV</h1><button type="button" class="ayuda" data-ayuda="panel" aria-label="Qué es esta sección" title="Qué es esta sección">?</button></div>
     <div class="fila-btn"><button class="btn" data-acc="reiniciar">Volver a los datos de ejemplo</button><button class="btn primario" data-acc="recorrido">${ICONOS.fiscal}Recorrido guiado</button></div></div>
   <div class="cartera">${cartera}</div>
+  ${etapasCaso(c, r)}
   <div class="resumen">
-    <div class="kpi oscuro"><div class="eti">${esc(c.nombre)}</div><div class="num">${r.tits}</div><div class="det">titulares con respuesta registrada</div></div>
-    <div class="kpi"><div class="eti">Consentimientos vigentes</div><div class="num">${r.vig}</div><div class="det">por finalidad</div></div>
-    <div class="kpi"><div class="eti">Revocados</div><div class="num">${r.rev}</div><div class="det">${r.rech} finalidades no autorizadas</div></div>
-    <div class="kpi"><div class="eti">Finalidad nueva sin responder</div><div class="num">${r.reconf.length}</div><div class="det">titulares por consultar</div></div>
-    <div class="kpi"><div class="eti">Registro probatorio</div><div class="num">${c.eventos.length}</div><div class="det">${r.roto ? '<b style="color:var(--rojo)">alterado</b>' : 'anotaciones, íntegro'}</div></div>
+    <button type="button" class="kpi oscuro" data-ruta="titulares" data-filtro=""><span class="eti">${esc(c.nombre)}</span><span class="num">${r.tits}</span><span class="det">titulares con respuesta registrada</span><span class="ir">Ver titulares</span></button>
+    <button type="button" class="kpi" data-ruta="titulares" data-filtro="otorgado"><span class="eti">Autorizaciones vigentes</span><span class="num">${r.vig}</span><span class="det">pares titular–finalidad</span><span class="ir">Ver quiénes</span></button>
+    <button type="button" class="kpi" data-ruta="titulares" data-filtro="revocado"><span class="eti">Revocadas</span><span class="num">${r.rev}</span><span class="det">${r.rech} finalidades no autorizadas</span><span class="ir">Ver quiénes</span></button>
+    <button type="button" class="kpi" data-ruta="titulares" data-filtro="reconf"><span class="eti">Finalidad nueva sin responder</span><span class="num">${r.reconf.length}</span><span class="det">titulares por consultar</span><span class="ir">Ver quiénes</span></button>
+    <button type="button" class="kpi" data-ruta="bitacora"><span class="eti">Registro probatorio</span><span class="num">${c.eventos.length}</span><span class="det">${r.roto ? '<b style="color:var(--rojo)">alterado</b>' : 'anotaciones, íntegro'}</span><span class="ir">Ver el registro</span></button>
+  </div>
+  <div class="graficos">
+    <div class="caja"><h3>Respuestas y revocaciones por mes</h3>${graficoEvolucion(c)}</div>
+    <div class="caja"><h3>Estado por finalidad</h3>${barrasFinalidades(c, r)}</div>
+    <div class="caja"><h3>Titulares por situación</h3>${graficoRosca(c)}</div>
   </div>
   <div class="dos">
     <div class="caja"><h2>Alertas</h2>${alertas || '<p class="nota">Sin alertas.</p>'}</div>
     <div class="caja"><h2>Últimos movimientos</h2><ul class="tiempo">${recientes}</ul><button class="btn-txt" data-ruta="bitacora">Ver el registro completo</button></div>
-  </div>
-  <div class="caja" style="margin-top:16px"><h2>Para la demostración</h2>
-    <ol style="margin:0;padding-left:20px;line-height:1.7">
-      <li><b>Inventario (RAT):</b> el semáforo dice en qué tratamientos corresponde pedir consentimiento y en cuáles no (T-07: salud mental de trabajadores).</li>
-      <li><b>Trabajador o titular</b> (arriba a la derecha): llenar el formulario con la marca del cliente, leer la política y elegir finalidades; recibir el comprobante y revocar con el mismo código.</li>
-      <li><b>Registro probatorio:</b> verificar la cadena y «Simular una alteración» para ver cómo se detecta.</li>
-      <li><b>Fiscalizador:</b> el panel de solo lectura que se entrega a la Agencia, con el expediente por titular.</li>
-    </ol></div>`;
+  </div>`;
+}
+
+/* ───── Etapas del caso y gráficos del panel (SVG propio, sin dependencias) ───── */
+function etapasCaso(c, r) {
+  const pol = polVigente(c);
+  const et = [
+    { k: 'rat', t: 'Inventario', v: `${c.rat.length} tratamientos`, s: r.rojos.length ? 'rojo' : r.ambar.length ? 'ambar' : 'verde', d: r.rojos.length ? `${r.rojos.length} en rojo` : r.ambar.length ? `${r.ambar.length} por revisar` : 'semáforo al día' },
+    { k: 'formularios', t: 'Política', v: `Versión ${pol.version}`, s: 'verde', d: `vigente desde ${fFecha(pol.fecha)}` },
+    { k: 'formularios', t: 'Formularios', v: `${c.formularios.length} publicado${c.formularios.length === 1 ? '' : 's'}`, s: 'verde', d: `con la marca de ${c.sigla}` },
+    { k: 'titulares', t: 'Respuestas', v: `${r.tits} de ${c.titulares.length} titulares`, s: r.reconf.length ? 'ambar' : 'verde', d: r.reconf.length ? `${r.reconf.length} con finalidad nueva` : 'sin pendientes' },
+    { k: 'bitacora', t: 'Registro probatorio', v: `${c.eventos.length} anotaciones`, s: r.roto ? 'rojo' : 'verde', d: r.roto ? `alterado desde N° ${r.roto}` : 'cadena íntegra' },
+  ];
+  return `<ol class="etapas" aria-label="Etapas del caso">${et.map((e, i) => `<li><button type="button" data-ruta="${e.k}"><span class="e-num ${e.s}">${i + 1}</span><span class="e-tit">${esc(e.t)}</span><span class="e-val">${esc(e.v)}</span><span class="e-det">${esc(e.d)}</span></button></li>`).join('')}</ol>`;
+}
+const MES3 = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+function graficoEvolucion(c) {
+  const hoy = new Date(ahora().slice(0, 10) + 'T12:00:00');
+  const meses = [...Array(6)].map((_, i) => { const x = new Date(hoy.getFullYear(), hoy.getMonth() - (5 - i), 1); return { k: `${x.getFullYear()}-${dos(x.getMonth() + 1)}`, eti: MES3[x.getMonth()] }; });
+  const serie = (tipo) => meses.map((m) => c.eventos.filter((e) => e.tipo === tipo && e.fecha.slice(0, 7) === m.k).length);
+  const resp = serie('consentimiento'), revs = serie('revocacion');
+  const W = 320, H = 150, pi = 26, pt = 10, pb = 24, pd = 8;
+  const max = Math.max(1, ...resp, ...revs);
+  const x = (i) => pi + i * ((W - pi - pd) / (meses.length - 1));
+  const y = (v) => pt + (H - pt - pb) * (1 - v / max);
+  const linea = (s) => s.map((v, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
+  const area = `${linea(resp)} L${x(meses.length - 1).toFixed(1)},${y(0).toFixed(1)} L${x(0).toFixed(1)},${y(0).toFixed(1)} Z`;
+  const pasos = Math.min(max, 4);
+  const ejeY = [...new Set([...Array(pasos + 1)].map((_, i) => Math.round(max * i / pasos)))];
+  return `<svg class="graf" viewBox="0 0 ${W} ${H}" role="img" aria-label="Respuestas al formulario y revocaciones en los últimos seis meses">
+    ${ejeY.map((v) => `<line x1="${pi}" x2="${W - pd}" y1="${y(v).toFixed(1)}" y2="${y(v).toFixed(1)}" class="g-reja"/><text x="${pi - 6}" y="${(y(v) + 3.5).toFixed(1)}" class="g-eje" text-anchor="end">${v}</text>`).join('')}
+    <path d="${area}" class="g-area"/><path d="${linea(resp)}" class="g-linea"/><path d="${linea(revs)}" class="g-linea rojo"/>
+    ${resp.map((v, i) => `<circle cx="${x(i).toFixed(1)}" cy="${y(v).toFixed(1)}" r="3.2" class="g-punto"><title>${meses[i].eti}: ${v} respuesta${v === 1 ? '' : 's'}</title></circle>`).join('')}
+    ${revs.map((v, i) => (v ? `<circle cx="${x(i).toFixed(1)}" cy="${y(v).toFixed(1)}" r="3.2" class="g-punto rojo"><title>${meses[i].eti}: ${v} revocación${v === 1 ? '' : 'es'}</title></circle>` : '')).join('')}
+    ${meses.map((m, i) => `<text x="${x(i).toFixed(1)}" y="${H - 7}" class="g-eje" text-anchor="middle">${m.eti}</text>`).join('')}
+  </svg><div class="leyenda"><span><i style="background:var(--marca)"></i>Respuestas al formulario</span><span><i style="background:var(--rojo-v)"></i>Revocaciones</span></div>`;
+}
+function barrasFinalidades(c, r) {
+  const ids = Object.keys(r.porFin); if (!ids.length) return '<p class="nota">Sin respuestas todavía.</p>';
+  return ids.map((id) => { const v = r.porFin[id], tot = v.otorgado + v.revocado + v.rechazado || 1, nom = (c.rat.find((t) => t.id === id) || {}).nombre || id;
+    return `<div class="fin-fila"><div class="cab"><span title="${esc(nom)}"><b>${esc(id)}</b> · ${esc(nom)}</span><span class="cifra">${v.otorgado} de ${tot}</span></div>
+    <div class="barra" title="${v.otorgado} vigentes · ${v.revocado} revocadas · ${v.rechazado} no autorizadas"><i style="width:${(v.otorgado / tot * 100).toFixed(1)}%;background:var(--verde-v)"></i><i style="width:${(v.revocado / tot * 100).toFixed(1)}%;background:var(--rojo-v)"></i><i style="width:${(v.rechazado / tot * 100).toFixed(1)}%;background:#B8B4AA"></i></div></div>`; }).join('')
+    + `<div class="leyenda"><span><i style="background:var(--verde-v)"></i>Vigente</span><span><i style="background:var(--rojo-v)"></i>Revocada</span><span><i style="background:#B8B4AA"></i>No autorizó</span></div>`;
+}
+const situacionTit = (c, t) => { const m = Object.values(estados(c, t.id)); return !m.length ? 'sin' : m.some((v) => v.estado === 'otorgado') ? 'vigente' : m.some((v) => v.estado === 'revocado') ? 'revocado' : 'rechazado'; };
+function graficoRosca(c) {
+  const cat = { vigente: 0, revocado: 0, rechazado: 0, sin: 0 };
+  for (const t of c.titulares) cat[situacionTit(c, t)]++;
+  const total = c.titulares.length, partes = [['vigente', 'Con alguna autorización vigente', 'var(--verde-v)'], ['revocado', 'Retiraron todas', 'var(--rojo-v)'], ['rechazado', 'No autorizaron ninguna', '#B8B4AA'], ['sin', 'Sin respuesta', 'var(--hundido)']];
+  const R = 50, ri = 36, cx = 60, cy = 60; let ang = -Math.PI / 2;
+  const p = (rad, a) => `${(cx + rad * Math.cos(a)).toFixed(2)},${(cy + rad * Math.sin(a)).toFixed(2)}`;
+  const arcos = partes.map(([k, eti, color]) => { const n = cat[k]; if (!n || !total) return ''; const a = n / total * Math.PI * 2, a2 = ang + a, grande = a > Math.PI ? 1 : 0;
+    const d = n === total ? `M${p(R, ang)} A${R},${R} 0 1,1 ${p(R, ang + Math.PI)} A${R},${R} 0 1,1 ${p(R, ang)} M${p(ri, ang)} A${ri},${ri} 0 1,0 ${p(ri, ang + Math.PI)} A${ri},${ri} 0 1,0 ${p(ri, ang)}` : `M${p(R, ang)} A${R},${R} 0 ${grande},1 ${p(R, a2)} L${p(ri, a2)} A${ri},${ri} 0 ${grande},0 ${p(ri, ang)} Z`;
+    ang = a2; return `<path d="${d}" fill="${color}" fill-rule="evenodd"><title>${esc(eti)}: ${n}</title></path>`; }).join('');
+  return `<div class="rosca"><svg viewBox="0 0 120 120" role="img" aria-label="Titulares por situación">${arcos || `<circle cx="60" cy="60" r="43" fill="none" stroke="var(--hundido)" stroke-width="14"/>`}
+    <text x="60" y="58" text-anchor="middle" class="centro">${total}</text><text x="60" y="72" text-anchor="middle" class="centro-eti">TITULARES</text></svg>
+    <ul>${partes.map(([k, eti, color]) => `<li><i style="background:${color}"></i><span>${esc(eti)}</span><b>${cat[k]}</b></li>`).join('')}</ul></div>`;
 }
 
 function describir(c, e) {
@@ -1077,14 +1178,18 @@ const polHtml = (txt) => txt.split('\n').map((l) => (l.startsWith('## ') ? `<h4>
 function vTitulares(c) {
   if (fichaId) return vFicha(c, c.titulares.find((t) => t.id === fichaId));
   const fins = [...new Set(c.formularios.flatMap((f) => f.finalidades))];
-  const lista = c.titulares.filter((t) => !filtroTit || norm(t.nombre + ' ' + t.rut + ' ' + t.id).includes(norm(filtroTit)));
+  const FILTROS = [['', 'Todos'], ['otorgado', 'Con autorización vigente'], ['revocado', 'Con revocación'], ['reconf', 'Con finalidad nueva'], ['sin', 'Sin respuesta']];
+  const pasaFiltro = (t) => { if (!filtroEstado) return true; const m = Object.values(estados(c, t.id)); if (filtroEstado === 'sin') return !m.length; if (filtroEstado === 'reconf') return !!porReconfirmar(c, t); return m.some((v) => v.estado === filtroEstado); };
+  const lista = c.titulares.filter((t) => pasaFiltro(t) && (!filtroTit || norm(t.nombre + ' ' + t.rut + ' ' + t.id).includes(norm(filtroTit))));
+  const filtros = `<div class="filtros" role="group" aria-label="Filtrar titulares">${FILTROS.map(([k, e]) => `<button type="button" data-ftr="${k}" aria-pressed="${k === filtroEstado}">${e}</button>`).join('')}</div>`;
   const filas = lista.map((t) => { const m = estados(c, t.id), rc = porReconfirmar(c, t), u = ultimoConsent(c, t.id); return `<tr class="clic" data-ficha="${esc(t.id)}">
     <td class="cab" data-et="Titular"><b>${esc(t.nombre)}</b><span class="mini">${esc(t.rut)} · ${esc(TITULARES[t.relacion] || '')} · ${esc(t.id)}</span></td>
     ${fins.map((id) => `<td data-et="${esc(id)}">${m[id] ? chipEstado(m[id].estado) : chip('gris', '—')}</td>`).join('')}
     <td data-et="Última respuesta">${u ? fFecha(u.fecha) + `<span class="mini">política v${esc(u.det.politica.version)}</span>` : '—'}${rc ? ' ' + chip('ambar', 'Finalidad nueva') : ''}</td></tr>`; }).join('');
   return `<div class="sec-cab"><div class="sec-tit"><h1>Titulares</h1><button type="button" class="ayuda" data-ayuda="titulares" aria-label="Qué es esta sección" title="Qué es esta sección">?</button></div>
     <input type="search" id="buscarTit" placeholder="Buscar por nombre o RUT" value="${esc(filtroTit)}" style="min-width:260px"></div>
-  <div class="tabla-env"><table class="tabla resp"><thead><tr><th>Titular</th>${fins.map((id) => `<th title="${esc((c.rat.find((t) => t.id === id) || {}).nombre)}">${esc(id)}</th>`).join('')}<th>Última respuesta</th></tr></thead><tbody>${filas || `<tr><td colspan="9"><div class="vacio">Sin resultados.</div></td></tr>`}</tbody></table></div>
+  ${filtros}
+  <div class="tabla-env"><table class="tabla resp"><thead><tr><th>Titular</th>${fins.map((id) => `<th title="${esc((c.rat.find((t) => t.id === id) || {}).nombre)}">${esc(id)}</th>`).join('')}<th>Última respuesta</th></tr></thead><tbody>${filas || `<tr><td colspan="9"><div class="vacio">Sin titulares con ese filtro. <button class="btn-txt" data-ftr="">Ver todos</button></div></td></tr>`}</tbody></table></div>
   <p class="nota">${fins.map((id) => `<b>${esc(id)}</b> ${esc((c.rat.find((t) => t.id === id) || {}).nombre)}`).join(' · ')}</p>`;
 }
 function vFicha(c, t) {
@@ -1102,11 +1207,17 @@ function vFicha(c, t) {
 function vBitacora(c, r) {
   const eventos = simulacion ? simulacion.eventos : c.eventos;
   const roto = simulacion ? verificar(eventos) : r.roto;
-  const filas = eventos.slice().reverse().map((e) => `<tr class="${roto && e.n >= roto ? 'mal' : ''}"><td data-et="N°">${e.n}</td><td data-et="Fecha">${fFechaHora(e.fecha)}</td><td data-et="Tipo">${esc(TIPOS[e.tipo] || e.tipo)}</td><td class="cab" data-et="Anotación">${describir(c, e)}</td><td data-et="Huella"><span class="huella" title="Anterior: ${esc(e.prev)}">${esc(e.hash.slice(0, 24))}…</span></td></tr>`).join('');
+  const TIPOS_F = [['', 'Todo'], ['consentimiento', 'Consentimientos'], ['revocacion', 'Revocaciones'], ['acceso', 'Fiscalizador'], ['cambios', 'Política, formularios e inventario']];
+  const pasaTipo = (e) => !filtroBitTipo || (filtroBitTipo === 'cambios' ? ['politica', 'formulario', 'rat', 'usuario'].includes(e.tipo) : e.tipo === filtroBitTipo);
+  const pasaTexto = (e) => !filtroBit || norm(`${e.n} ${e.fecha} ${TIPOS[e.tipo] || e.tipo} ${describir(c, e).replace(/<[^>]+>/g, ' ')}`).includes(norm(filtroBit));
+  const visibles = eventos.filter((e) => pasaTipo(e) && pasaTexto(e));
+  const filtros = `<div class="filtros" role="group" aria-label="Filtrar el registro">${TIPOS_F.map(([k, e]) => `<button type="button" data-ftrb="${k}" aria-pressed="${k === filtroBitTipo}">${e}</button>`).join('')}${filtroBit || filtroBitTipo ? `<span class="mini" style="display:inline-flex;align-items:center;margin-left:4px">${visibles.length} de ${eventos.length}</span>` : ''}</div>`;
+  const filas = visibles.slice().reverse().map((e) => `<tr class="${roto && e.n >= roto ? 'mal' : ''}"><td data-et="N°">${e.n}</td><td data-et="Fecha">${fFechaHora(e.fecha)}</td><td data-et="Tipo">${esc(TIPOS[e.tipo] || e.tipo)}</td><td class="cab" data-et="Anotación">${describir(c, e)}</td><td data-et="Huella"><span class="huella" title="Anterior: ${esc(e.prev)}">${esc(e.hash.slice(0, 24))}…</span></td></tr>`).join('');
   return `<div class="sec-cab"><div class="sec-tit"><h1>Registro probatorio</h1><button type="button" class="ayuda" data-ayuda="bitacora" aria-label="Qué es esta sección" title="Qué es esta sección">?</button></div>
-    <div class="fila-btn"><button class="btn" data-acc="verificar">Verificar la cadena</button><button class="btn" data-acc="${simulacion ? 'finSim' : 'simular'}">${simulacion ? 'Terminar la simulación' : 'Simular una alteración'}</button><button class="btn" data-acc="descCadena">Descargar el registro (JSON)</button></div></div>
+    <div class="fila-btn"><input type="search" id="buscarBit" placeholder="Buscar en el registro" value="${esc(filtroBit)}" style="min-width:220px"><button class="btn" data-acc="verificar">Verificar la cadena</button><button class="btn" data-acc="${simulacion ? 'finSim' : 'simular'}">${simulacion ? 'Terminar la simulación' : 'Simular una alteración'}</button><button class="btn" data-acc="descCadena">Descargar el registro (JSON)</button></div></div>
+  ${filtros}
   ${simulacion ? `<div class="alerta rojo"><b>Simulación:</b> se cambió la anotación N° ${simulacion.n} (${esc(simulacion.que)}) sin tocar las huellas. La verificación falla desde la N° ${roto}. Nada de esto se guardó.</div>` : roto ? `<div class="alerta rojo">La cadena está rota desde la anotación N° ${roto}.</div>` : `<div class="alerta verde"><b>Cadena íntegra:</b> ${eventos.length} anotaciones verificadas. Huella de cierre: <span class="huella">${esc(eventos[eventos.length - 1].hash)}</span></div>`}
-  <div class="tabla-env"><table class="tabla resp"><thead><tr><th>N°</th><th>Fecha</th><th>Tipo</th><th>Anotación</th><th>Huella</th></tr></thead><tbody>${filas}</tbody></table></div>
+  <div class="tabla-env"><table class="tabla resp"><thead><tr><th>N°</th><th>Fecha</th><th>Tipo</th><th>Anotación</th><th>Huella</th></tr></thead><tbody>${filas || `<tr><td colspan="5"><div class="vacio">Ninguna anotación coincide. <button class="btn-txt" data-ftrb="">Ver todo</button></div></td></tr>`}</tbody></table></div>
   <p class="nota">En la versión con servidor, la huella de cierre de cada día se sella con un tercero (sello de tiempo) para probar además que nada se reescribió completo después. Los nombres y RUT no van dentro de la cadena: se guarda su huella, así una persona puede pedir la supresión de sus datos sin romper la prueba.</p>`;
 }
 
@@ -1333,7 +1444,7 @@ function accionTitular(k, el) {
 
 /* ───────── Eventos ───────── */
 document.addEventListener('click', (ev) => {
-  const el = ev.target.closest('[data-modo],[data-ruta],[data-cli],[data-acc],[data-trat],[data-ficha],[data-expediente],[data-abrir-form],[data-t],[data-verpol],[data-rutdemo],[data-usuario],[data-ayuda]');
+  const el = ev.target.closest('[data-modo],[data-ruta],[data-cli],[data-acc],[data-trat],[data-ficha],[data-expediente],[data-abrir-form],[data-t],[data-verpol],[data-rutdemo],[data-usuario],[data-ayuda],[data-ftr],[data-ftrb]');
   if (!el) return;
   const c = cli(), d = el.dataset;
   if (d.modo) {
@@ -1344,7 +1455,9 @@ document.addEventListener('click', (ev) => {
     history.replaceState(null, '', modo === 'mlv' ? location.pathname : '#' + modo);
     render(); window.scrollTo(0, 0); return;
   }
-  if (d.ruta) { ruta = d.ruta; fichaId = null; simulacion = null; render(); return; }
+  if (d.ftr !== undefined) { filtroEstado = d.ftr; render(); return; }
+  if (d.ftrb !== undefined) { filtroBitTipo = d.ftrb; if (!d.ftrb) filtroBit = ''; render(); return; }
+  if (d.ruta) { ruta = d.ruta; fichaId = null; simulacion = null; if (d.filtro !== undefined) { filtroEstado = d.filtro; filtroTit = ''; } render(); if (d.filtro !== undefined || el.closest('.etapas')) window.scrollTo(0, 0); return; }
   if (d.cli) { db.actual = d.cli; fichaId = null; render(); return; }
   if (d.trat) { editarTrat(d.trat); return; }
   if (d.ficha) { fichaId = d.ficha; render(); window.scrollTo(0, 0); return; }
@@ -1415,7 +1528,11 @@ document.addEventListener('change', (ev) => {
   if (el.dataset.tfin) { T.marcas[el.dataset.tfin] = el.checked; el.closest('.fin').classList.toggle('marcada', el.checked); return; }
   if (el.dataset.trev) { T.rev.sel[el.dataset.trev] = el.checked; return; }
 });
-document.addEventListener('input', (ev) => { if (ev.target.id === 'buscarTit') { filtroTit = ev.target.value; const pos = ev.target.selectionStart; render(); const b = $('buscarTit'); b.focus(); b.setSelectionRange(pos, pos); } });
+document.addEventListener('input', (ev) => {
+  const buscadores = { buscarTit: (v) => { filtroTit = v; }, buscarBit: (v) => { filtroBit = v; } };
+  if (!buscadores[ev.target.id]) return;
+  buscadores[ev.target.id](ev.target.value); const id = ev.target.id, pos = ev.target.selectionStart; render(); const b = $(id); if (b) { b.focus(); b.setSelectionRange(pos, pos); }
+});
 document.addEventListener('scroll', (ev) => { if (ev.target.id === 'polCaja') revisarScroll(); }, true);
 
 db = cargar();
