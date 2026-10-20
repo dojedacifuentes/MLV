@@ -296,6 +296,7 @@
   .etapas button:hover { transform: translateY(-1px); box-shadow: 0 6px 16px -10px rgba(18, 28, 33, .35); }
   .kpi:active, .cli:active, .etapas button:active, .tabla tr.clic:active { transform: translateY(1px); box-shadow: var(--sombra); transition-duration: .06s; }
   .alertas-panel { margin: 0 0 16px; }
+  .imp-vista { margin-top: 14px; } .imp-vista .alerta { margin-bottom: 8px; } .imp-err { margin: 6px 0 0; padding-left: 18px; }
   /* Resumen de una línea del cliente elegido, arriba del panel */
   .resumen-linea { margin: -4px 0 18px; font-size: var(--t-lead); line-height: 1.5; color: var(--tinta); }
   .resumen-linea .punto { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 8px; vertical-align: 1px; background: var(--verde-v); }
@@ -1458,7 +1459,8 @@ function exportarCsv() {
 }
 function parseCsv(txt) {
   txt = txt.replace(/^﻿/, '');
-  const sep = (txt.split('\n')[0].match(/;/g) || []).length >= (txt.split('\n')[0].match(/,/g) || []).length ? ';' : ',';
+  const l0 = txt.split('\n')[0], cuenta = (ch) => l0.split(ch).length - 1;
+  const sep = cuenta('\t') > 0 && cuenta('\t') >= cuenta(';') && cuenta('\t') >= cuenta(',') ? '\t' : cuenta(';') >= cuenta(',') ? ';' : ',';
   const filas = []; let f = [], cel = '', com = false;
   for (let i = 0; i < txt.length; i++) {
     const ch = txt[i];
@@ -1489,6 +1491,95 @@ function importarCsv(txt) {
   }
   registrar(c, 'rat', { accion: 'Importación desde planilla', cantidad: n });
   render();
+}
+
+/* ───── Importar trabajadores desde una planilla (.xlsx de Excel o Google Sheets, .csv o celdas pegadas) ───── */
+// RUT chileno: valida el dígito verificador y lo devuelve con puntos y guion; null si no es válido.
+function rutValido(v) {
+  const m = String(v || '').toUpperCase().replace(/[^0-9K]/g, '').match(/^(\d{6,8})([0-9K])$/);
+  return m && dvRut(m[1]) === m[2] ? fmtRut(Number(m[1])) : null;
+}
+// Lector mínimo de .xlsx sin dependencias: el archivo es un ZIP; se lee la primera hoja y sus textos compartidos.
+async function leerXlsx(buf) {
+  const u8 = new Uint8Array(buf), v = new DataView(buf), dec = new TextDecoder();
+  let e = u8.length - 22; while (e >= 0 && v.getUint32(e, true) !== 0x06054b50) e--;
+  if (e < 0) throw new Error('El archivo no es un .xlsx válido.');
+  const arch = {}; let q = v.getUint32(e + 16, true);
+  for (let i = 0, n = v.getUint16(e + 10, true); i < n; i++) {
+    const ln = v.getUint16(q + 28, true);
+    arch[dec.decode(u8.subarray(q + 46, q + 46 + ln))] = { metodo: v.getUint16(q + 10, true), tam: v.getUint32(q + 20, true), loc: v.getUint32(q + 42, true) };
+    q += 46 + ln + v.getUint16(q + 30, true) + v.getUint16(q + 32, true);
+  }
+  const leer = async (nombre) => {
+    const a = arch[nombre]; if (!a) return '';
+    const ini = a.loc + 30 + v.getUint16(a.loc + 26, true) + v.getUint16(a.loc + 28, true), datos = u8.subarray(ini, ini + a.tam);
+    if (a.metodo === 0) return dec.decode(datos);
+    return new Response(new Blob([datos]).stream().pipeThrough(new DecompressionStream('deflate-raw'))).text();
+  };
+  const xml = (t) => new DOMParser().parseFromString(t, 'application/xml');
+  const hoja = arch['xl/worksheets/sheet1.xml'] ? 'xl/worksheets/sheet1.xml' : Object.keys(arch).filter((k) => /^xl\/worksheets\/sheet\d+\.xml$/.test(k)).sort()[0];
+  if (!hoja) throw new Error('No se encontró ninguna hoja en el archivo.');
+  const textos = [...xml(await leer('xl/sharedStrings.xml')).getElementsByTagName('si')].map((si) => [...si.getElementsByTagName('t')].map((t) => t.textContent).join(''));
+  const col = (ref) => [...ref.replace(/\d+/g, '')].reduce((n, ch) => n * 26 + ch.charCodeAt(0) - 64, 0) - 1;
+  return [...xml(await leer(hoja)).getElementsByTagName('row')].map((fila) => {
+    const r = [];
+    for (const c of fila.getElementsByTagName('c')) {
+      const t = c.getAttribute('t'), val = (c.getElementsByTagName('v')[0] || {}).textContent || '';
+      r[col(c.getAttribute('r') || 'A')] = t === 's' ? textos[+val] || '' : t === 'inlineStr' ? [...c.getElementsByTagName('t')].map((x) => x.textContent).join('') : val;
+    }
+    return Array.from(r, (x) => x || '');
+  }).filter((r) => r.some((x) => String(x).trim()));
+}
+// Revisa la planilla antes de cargar: qué filas entran y por qué otras no.
+function revisarNomina(c, filas) {
+  if (filas.length < 2) return { nuevos: [], errores: [], falta: 'La planilla necesita una fila de títulos y al menos una persona.' };
+  const cab = filas[0].map(norm), col = (...pal) => cab.findIndex((h) => pal.some((x) => h.includes(x)));
+  const ix = { nombre: col('nombre'), rut: col('rut'), correo: col('correo', 'mail'), cargo: col('cargo', 'puesto'), area: col('area', 'gerencia', 'departamento'), relacion: col('relacion', 'vinculo', 'tipo') };
+  if (ix.nombre < 0 || ix.rut < 0) return { nuevos: [], errores: [], falta: 'No se encontraron las columnas «Nombre» y «RUT» en la primera fila.' };
+  const relDe = (x) => { x = norm(x); return x.includes('postul') ? 'postulantes' : x.startsWith('ex') ? 'extrabajadores' : Object.keys(TITULARES).find((k) => x && x.includes(k.slice(0, 6))) || 'trabajadores'; };
+  const ya = new Set(c.titulares.map((t) => t.rut)), nuevos = [], errores = [];
+  filas.slice(1).forEach((r, i) => {
+    const g = (k) => (ix[k] >= 0 ? String(r[ix[k]] || '').trim() : ''), fila = i + 2, nombre = g('nombre');
+    if (!nombre && !g('rut')) return;
+    const rut = rutValido(g('rut'));
+    if (!nombre) errores.push({ fila, nombre: '—', motivo: 'falta el nombre' });
+    else if (!rut) errores.push({ fila, nombre, motivo: `el RUT «${g('rut') || 'vacío'}» no es válido (revise el dígito verificador)` });
+    else if (ya.has(rut)) errores.push({ fila, nombre, motivo: `ya está en Titulares (RUT ${rut})` });
+    else { ya.add(rut); nuevos.push({ nombre, rut, correo: /.+@.+\..+/.test(g('correo')) ? g('correo') : '', cargo: g('cargo'), area: g('area'), relacion: relDe(g('relacion')) }); }
+  });
+  return { nuevos, errores };
+}
+let nominaPendiente = null;
+function pintarRevision(rev) {
+  nominaPendiente = rev;
+  const v = $('impVista'); if (!v) return;
+  if (rev.falta) { v.innerHTML = `<div class="alerta rojo">${esc(rev.falta)}</div>`; return; }
+  const nombres = rev.nuevos.slice(0, 4).map((x) => esc(x.nombre)).join(', ') + (rev.nuevos.length > 4 ? ` y ${rev.nuevos.length - 4} más` : '');
+  v.innerHTML = (rev.nuevos.length ? `<div class="alerta verde"><b>${rev.nuevos.length} ${rev.nuevos.length === 1 ? 'persona lista' : 'personas listas'} para cargar:</b> ${nombres}.</div>` : '<div class="alerta ambar">Ninguna fila se puede cargar.</div>')
+    + (rev.errores.length ? `<div class="alerta ambar"><b>${rev.errores.length} ${rev.errores.length === 1 ? 'fila queda' : 'filas quedan'} fuera:</b><ul class="imp-err">${rev.errores.map((x) => `<li>Fila ${x.fila} · ${esc(x.nombre)}: ${esc(x.motivo)}</li>`).join('')}</ul></div>` : '');
+}
+function dialogoImportarTitulares() {
+  const c = cli(); nominaPendiente = null;
+  abrirDialogo(`Importar trabajadores · ${c.nombre}`, `<p style="margin:0 0 12px">Suba la planilla de la empresa o pegue las celdas copiadas. Se reconocen las columnas <b>Nombre</b>, <b>RUT</b>, <b>Correo</b>, <b>Cargo</b> y <b>Relación</b>; las demás se ignoran. Antes de cargar se revisa cada RUT y se omiten las personas que ya están.</p>
+    <label class="campo"><span>Archivo de Excel o Google Sheets (.xlsx) o .csv</span><input type="file" id="impArchivo" accept=".xlsx,.csv,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"></label>
+    <label class="campo" style="margin-top:12px"><span>O pegue aquí las celdas, con la fila de títulos</span><textarea id="impTexto" rows="4" placeholder="Seleccione las celdas en la planilla, cópielas (Ctrl+C) y péguelas aquí (Ctrl+V)"></textarea></label>
+    <div id="impVista" class="imp-vista" aria-live="polite"></div>
+    <p class="nota" style="margin:10px 0 0">Demostración: use solo datos ficticios. Todo queda guardado en este navegador.</p>`,
+  [['cancel', 'Cancelar'], ['ok', 'Cargar trabajadores', 'primario']], () => {
+    if (!nominaPendiente || !nominaPendiente.nuevos.length) { pintarRevision(nominaPendiente || { falta: 'Primero elija un archivo o pegue las celdas.' }); return false; }
+    nominaPendiente.nuevos.forEach((x) => { const t = nuevoTitular(c, x.nombre, x.rut, x.relacion); if (x.correo) t.correo = x.correo; if (x.cargo) t.cargo = x.cargo; if (x.area) t.area = x.area; });
+    const n = nominaPendiente.nuevos.length; nominaPendiente = null;
+    modo = 'mlv'; ruta = 'titulares'; fichaId = null; filtroEstado = 'sin'; filtroTit = ''; ordenTit = { k: 'nombre', dir: 'asc' };
+    render(); aviso(`Se cargaron ${n} personas en ${c.nombre}: aparecen en «Sin respuesta»`);
+  });
+  $('impTexto').addEventListener('input', (ev) => pintarRevision(revisarNomina(c, parseCsv(ev.target.value))));
+  $('impArchivo').addEventListener('change', async (ev) => {
+    const f = ev.target.files[0]; if (!f) return;
+    try {
+      const filas = /\.xlsx$/i.test(f.name) ? await leerXlsx(await f.arrayBuffer()) : /\.xls$/i.test(f.name) ? null : parseCsv(await f.text());
+      pintarRevision(filas ? revisarNomina(c, filas) : { falta: 'Los archivos .xls antiguos no se leen: guárdelo como .xlsx o .csv.' });
+    } catch (err) { pintarRevision({ falta: err.message || 'No se pudo leer el archivo.' }); }
+  });
 }
 
 /* ───── Formularios y política ───── */
@@ -1548,11 +1639,11 @@ function vTitulares(c) {
   const FILTROS = [['', 'Todos'], ['otorgado', 'Con autorización vigente'], ['revocado', 'Con revocación'], ['reconf', 'Con finalidad nueva'], ['sin', 'Sin respuesta']];
   const filtros = `<div class="filtros" role="group" aria-label="Filtrar titulares">${FILTROS.map(([k, e]) => `<button type="button" data-ftr="${k}" aria-pressed="${k === filtroEstado}">${e}</button>`).join('')}</div>`;
   const filas = lista.map((t) => { const m = estados(c, t.id), rc = porReconfirmar(c, t), u = ultimoConsent(c, t.id); return `<tr class="clic" data-ficha="${esc(t.id)}">
-    <td class="cab" data-et="Titular"><b>${esc(t.nombre)}</b><span class="mini">${esc(t.rut)} · ${esc(TITULARES[t.relacion] || '')} · ${esc(t.id)}</span></td>
+    <td class="cab" data-et="Titular"><b>${esc(t.nombre)}</b><span class="mini">${esc(t.rut)} · ${esc(TITULARES[t.relacion] || '')}${t.cargo ? ' · ' + esc(t.cargo) : ''} · ${esc(t.id)}</span></td>
     ${fins.map((id) => `<td data-et="${esc(id)}">${m[id] ? chipEstado(m[id].estado) : chip('gris', '—')}</td>`).join('')}
     <td data-et="Última respuesta">${u ? fFecha(u.fecha) + `<span class="mini">política v${esc(u.det.politica.version)}</span>` : '—'}${rc ? ' ' + chip('ambar', 'Finalidad nueva') : ''}</td></tr>`; }).join('');
   return `<div class="sec-cab"><div class="sec-tit"><h1>Titulares</h1><button type="button" class="ayuda" data-ayuda="titulares" aria-label="Qué es esta sección" title="Qué es esta sección">?</button></div>
-    <div class="fila-btn"><input type="search" id="buscarTit" aria-label="Buscar titular por nombre o RUT" placeholder="Buscar por nombre o RUT" value="${esc(filtroTit)}" style="min-width:260px"><button class="btn" data-acc="excelTit" title="Descarga lo que se ve: con el filtro, la búsqueda y el orden puestos">Descargar para Excel</button></div></div>
+    <div class="fila-btn"><input type="search" id="buscarTit" aria-label="Buscar titular por nombre o RUT" placeholder="Buscar por nombre o RUT" value="${esc(filtroTit)}" style="min-width:260px"><button class="btn" data-acc="excelTit" title="Descarga lo que se ve: con el filtro, la búsqueda y el orden puestos">Descargar para Excel</button><button class="btn primario" data-acc="importarTit">Importar trabajadores</button></div></div>
   ${filtros}
   <div class="tabla-env fija"><table class="tabla resp"><thead><tr>${thOrden('tit', 'nombre', 'Titular', ordenTit)}${fins.map((id) => `<th scope="col" title="${esc((c.rat.find((t) => t.id === id) || {}).nombre)}">${esc(id)}</th>`).join('')}${thOrden('tit', 'fecha', 'Última respuesta', ordenTit)}</tr></thead><tbody>${filas || `<tr><td colspan="9"><div class="vacio">${filtroTit && camilaPendiente(c, norm(filtroTit)) ? `${esc(PROTAGONISTA.nombre)} todavía no responde su formulario: aparece aquí cuando lo envía. <button class="btn-txt" data-acc="recorrido">Hacerlo en el recorrido guiado</button>` : 'Ningún titular coincide con este filtro. <button class="btn-txt" data-ftr="">Ver todos los titulares</button>'}</div></td></tr>`}</tbody></table></div>
   <p class="nota">${fins.map((id) => `<b>${esc(id)}</b> ${esc((c.rat.find((t) => t.id === id) || {}).nombre)}`).join(' · ')}</p>`;
@@ -1853,6 +1944,7 @@ document.addEventListener('click', (ev) => {
   switch (d.acc) {
     case 'prepararDemo': prepararDemo(); break;
     case 'excelTit': excelTitulares(c); break;
+    case 'importarTit': dialogoImportarTitulares(); break;
     case 'excelReg': excelRegistro(c); break;
     case 'reiniciar': if (confirm('¿Borrar los cambios y volver a los datos de ejemplo?')) { db = semilla(); fichaId = null; render(); } break;
     case 'recorrido': irPaso(0); break;
@@ -1963,6 +2055,7 @@ function opcionesPaleta(q) {
   add('Acción', 'Agregar tratamiento', 'inventario', () => { modo = 'mlv'; ruta = 'rat'; setTimeout(() => editarTrat(null), 80); });
   add('Acción', 'Modo oscuro', 'activa o desactiva', () => { aplicarOscuro(document.documentElement.dataset.oscuro !== 'si'); });
   add('Acción', 'Letra grande (modo presentación)', 'activa o desactiva', () => { aplicarPresentar(document.documentElement.dataset.presentar !== 'si'); });
+  add('Acción', 'Importar trabajadores', 'desde Excel, Google Sheets o .csv', () => { modo = 'mlv'; ruta = 'titulares'; setTimeout(dialogoImportarTitulares, 80); });
   add('Acción', 'Preparar demo', 'datos de ejemplo, sin filtros, panel desde arriba', () => { prepararDemo(); });
   add('Acción', 'Volver a los datos de ejemplo', 'borra los cambios de este navegador', () => { if (confirm('¿Borrar los cambios y volver a los datos de ejemplo?')) { db = semilla(); fichaId = null; modo = 'mlv'; ruta = 'panel'; } });
   db.clientes.forEach((k) => add('Cliente', k.nombre, k.rubro, () => { db.actual = k.id; modo = 'mlv'; ruta = 'panel'; }));
