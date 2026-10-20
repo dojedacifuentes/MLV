@@ -1343,7 +1343,7 @@ function vTitulares(c) {
   return `<div class="sec-cab"><div class="sec-tit"><h1>Titulares</h1><button type="button" class="ayuda" data-ayuda="titulares" aria-label="Qué es esta sección" title="Qué es esta sección">?</button></div>
     <input type="search" id="buscarTit" aria-label="Buscar titular por nombre o RUT" placeholder="Buscar por nombre o RUT" value="${esc(filtroTit)}" style="min-width:260px"></div>
   ${filtros}
-  <div class="tabla-env fija"><table class="tabla resp"><thead><tr>${thOrden('tit', 'nombre', 'Titular', ordenTit)}${fins.map((id) => `<th scope="col" title="${esc((c.rat.find((t) => t.id === id) || {}).nombre)}">${esc(id)}</th>`).join('')}${thOrden('tit', 'fecha', 'Última respuesta', ordenTit)}</tr></thead><tbody>${filas || `<tr><td colspan="9"><div class="vacio">Ningún titular coincide con este filtro. <button class="btn-txt" data-ftr="">Ver todos los titulares</button></div></td></tr>`}</tbody></table></div>
+  <div class="tabla-env fija"><table class="tabla resp"><thead><tr>${thOrden('tit', 'nombre', 'Titular', ordenTit)}${fins.map((id) => `<th scope="col" title="${esc((c.rat.find((t) => t.id === id) || {}).nombre)}">${esc(id)}</th>`).join('')}${thOrden('tit', 'fecha', 'Última respuesta', ordenTit)}</tr></thead><tbody>${filas || `<tr><td colspan="9"><div class="vacio">${filtroTit && camilaPendiente(c, norm(filtroTit)) ? `${esc(PROTAGONISTA.nombre)} todavía no responde su formulario: aparece aquí cuando lo envía. <button class="btn-txt" data-acc="recorrido">Hacerlo en el recorrido guiado</button>` : 'Ningún titular coincide con este filtro. <button class="btn-txt" data-ftr="">Ver todos los titulares</button>'}</div></td></tr>`}</tbody></table></div>
   <p class="nota">${fins.map((id) => `<b>${esc(id)}</b> ${esc((c.rat.find((t) => t.id === id) || {}).nombre)}`).join(' · ')}</p>`;
 }
 function vFicha(c, t) {
@@ -1730,8 +1730,10 @@ function animarCifras(c) {
 }
 
 let paletaIdx = 0, paletaOps = [];
+// Camila (la protagonista del recorrido) no está en los datos de ejemplo: aparece cuando responde su formulario.
+const camilaPendiente = (c, n) => n.length >= 3 && norm(`${PROTAGONISTA.nombre} ${PROTAGONISTA.rut}`).includes(n) && !c.titulares.some((t) => t.rut === PROTAGONISTA.rut);
 function opcionesPaleta(q) {
-  const c = cli(), n = norm(q || ''), out = [];
+  const c = cli(), n = norm((q || '').replace(/^\s*\/+/, '')), out = [];
   const add = (grupo, titulo, sub, fn) => out.push({ grupo, titulo, sub, fn });
   const rutas = [['panel', 'Panel'], ['rat', 'Inventario (RAT)'], ['formularios', 'Formularios y política'], ['titulares', 'Titulares'], ['bitacora', 'Registro probatorio'], ['usuarios', 'Usuarios y permisos'], ['como', 'Cómo funciona']];
   rutas.forEach(([k, e], i) => add('Sección', e, `tecla ${i + 1}`, () => { modo = 'mlv'; ruta = k; }));
@@ -1746,6 +1748,7 @@ function opcionesPaleta(q) {
   db.clientes.forEach((k) => add('Cliente', k.nombre, k.rubro, () => { db.actual = k.id; modo = 'mlv'; ruta = 'panel'; }));
   c.rat.forEach((t) => add('Tratamiento', `${t.id} · ${t.nombre}`, t.area, () => { modo = 'mlv'; ruta = 'rat'; setTimeout(() => editarTrat(t.id), 80); }));
   c.titulares.forEach((t) => add('Titular', t.nombre, `${t.rut} · ${t.id}`, () => { modo = 'mlv'; ruta = 'titulares'; filtroEstado = ''; filtroTit = ''; fichaId = t.id; }));
+  if (n && camilaPendiente(c, n)) add('Titular', PROTAGONISTA.nombre, 'aún no responde · su formulario se llena en el recorrido guiado', () => { modo = 'mlv'; irPaso(0); });
   const lista = n ? out.filter((o) => norm(`${o.grupo} ${o.titulo} ${o.sub}`).includes(n)) : out.filter((o) => o.grupo !== 'Titular' && o.grupo !== 'Tratamiento');
   return lista.slice(0, 12);
 }
@@ -1778,7 +1781,7 @@ document.addEventListener('keydown', (ev) => {
   const enCampo = /^(INPUT|TEXTAREA|SELECT)$/.test(ev.target.tagName) || ev.target.isContentEditable;
   if (enCampo || ev.altKey || ev.ctrlKey || ev.metaKey) return;
   if ((ev.key === 'Enter' || ev.key === ' ') && ev.target.matches && ev.target.matches('tr.clic')) { ev.preventDefault(); ev.target.click(); return; }
-  if (ev.key === '/') { const b = document.querySelector('#main input[type="search"]'); if (b) { ev.preventDefault(); b.focus(); b.select(); } return; }
+  if (ev.key === '/') { ev.preventDefault(); const b = document.querySelector('#main input[type="search"]'); if (b) { b.focus(); b.select(); } else abrirPaleta(); return; } // sin buscador propio, abre la búsqueda general
   if (modo === 'mlv' && /^[1-7]$/.test(ev.key)) { ruta = ['panel', 'rat', 'formularios', 'titulares', 'bitacora', 'usuarios', 'como'][+ev.key - 1]; fichaId = null; simulacion = null; render(); }
 });
 document.addEventListener('scroll', (ev) => { if (ev.target.id === 'polCaja') revisarScroll(); }, true);
