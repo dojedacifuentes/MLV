@@ -278,13 +278,36 @@
   @media (max-width: 700px) { .recorrido { grid-template-columns: 1fr; padding: 10px 14px; } .recorrido .rec-num { display: none; } .rec-der { justify-content: space-between; } }
 
   /* Movimiento con sentido: entrada de cada vista, botones y tarjetas */
-  .vista-entra { animation: vista-entra .22s ease-out; }
-  @keyframes vista-entra { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  .vista-entra { animation: vista-entra .15s cubic-bezier(.2, 0, 0, 1); }
+  @keyframes vista-entra { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
   .btn:active { transform: translateY(1px); }
   .lateral nav button { transition: background .15s, color .15s; }
-  .caja, .kpi { transition: box-shadow .2s, border-color .2s; }
-  .kpi:hover { box-shadow: var(--sombra-2); }
-  @media (prefers-reduced-motion: reduce) { .vista-entra, .recorrido, .foco-rec { animation: none; } * { transition: none !important; } }
+  .caja { transition: box-shadow .15s, border-color .15s; }
+  /* Al pasar, la tarjeta se eleva; al pulsar, se hunde */
+  .kpi, .cli, .etapas button, .tabla tr.clic { transition: transform .15s cubic-bezier(.2, 0, 0, 1), box-shadow .15s, border-color .15s, background .15s; }
+  .kpi:hover, .cli:hover, .tabla tr.clic:hover { transform: translateY(-1px); box-shadow: var(--sombra-2); }
+  .etapas button:hover { transform: translateY(-1px); box-shadow: 0 6px 16px -10px rgba(18, 28, 33, .35); }
+  .kpi:active, .cli:active, .etapas button:active, .tabla tr.clic:active { transform: translateY(1px); box-shadow: var(--sombra); transition-duration: .06s; }
+  .alertas-panel { margin: 0 0 16px; }
+  .alertas-panel .alerta:last-child { margin-bottom: 0; }
+  .tiempo time { font: inherit; }
+  /* Esqueleto mientras se cambia de cliente */
+  .esqueleto { display: block; border-radius: 6px; background: linear-gradient(90deg, var(--linea2) 25%, var(--papel2) 50%, var(--linea2) 75%); background-size: 200% 100%; animation: brillo 1s linear infinite; }
+  .esqueleto + .esqueleto { margin-top: 8px; }
+  @keyframes brillo { from { background-position: 100% 0; } to { background-position: -100% 0; } }
+  /* Encabezados ordenables y fijos bajo la barra superior */
+  .tabla th .ord { font: inherit; color: inherit; letter-spacing: inherit; text-transform: inherit; background: none; border: 0; padding: 0; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; }
+  .tabla th .ord:hover { color: var(--tinta); }
+  .tabla th .ord:focus-visible { outline: 2px solid var(--accion); outline-offset: 2px; border-radius: 3px; }
+  .tabla th .ord::after { content: "↕"; opacity: .45; font-size: 11px; }
+  .tabla th[aria-sort="ascending"] .ord::after { content: "↑"; opacity: 1; }
+  .tabla th[aria-sort="descending"] .ord::after { content: "↓"; opacity: 1; }
+  .tabla th[aria-sort="ascending"], .tabla th[aria-sort="descending"] { color: var(--tinta); }
+  @media (min-width: 1100px) {
+    .tabla-env.fija { overflow: visible; }
+    .tabla-env.fija .tabla th { position: sticky; top: 58px; z-index: 3; }
+  }
+  @media (prefers-reduced-motion: reduce) { .vista-entra, .recorrido, .foco-rec, .esqueleto { animation: none; } * { transition: none !important; } }
 
   /* Diálogo */
   dialog { border: 1px solid var(--linea); border-radius: 14px; padding: 0; width: min(760px, calc(100vw - 24px)); max-height: calc(100vh - 40px); color: var(--tinta); background: var(--papel); box-shadow: var(--sombra-2); }
@@ -512,6 +535,15 @@ const ahora = () => { const d = new Date(); return `${d.getFullYear()}-${dos(d.g
 const MESES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
 const fFecha = (fh) => { if (!fh) return '—'; const [y, m, d] = fh.slice(0, 10).split('-').map(Number); return `${d} ${MESES[m - 1].slice(0, 3)}. ${y}`; };
 const fFechaHora = (fh) => (fh ? `${fFecha(fh)}, ${fh.slice(11, 16)}` : '—');
+// Tiempo relativo para leer de un vistazo (últimos 7 días); la fecha completa queda en el title. No se usa en evidencia.
+const fRel = (fh) => {
+  if (!fh) return '—';
+  const s = (Date.now() - new Date(fh.replace(' ', 'T'))) / 1000;
+  const hoy = new Date(); hoy.setHours(0, 0, 0, 0);
+  const dias = Math.round((hoy - new Date(fh.slice(0, 10) + 'T00:00:00')) / 864e5);
+  const txt = s < 0 || dias > 7 ? fFecha(fh) : s < 60 ? 'hace un momento' : s < 3600 ? `hace ${Math.floor(s / 60)} min` : dias === 0 ? `hace ${Math.floor(s / 3600)} h` : dias === 1 ? 'ayer' : `hace ${dias} días`;
+  return `<time datetime="${esc(fh.replace(' ', 'T'))}" title="${esc(fFechaHora(fh))}">${txt}</time>`;
+};
 const corta = (h) => (h ? h.slice(0, 12) + '…' : '');
 
 /* ───────── RUT ───────── */
@@ -969,6 +1001,8 @@ function pintarRecorrido() {
 
 /* ───────── Estado de la pantalla ───────── */
 let modo = 'mlv', ruta = 'panel', fichaId = null, filtroTit = '', filtroEstado = '', filtroBit = '', filtroBitTipo = '', fechaCorte = '', fiscConsulta = '', fiscExp = null, simulacion = null;
+let ordenTit = { k: '', dir: 'asc' }, ordenBit = { k: 'n', dir: 'desc' }; // orden de las tablas de Titulares y Registro
+let ultimaVista = '', esqTemp = null;
 let T = null; // flujo del formulario del titular
 
 /* ───────── Pintado general ───────── */
@@ -986,7 +1020,9 @@ function render() {
   const opciones = db.clientes.map((k) => `<option value="${k.id}" ${k.id === c.id ? 'selected' : ''}>${esc(k.nombre)}</option>`).join('');
   $('selCli').innerHTML = opciones; $('selCliLat').innerHTML = opciones;
   const vistas = { panel: vPanel, rat: vRat, formularios: vFormularios, titulares: vTitulares, bitacora: vBitacora, usuarios: vUsuarios, como: vComo, fiscal: vFiscal };
-  $('main').innerHTML = `<div class="vista-entra">${(vistas[ruta] || vPanel)(c, r)}</div>`;
+  clearTimeout(esqTemp); $('main').removeAttribute('aria-busy');
+  const vista = `${modo}|${ruta}|${c.id}`, entra = vista !== ultimaVista; ultimaVista = vista; // el cruce solo al cambiar de sección o de cliente
+  $('main').innerHTML = `<div class="${entra ? 'vista-entra' : ''}">${(vistas[ruta] || vPanel)(c, r)}</div>`;
   document.querySelectorAll('#main tr.clic:not([tabindex])').forEach((tr) => { tr.tabIndex = 0; });
   pintarHoja(c); animarCifras(c);
   if (ultimoRegistro.id === c.id && c.eventos.length > ultimoRegistro.n) aviso(`Anotado en el registro probatorio · N° ${c.eventos.length}`);
@@ -998,13 +1034,28 @@ const chip = (nivel, eti) => `<span class="chip ${nivel}">${esc(eti)}</span>`;
 const chipEstado = (e) => (e === 'otorgado' ? chip('verde', 'Vigente') : e === 'revocado' ? chip('rojo', 'Revocado') : e === 'rechazado' ? chip('gris', 'No autorizó') : chip('gris', 'Sin respuesta'));
 const selloCli = (c, tam = 38) => `<span class="sello" style="background:${esc(c.color)};width:${tam}px;height:${tam}px">${esc(c.sigla)}</span>`;
 
+/* ───── Cambio de cliente: esqueleto breve en el panel antes de pintar ───── */
+function cambiarCliente(id) {
+  if (id === db.actual) return;
+  db.actual = id; fichaId = null; fiscExp = null;
+  if (modo !== 'mlv' || ruta !== 'panel' || !document.querySelector('#main .resumen')) { render(); return; }
+  const linea = (w, h = 12) => `<span class="esqueleto" style="width:${w};height:${h}px"></span>`;
+  ['selCli', 'selCliLat'].forEach((s) => { $(s).value = id; });
+  document.querySelectorAll('#main .cli').forEach((b) => { b.setAttribute('aria-pressed', String(b.dataset.cli === id)); });
+  document.querySelectorAll('#main .etapas button').forEach((b) => { b.innerHTML = `<span>${linea('22px', 22)}</span><span>${linea('70%')}${linea('50%')}</span>`; });
+  document.querySelectorAll('#main .resumen .kpi').forEach((b) => { b.innerHTML = linea('55%', 10) + linea('40%', 28) + linea('75%', 10); });
+  document.querySelectorAll('#main .graficos .caja, #main .alertas-panel, #main .movimientos').forEach((b) => { b.innerHTML = linea('45%', 14) + linea('100%', 96) + linea('80%'); });
+  $('main').setAttribute('aria-busy', 'true');
+  clearTimeout(esqTemp); esqTemp = setTimeout(render, 180);
+}
+
 /* ───── Panel ───── */
 function vPanel(c, r) {
   const cartera = db.clientes.map((k) => { const s = resumen(k); return `<button type="button" class="cli" data-cli="${k.id}" aria-pressed="${k.id === c.id}">
     <div class="top">${selloCli(k)}<div><b>${esc(k.nombre)}</b><span class="mini">${esc(k.rubro)}</span></div></div>
     <div class="cifras"><span><b>${s.vig}</b> vigentes</span><span><b>${s.rev}</b> revocados</span><span>Política <b>v${esc(polVigente(k).version)}</b></span>
     ${s.roto ? chip('rojo', 'Registro alterado') : chip('verde', 'Registro íntegro')}${s.rojos.length ? ' ' + chip('rojo', s.rojos.length + ' alerta') : ''}</div></button>`; }).join('');
-  const recientes = c.eventos.slice(-6).reverse().map((e) => `<li class="${e.tipo === 'revocacion' ? 'revoca' : e.tipo === 'acceso' ? 'acceso' : ''}"><div class="cuando">${fFechaHora(e.fecha)} · N° ${e.n}</div>${describir(c, e)}</li>`).join('');
+  const recientes = c.eventos.slice(-6).reverse().map((e) => `<li class="${e.tipo === 'revocacion' ? 'revoca' : e.tipo === 'acceso' ? 'acceso' : ''}"><div class="cuando">${fRel(e.fecha)} · N° ${e.n}</div>${describir(c, e)}</li>`).join('');
   const alertas = [
     ...r.rojos.map(({ t, ev }) => `<div class="alerta rojo"><b>${esc(t.id)} · ${esc(t.nombre)}:</b> ${esc(ev.r[0])} <button class="btn-txt" data-ruta="rat">Ver en el inventario</button></div>`),
     ...r.ambar.map(({ t, ev }) => `<div class="alerta ambar"><b>${esc(t.id)} · ${esc(t.nombre)}:</b> ${esc(ev.r[0])}</div>`),
@@ -1022,15 +1073,13 @@ function vPanel(c, r) {
     <button type="button" class="kpi" data-ruta="titulares" data-filtro="reconf"><span class="eti">Finalidad nueva sin responder</span><span class="num">${r.reconf.length}</span><span class="det">titulares por consultar</span><span class="ir">Ver quiénes</span></button>
     <button type="button" class="kpi" data-ruta="bitacora"><span class="eti">Registro probatorio</span><span class="num">${c.eventos.length}</span><span class="det">${r.roto ? '<b style="color:var(--rojo)">alterado</b>' : 'anotaciones, íntegro'}</span><span class="ir">Ver el registro</span></button>
   </div>
+  <div class="caja alertas-panel"><h2>Alertas</h2>${alertas || '<p class="nota">Sin alertas: el inventario y el registro están al día.</p>'}</div>
   <div class="graficos">
     <div class="caja"><h3>Respuestas y revocaciones por mes</h3>${graficoEvolucion(c)}</div>
     <div class="caja"><h3>Estado por finalidad</h3>${barrasFinalidades(c, r)}</div>
     <div class="caja"><h3>Titulares por situación</h3>${graficoRosca(c)}</div>
   </div>
-  <div class="dos">
-    <div class="caja"><h2>Alertas</h2>${alertas || '<p class="nota">Sin alertas: el inventario y el registro están al día.</p>'}</div>
-    <div class="caja"><h2>Últimos movimientos</h2><ul class="tiempo">${recientes}</ul><button class="btn-txt" data-ruta="bitacora">Ver el registro completo</button></div>
-  </div>`;
+  <div class="caja movimientos"><h2>Últimos movimientos</h2><ul class="tiempo">${recientes}</ul><button class="btn-txt" data-ruta="bitacora">Ver el registro completo</button></div>`;
 }
 
 /* ───── Etapas del caso y gráficos del panel (SVG propio, sin dependencias) ───── */
@@ -1240,11 +1289,17 @@ function verPolitica(c, p = polVigente(c)) {
 const polHtml = (txt) => txt.split('\n').map((l) => (l.startsWith('## ') ? `<h4>${esc(l.slice(3))}</h4>` : l.trim() ? `<p>${esc(l)}</p>` : '')).join('');
 
 /* ───── Titulares ───── */
+// Encabezado ordenable: aria-sort va en el th (así lo anuncian los lectores de pantalla); el botón cambia el orden.
+const thOrden = (tabla, k, eti, o) => `<th scope="col" aria-sort="${o.k === k ? (o.dir === 'asc' ? 'ascending' : 'descending') : 'none'}"><button type="button" class="ord" data-ord="${tabla}:${k}">${esc(eti)}</button></th>`;
 function vTitulares(c) {
   const fins = [...new Set(c.formularios.flatMap((f) => f.finalidades))];
   const FILTROS = [['', 'Todos'], ['otorgado', 'Con autorización vigente'], ['revocado', 'Con revocación'], ['reconf', 'Con finalidad nueva'], ['sin', 'Sin respuesta']];
   const pasaFiltro = (t) => { if (!filtroEstado) return true; const m = Object.values(estados(c, t.id)); if (filtroEstado === 'sin') return !m.length; if (filtroEstado === 'reconf') return !!porReconfirmar(c, t); return m.some((v) => v.estado === filtroEstado); };
   const lista = c.titulares.filter((t) => pasaFiltro(t) && (!filtroTit || norm(t.nombre + ' ' + t.rut + ' ' + t.id).includes(norm(filtroTit))));
+  if (ordenTit.k) {
+    const val = (t) => (ordenTit.k === 'nombre' ? t.nombre : (ultimoConsent(c, t.id) || {}).fecha || '');
+    lista.sort((a, b) => (ordenTit.dir === 'asc' ? 1 : -1) * val(a).localeCompare(val(b), 'es'));
+  }
   const filtros = `<div class="filtros" role="group" aria-label="Filtrar titulares">${FILTROS.map(([k, e]) => `<button type="button" data-ftr="${k}" aria-pressed="${k === filtroEstado}">${e}</button>`).join('')}</div>`;
   const filas = lista.map((t) => { const m = estados(c, t.id), rc = porReconfirmar(c, t), u = ultimoConsent(c, t.id); return `<tr class="clic" data-ficha="${esc(t.id)}">
     <td class="cab" data-et="Titular"><b>${esc(t.nombre)}</b><span class="mini">${esc(t.rut)} · ${esc(TITULARES[t.relacion] || '')} · ${esc(t.id)}</span></td>
@@ -1253,7 +1308,7 @@ function vTitulares(c) {
   return `<div class="sec-cab"><div class="sec-tit"><h1>Titulares</h1><button type="button" class="ayuda" data-ayuda="titulares" aria-label="Qué es esta sección" title="Qué es esta sección">?</button></div>
     <input type="search" id="buscarTit" aria-label="Buscar titular por nombre o RUT" placeholder="Buscar por nombre o RUT" value="${esc(filtroTit)}" style="min-width:260px"></div>
   ${filtros}
-  <div class="tabla-env"><table class="tabla resp"><thead><tr><th scope="col">Titular</th>${fins.map((id) => `<th scope="col" title="${esc((c.rat.find((t) => t.id === id) || {}).nombre)}">${esc(id)}</th>`).join('')}<th scope="col">Última respuesta</th></tr></thead><tbody>${filas || `<tr><td colspan="9"><div class="vacio">Ningún titular coincide con este filtro. <button class="btn-txt" data-ftr="">Ver todos los titulares</button></div></td></tr>`}</tbody></table></div>
+  <div class="tabla-env fija"><table class="tabla resp"><thead><tr>${thOrden('tit', 'nombre', 'Titular', ordenTit)}${fins.map((id) => `<th scope="col" title="${esc((c.rat.find((t) => t.id === id) || {}).nombre)}">${esc(id)}</th>`).join('')}${thOrden('tit', 'fecha', 'Última respuesta', ordenTit)}</tr></thead><tbody>${filas || `<tr><td colspan="9"><div class="vacio">Ningún titular coincide con este filtro. <button class="btn-txt" data-ftr="">Ver todos los titulares</button></div></td></tr>`}</tbody></table></div>
   <p class="nota">${fins.map((id) => `<b>${esc(id)}</b> ${esc((c.rat.find((t) => t.id === id) || {}).nombre)}`).join(' · ')}</p>`;
 }
 function vFicha(c, t) {
@@ -1264,7 +1319,7 @@ function vFicha(c, t) {
     <div class="fila-btn"><button class="btn" data-acc="revocarOtro">Anotar revocación recibida por otro medio</button><button class="btn" data-acc="descExpediente">Descargar expediente</button><button class="btn primario" data-expediente="${esc(t.id)}">Imprimir o guardar en PDF</button></div></div>
   ${rc ? `<div class="alerta ambar">El formulario agregó ${rc.faltan.map(esc).join(', ')} después de su respuesta (dada con la política v${esc(rc.version)}). Hay que pedirle esa autorización aparte; lo que ya autorizó sigue vigente.</div>` : ''}
   <div class="dos"><div class="caja"><h2>Finalidades</h2><table class="tabla"><thead><tr><th scope="col">Finalidad</th><th scope="col">Estado</th><th scope="col">Desde</th></tr></thead><tbody>${Object.entries(m).map(([id, v]) => `<tr><td>${esc(id)} · ${esc((c.rat.find((x) => x.id === id) || {}).nombre)}</td><td>${chipEstado(v.estado)}</td><td>${fFechaHora((v.rev || v.ev).fecha)}</td></tr>`).join('')}</tbody></table></div>
-  <div class="caja"><h2>Historial</h2><ul class="tiempo">${evs.map((e) => `<li class="${e.tipo === 'revocacion' ? 'revoca' : ''}"><div class="cuando">${fFechaHora(e.fecha)} · anotación N° ${e.n}</div>${describir(c, e)}${e.tipo === 'consentimiento' ? `<div class="mini">Política ${e.det.lectura.alFinal ? 'leída hasta el final' : 'abierta, sin llegar al final'} · ${e.det.lectura.segundos} s en pantalla · ${esc(e.det.canal)}</div>` : ''}<div class="huella">${esc(e.hash)}</div></li>`).join('')}</ul></div></div>`;
+  <div class="caja"><h2>Historial</h2><ul class="tiempo">${evs.map((e) => `<li class="${e.tipo === 'revocacion' ? 'revoca' : ''}"><div class="cuando">${fRel(e.fecha)} · anotación N° ${e.n}</div>${describir(c, e)}${e.tipo === 'consentimiento' ? `<div class="mini">Política ${e.det.lectura.alFinal ? 'leída hasta el final' : 'abierta, sin llegar al final'} · ${e.det.lectura.segundos} s en pantalla · ${esc(e.det.canal)}</div>` : ''}<div class="huella">${esc(e.hash)}</div></li>`).join('')}</ul></div></div>`;
 }
 
 /* ───── Registro probatorio ───── */
@@ -1280,13 +1335,14 @@ function vBitacora(c, r) {
   const pasaTexto = (e) => !filtroBit || norm(`${e.n} ${e.fecha} ${TIPOS[e.tipo] || e.tipo} ${describir(c, e).replace(/<[^>]+>/g, ' ')}`).includes(norm(filtroBit));
   const visibles = eventos.filter((e) => pasaTipo(e) && pasaTexto(e));
   const filtros = `<div class="filtros" role="group" aria-label="Filtrar el registro">${TIPOS_F.map(([k, e]) => `<button type="button" data-ftrb="${k}" aria-pressed="${k === filtroBitTipo}">${e}</button>`).join('')}${filtroBit || filtroBitTipo ? `<span class="mini" style="display:inline-flex;align-items:center;margin-left:4px">${visibles.length} de ${eventos.length}</span>` : ''}</div>`;
-  const filas = visibles.slice().reverse().map((e) => `<tr class="${roto && e.n >= roto ? 'mal' : ''}"><td data-et="N°">${e.n}</td><td data-et="Fecha">${fFechaHora(e.fecha)}</td><td data-et="Tipo">${esc(TIPOS[e.tipo] || e.tipo)}</td><td class="cab" data-et="Anotación">${describir(c, e)}</td><td data-et="Huella"><span class="huella" title="Anterior: ${esc(e.prev)}">${esc(e.hash.slice(0, 24))}…</span></td></tr>`).join('');
+  const vOrd = (e) => (ordenBit.k === 'fecha' ? e.fecha : String(e.n).padStart(8, '0'));
+  const filas = visibles.slice().sort((x, y) => (ordenBit.dir === 'asc' ? 1 : -1) * (vOrd(x).localeCompare(vOrd(y)) || x.n - y.n)).map((e) => `<tr class="${roto && e.n >= roto ? 'mal' : ''}"><td data-et="N°">${e.n}</td><td data-et="Fecha">${fFechaHora(e.fecha)}</td><td data-et="Tipo">${esc(TIPOS[e.tipo] || e.tipo)}</td><td class="cab" data-et="Anotación">${describir(c, e)}</td><td data-et="Huella"><span class="huella" title="Anterior: ${esc(e.prev)}">${esc(e.hash.slice(0, 24))}…</span></td></tr>`).join('');
   return `<div class="sec-cab"><div class="sec-tit"><h1>Registro probatorio</h1><button type="button" class="ayuda" data-ayuda="bitacora" aria-label="Qué es esta sección" title="Qué es esta sección">?</button></div>
     <div class="fila-btn"><input type="search" id="buscarBit" aria-label="Buscar en el registro" placeholder="Buscar en el registro" value="${esc(filtroBit)}" style="min-width:220px"><button class="btn" data-acc="verificar">Verificar la cadena</button><button class="btn" data-acc="${simulacion ? 'finSim' : 'simular'}">${simulacion ? 'Terminar la simulación' : 'Simular una alteración'}</button><button class="btn" data-acc="descCadena">Descargar el registro (JSON)</button></div></div>
   <div class="fila-btn" style="margin-bottom:12px">${corte}</div>
   ${banda}${filtros}
   ${simulacion ? `<div class="alerta rojo"><b>Simulación:</b> se cambió la anotación N° ${simulacion.n} (${esc(simulacion.que)}) sin tocar las huellas. La verificación falla desde la N° ${roto}. Nada de esto se guardó.</div>` : roto ? `<div class="alerta rojo">La cadena está rota desde la anotación N° ${roto}.</div>` : `<div class="alerta verde"><b>Cadena íntegra:</b> ${eventos.length} anotaciones verificadas. Huella de cierre: <span class="huella">${esc(eventos[eventos.length - 1].hash)}</span></div>`}
-  <div class="tabla-env"><table class="tabla resp"><thead><tr><th scope="col">N°</th><th scope="col">Fecha</th><th scope="col">Tipo</th><th scope="col">Anotación</th><th scope="col">Huella</th></tr></thead><tbody>${filas || `<tr><td colspan="5"><div class="vacio">Ninguna anotación coincide con la búsqueda. <button class="btn-txt" data-ftrb="">Ver todo el registro</button></div></td></tr>`}</tbody></table></div>
+  <div class="tabla-env fija"><table class="tabla resp"><thead><tr>${thOrden('bit', 'n', 'N°', ordenBit)}${thOrden('bit', 'fecha', 'Fecha', ordenBit)}<th scope="col">Tipo</th><th scope="col">Anotación</th><th scope="col">Huella</th></tr></thead><tbody>${filas || `<tr><td colspan="5"><div class="vacio">Ninguna anotación coincide con la búsqueda. <button class="btn-txt" data-ftrb="">Ver todo el registro</button></div></td></tr>`}</tbody></table></div>
   <p class="nota">En la versión con servidor, la huella de cierre de cada día se sella con un tercero (sello de tiempo) para probar además que nada se reescribió completo después. Los nombres y RUT no van dentro de la cadena: se guarda su huella, así una persona puede pedir la supresión de sus datos sin romper la prueba.</p>`;
 }
 
@@ -1513,7 +1569,7 @@ function accionTitular(k, el) {
 
 /* ───────── Eventos ───────── */
 document.addEventListener('click', (ev) => {
-  const el = ev.target.closest('[data-modo],[data-ruta],[data-cli],[data-acc],[data-trat],[data-ficha],[data-expediente],[data-abrir-form],[data-t],[data-verpol],[data-rutdemo],[data-usuario],[data-ayuda],[data-ftr],[data-ftrb],[data-pi]');
+  const el = ev.target.closest('[data-modo],[data-ruta],[data-cli],[data-acc],[data-trat],[data-ficha],[data-expediente],[data-abrir-form],[data-t],[data-verpol],[data-rutdemo],[data-usuario],[data-ayuda],[data-ftr],[data-ftrb],[data-pi],[data-ord]');
   if (!el) return;
   const c = cli(), d = el.dataset;
   if (d.modo) {
@@ -1524,10 +1580,15 @@ document.addEventListener('click', (ev) => {
     history.replaceState(null, '', modo === 'mlv' ? location.pathname : '#' + modo);
     render(); window.scrollTo(0, 0); return;
   }
+  if (d.ord) { // mismo encabezado invierte; uno nuevo parte en su orden natural (texto A→Z, fechas y N° de lo más nuevo)
+    const [tabla, k] = d.ord.split(':'), o = tabla === 'tit' ? ordenTit : ordenBit;
+    o.dir = o.k === k ? (o.dir === 'asc' ? 'desc' : 'asc') : k === 'nombre' ? 'asc' : 'desc'; o.k = k;
+    render(); const b = document.querySelector(`[data-ord="${d.ord}"]`); if (b) b.focus(); return;
+  }
   if (d.ftr !== undefined) { filtroEstado = d.ftr; render(); return; }
   if (d.ftrb !== undefined) { filtroBitTipo = d.ftrb; if (!d.ftrb) filtroBit = ''; render(); return; }
-  if (d.ruta) { ruta = d.ruta; fichaId = null; simulacion = null; if (d.filtro !== undefined) { filtroEstado = d.filtro; filtroTit = ''; } render(); if (d.filtro !== undefined || el.closest('.etapas')) window.scrollTo(0, 0); return; }
-  if (d.cli) { db.actual = d.cli; fichaId = null; render(); return; }
+  if (d.ruta) { ruta = d.ruta; fichaId = null; simulacion = null; if (d.filtro !== undefined) { filtroEstado = d.filtro; filtroTit = ''; } render(); if (el.closest('#vistas')) window.scrollTo({ top: 0, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }); else if (d.filtro !== undefined || el.closest('.etapas')) window.scrollTo(0, 0); return; }
+  if (d.cli) { cambiarCliente(d.cli); return; }
   if (d.trat) { editarTrat(d.trat); return; }
   if (d.ficha) { fichaId = d.ficha; render(); return; }
   if (d.pi !== undefined) { ejecutarPaleta(+d.pi); return; }
@@ -1592,7 +1653,7 @@ document.addEventListener('change', (ev) => {
     render(); return;
   }
   if (el.dataset.marca) { c[el.dataset.marca] = el.value; render(); return; }
-  if (el.id === 'selCli' || el.id === 'selCliLat') { db.actual = el.value; fichaId = null; fiscExp = null; render(); return; }
+  if (el.id === 'selCli' || el.id === 'selCliLat') { cambiarCliente(el.value); return; }
   if (el.id === 'selTema') { aplicarTema(el.value); return; }
   if (el.id === 'tCli') { db.actual = el.value; iniciarTitular(); render(); return; }
   if (el.id === 'tForm') { iniciarTitular(el.value); render(); return; }
