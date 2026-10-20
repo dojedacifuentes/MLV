@@ -289,6 +289,12 @@
   .etapas button:hover { transform: translateY(-1px); box-shadow: 0 6px 16px -10px rgba(18, 28, 33, .35); }
   .kpi:active, .cli:active, .etapas button:active, .tabla tr.clic:active { transform: translateY(1px); box-shadow: var(--sombra); transition-duration: .06s; }
   .alertas-panel { margin: 0 0 16px; }
+  /* Resumen de una línea del cliente elegido, arriba del panel */
+  .resumen-linea { margin: -4px 0 18px; font-size: var(--t-lead); line-height: 1.5; color: var(--tinta); }
+  .resumen-linea .punto { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 8px; vertical-align: 1px; background: var(--verde-v); }
+  .resumen-linea.ambar .punto { background: var(--ambar-v); }
+  .resumen-linea.rojo .punto { background: var(--rojo-v); }
+  .resumen-linea .btn-txt { font-size: inherit; padding: 0; }
   .alertas-panel .alerta:last-child { margin-bottom: 0; }
   .tiempo time { font: inherit; }
   /* Esqueleto mientras se cambia de cliente */
@@ -952,6 +958,19 @@ function aviso(texto) {
 }
 let ultimoRegistro = { id: null, n: 0 };
 
+/* Deja la demostración lista en un clic: datos de ejemplo, sin filtros ni órdenes, Panel del primer cliente, desde arriba. */
+function prepararDemo() {
+  if (modo === 'titular') pararReloj();
+  pasoRec = -1; pintarRecorrido();
+  db = semilla(); modo = 'mlv'; ruta = 'panel'; fichaId = null; simulacion = null; fiscExp = null; fiscConsulta = '';
+  filtroTit = ''; filtroEstado = ''; filtroBit = ''; filtroBitTipo = ''; fechaCorte = '';
+  ordenTit = { k: '', dir: 'asc' }; ordenBit = { k: 'n', dir: 'desc' };
+  ultimoRegistro = { id: null, n: 0 };
+  history.replaceState(null, '', location.pathname);
+  render(); window.scrollTo(0, 0);
+  aviso(`Demo lista: datos de ejemplo y panel de ${cli().nombre}`);
+}
+
 /* Simula una alteración del registro sin guardarla: sirve para ver cómo se rompe la cadena. */
 function simularAlteracion(c) {
   const copia = JSON.parse(JSON.stringify(c.eventos));
@@ -1042,6 +1061,7 @@ function cambiarCliente(id) {
   const linea = (w, h = 12) => `<span class="esqueleto" style="width:${w};height:${h}px"></span>`;
   ['selCli', 'selCliLat'].forEach((s) => { $(s).value = id; });
   document.querySelectorAll('#main .cli').forEach((b) => { b.setAttribute('aria-pressed', String(b.dataset.cli === id)); });
+  const linRes = document.querySelector('#main .resumen-linea'); if (linRes) linRes.innerHTML = linea('min(560px, 80%)', 16);
   document.querySelectorAll('#main .etapas button').forEach((b) => { b.innerHTML = `<span>${linea('22px', 22)}</span><span>${linea('70%')}${linea('50%')}</span>`; });
   document.querySelectorAll('#main .resumen .kpi').forEach((b) => { b.innerHTML = linea('55%', 10) + linea('40%', 28) + linea('75%', 10); });
   document.querySelectorAll('#main .graficos .caja, #main .alertas-panel, #main .movimientos').forEach((b) => { b.innerHTML = linea('45%', 14) + linea('100%', 96) + linea('80%'); });
@@ -1063,7 +1083,8 @@ function vPanel(c, r) {
     r.roto ? `<div class="alerta rojo"><b>El registro probatorio fue alterado</b> desde la anotación N° ${r.roto}.</div>` : '',
   ].join('');
   return `<div class="sec-cab"><div class="sec-tit"><h1>Panel de MLV</h1><button type="button" class="ayuda" data-ayuda="panel" aria-label="Qué es esta sección" title="Qué es esta sección">?</button></div>
-    <div class="fila-btn"><button class="btn" data-acc="reiniciar">Volver a los datos de ejemplo</button><button class="btn primario" data-acc="recorrido">${ICONOS.fiscal}Recorrido guiado</button></div></div>
+    <div class="fila-btn"><button class="btn" data-acc="prepararDemo" title="Vuelve a los datos de ejemplo, quita filtros y órdenes y abre este panel desde arriba">Preparar demo</button><button class="btn primario" data-acc="recorrido">${ICONOS.fiscal}Recorrido guiado</button></div></div>
+  ${resumenLinea(c, r)}
   <div class="cartera">${cartera}</div>
   ${etapasCaso(c, r)}
   <div class="resumen">
@@ -1080,6 +1101,20 @@ function vPanel(c, r) {
     <div class="caja"><h3>Titulares por situación</h3>${graficoRosca(c)}</div>
   </div>
   <div class="caja movimientos"><h2>Últimos movimientos</h2><ul class="tiempo">${recientes}</ul><button class="btn-txt" data-ruta="bitacora">Ver el registro completo</button></div>`;
+}
+
+/* Una frase con el estado del cliente: lo que Cristóbal dice en cinco segundos. Cada parte lleva a su sección. */
+function resumenLinea(c, r) {
+  const n = (k, uno, varios) => `${k} ${k === 1 ? uno : varios}`;
+  const partes = [];
+  if (r.rojos.length) partes.push(`<button type="button" class="btn-txt" data-ruta="rat">${n(r.rojos.length, 'problema grave', 'problemas graves')} en el inventario</button>`);
+  if (r.ambar.length) partes.push(`<button type="button" class="btn-txt" data-ruta="rat">${n(r.ambar.length, 'tratamiento por revisar', 'tratamientos por revisar')}</button>`);
+  if (r.reconf.length) partes.push(`<button type="button" class="btn-txt" data-ruta="titulares" data-filtro="reconf">${n(r.reconf.length, 'titular por consultar', 'titulares por consultar')}</button>`);
+  if (!partes.length) partes.push('sin alertas');
+  partes.push(`<button type="button" class="btn-txt" data-ruta="bitacora">${r.roto ? `registro alterado desde la anotación N° ${r.roto}` : 'registro íntegro'}</button>`);
+  const nivel = r.rojos.length || r.roto ? 'rojo' : r.ambar.length || r.reconf.length ? 'ambar' : 'verde';
+  const texto = partes.length > 1 ? `${partes.slice(0, -1).join(', ')} y ${partes[partes.length - 1]}` : partes[0];
+  return `<p class="resumen-linea ${nivel}"><span class="punto" aria-hidden="true"></span><b>${esc(c.nombre)}:</b> ${texto}.</p>`;
 }
 
 /* ───── Etapas del caso y gráficos del panel (SVG propio, sin dependencias) ───── */
@@ -1600,6 +1635,7 @@ document.addEventListener('click', (ev) => {
   if (d.usuario) { dialogoUsuario(d.usuario); return; }
   if (d.ayuda) { abrirDialogo(el.closest('.sec-tit').querySelector('h1').textContent, `<p style="font-size:var(--t-lead);line-height:1.55;margin:0">${AYUDA[d.ayuda] || ''}</p>`, [['ok', 'Entendido', 'primario']]); return; }
   switch (d.acc) {
+    case 'prepararDemo': prepararDemo(); break;
     case 'reiniciar': if (confirm('¿Borrar los cambios y volver a los datos de ejemplo?')) { db = semilla(); fichaId = null; render(); } break;
     case 'recorrido': irPaso(0); break;
     case 'recAnt': irPaso(Math.max(0, pasoRec - 1)); break;
@@ -1705,6 +1741,7 @@ function opcionesPaleta(q) {
   add('Acción', 'Verificar la cadena', 'registro probatorio', () => { modo = 'mlv'; ruta = 'bitacora'; setTimeout(() => aviso(verificar(cli().eventos) ? 'La cadena está rota' : `Cadena íntegra: ${cli().eventos.length} anotaciones`), 80); });
   add('Acción', 'Simular una alteración', 'registro probatorio', () => { modo = 'mlv'; ruta = 'bitacora'; simularAlteracion(cli()); });
   add('Acción', 'Agregar tratamiento', 'inventario', () => { modo = 'mlv'; ruta = 'rat'; setTimeout(() => editarTrat(null), 80); });
+  add('Acción', 'Preparar demo', 'datos de ejemplo, sin filtros, panel desde arriba', () => { prepararDemo(); });
   add('Acción', 'Volver a los datos de ejemplo', 'borra los cambios de este navegador', () => { if (confirm('¿Borrar los cambios y volver a los datos de ejemplo?')) { db = semilla(); fichaId = null; modo = 'mlv'; ruta = 'panel'; } });
   db.clientes.forEach((k) => add('Cliente', k.nombre, k.rubro, () => { db.actual = k.id; modo = 'mlv'; ruta = 'panel'; }));
   c.rat.forEach((t) => add('Tratamiento', `${t.id} · ${t.nombre}`, t.area, () => { modo = 'mlv'; ruta = 'rat'; setTimeout(() => editarTrat(t.id), 80); }));
@@ -1748,12 +1785,13 @@ document.addEventListener('scroll', (ev) => { if (ev.target.id === 'polCaja') re
 
 db = cargar();
 try { aplicarTema(localStorage.getItem('mlv-tema') || 'sello'); } catch { aplicarTema('sello'); }
-// Enlaces directos para la demostración: #titular abre el formulario; #fiscal, el panel del fiscalizador; #recorrido inicia el recorrido guiado.
+// Enlaces directos para la demostración: #titular abre el formulario; #fiscal, el panel del fiscalizador; #recorrido inicia el recorrido guiado; #demo la deja lista desde cero.
 const inicial = location.hash.replace('#', '');
 if (inicial === 'titular') { modo = 'titular'; iniciarTitular(); } else if (inicial === 'fiscal') modo = 'fiscal';
 else if (['rat', 'formularios', 'titulares', 'bitacora', 'usuarios', 'como'].includes(inicial)) ruta = inicial;
 render();
 if (inicial === 'recorrido') irPaso(0);
+if (inicial === 'demo') prepararDemo();
 </script>
 </body>
 </html>
