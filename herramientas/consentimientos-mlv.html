@@ -385,6 +385,55 @@
   .filtros button { font: inherit; font-size: 12.5px; font-weight: 500; padding: 5px 11px; border-radius: 999px; border: 1px solid var(--linea); background: var(--papel); color: var(--tinta2); cursor: pointer; }
   .filtros button:hover { border-color: var(--campo); }
   .filtros button[aria-pressed="true"] { background: var(--marca-claro); border-color: var(--marca-borde); color: var(--marca); font-weight: 600; }
+
+  /* Movimiento con intención: gráficos que se dibujan, barras que crecen */
+  .g-linea { stroke-dasharray: 1200; stroke-dashoffset: 1200; animation: traza .9s cubic-bezier(.2, 0, 0, 1) forwards; }
+  .g-area, .g-punto { animation: aparece .6s ease-out both; animation-delay: .5s; }
+  .barra i { animation: crece .7s cubic-bezier(.2, 0, 0, 1) both; }
+  .rosca path { transform-origin: 60px 60px; animation: gira .7s cubic-bezier(.2, 0, 0, 1) both; }
+  @keyframes traza { to { stroke-dashoffset: 0; } }
+  @keyframes aparece { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes crece { from { width: 0; } }
+  @keyframes gira { from { transform: rotate(-90deg) scale(.6); opacity: 0; } to { transform: none; opacity: 1; } }
+
+  /* Teclado: filas operables */
+  .tabla tr.clic:focus-visible { outline: none; }
+  .tabla tr.clic:focus-visible td { background: var(--marca-claro); box-shadow: inset 0 2px 0 var(--realce), inset 0 -2px 0 var(--realce); }
+  kbd { font: 11px/1 var(--mono); border: 1px solid var(--linea); border-bottom-width: 2px; border-radius: 4px; padding: 2px 5px; background: var(--papel2); color: var(--tinta2); white-space: nowrap; }
+  .btn-k { display: inline-flex; align-items: center; gap: 8px; font: inherit; font-size: 12.5px; color: var(--suave); background: var(--papel2); border: 1px solid var(--linea); border-radius: var(--radio-s); padding: 5px 8px 5px 10px; cursor: pointer; margin-left: 10px; }
+  .btn-k:hover { color: var(--tinta); border-color: var(--campo); }
+  @media (max-width: 900px) { .btn-k kbd { display: none; } }
+
+  /* Panel lateral de detalle (hoja): la lista sigue visible detrás */
+  .hoja-fondo { position: fixed; inset: 0; background: rgba(18, 28, 33, .28); z-index: 30; animation: aparece .18s ease-out; }
+  .hoja { position: fixed; top: 0; right: 0; bottom: 0; width: min(600px, 100vw); background: var(--papel); border-left: 1px solid var(--linea); box-shadow: -16px 0 48px -24px rgba(18, 28, 33, .45); z-index: 31; overflow: auto; padding: 22px 26px 36px; animation: hoja-entra .24s cubic-bezier(.2, 0, 0, 1); }
+  .hoja .sec-cab { flex-direction: column; align-items: flex-start; gap: 12px; padding-right: 36px; }
+  .hoja .sec-cab h1 { font-size: 20px; }
+  .hoja .dos { grid-template-columns: 1fr; }
+  .hoja-x { position: absolute; top: 14px; right: 16px; width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--linea); background: var(--papel); color: var(--tinta2); font-size: 18px; line-height: 1; cursor: pointer; }
+  .hoja-x:hover { background: var(--papel2); color: var(--tinta); }
+  .hoja .pista { font-size: 11.5px; color: var(--suave); margin: 0 0 10px; }
+  @keyframes hoja-entra { from { transform: translateX(28px); opacity: 0; } to { transform: none; opacity: 1; } }
+
+  /* Paleta de comandos (Ctrl+K) */
+  .paleta { width: min(640px, calc(100vw - 24px)); margin-top: 10vh; border-radius: 14px; }
+  .paleta input { width: 100%; border: 0; border-bottom: 1px solid var(--linea); border-radius: 14px 14px 0 0; padding: 16px 18px; font-size: 16px; outline: none; background: var(--papel); }
+  .paleta ul { list-style: none; margin: 0; padding: 6px; max-height: 52vh; overflow: auto; }
+  .paleta li { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 12px; align-items: baseline; padding: 9px 12px; border-radius: var(--radio-s); cursor: pointer; font-size: 13.5px; }
+  .paleta li[aria-selected="true"], .paleta li:hover { background: var(--marca-claro); }
+  .paleta li .g { font-size: 11px; text-transform: uppercase; letter-spacing: .07em; color: var(--suave); font-weight: 600; }
+  .paleta li .s { color: var(--suave); font-size: 12.5px; margin-left: 8px; }
+  .paleta li .t { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .paleta .p-pie { display: flex; gap: 18px; padding: 8px 18px; border-top: 1px solid var(--linea2); font-size: 11.5px; color: var(--suave); background: var(--papel2); border-radius: 0 0 14px 14px; }
+  .paleta .vacio-p { padding: 26px; text-align: center; color: var(--suave); font-size: 13px; }
+
+  /* Viaje en el tiempo del registro */
+  .corte { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--tinta2); }
+  .corte input { padding: 6px 9px; font-size: 13px; }
+  .corte-banda { background: var(--marca-claro); border: 1px solid var(--marca-borde); color: var(--marca-osc); border-radius: var(--radio-s); padding: 10px 14px; font-size: 13.5px; margin: 0 0 10px; display: flex; flex-wrap: wrap; gap: 6px 18px; align-items: center; }
+  .corte-banda b { font-size: 15px; }
+
+  @media (prefers-reduced-motion: reduce) { .g-linea { stroke-dashoffset: 0; } .g-linea, .g-area, .g-punto, .barra i, .rosca path, .hoja, .hoja-fondo { animation: none; } }
   .dl { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 6px 14px; font-size: 13.5px; margin: 0; }
   .dl dt { color: var(--suave); }
   .dl dd { margin: 0; }
@@ -411,7 +460,7 @@
 
 <header class="barra-app" id="barraApp">
   <a class="marca-app" href="../index.html"><svg class="sello-logo" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="18" fill="var(--marca)"/><circle cx="20" cy="20" r="12.5" fill="none" stroke="rgba(255,255,255,.38)" stroke-width="1.5" stroke-dasharray="3 2.2"/><path d="M13.5 20.5l4.2 4.2L27 15.5" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span><span class="firma">Consentimientos</span><span class="sub">Plataforma de MLV Abogados · Ley 21.719</span></span></a>
-  <div class="cab-centro"><label class="sel-cli"><span>Cliente</span><select id="selCli" aria-label="Cliente"></select></label></div>
+  <div class="cab-centro"><label class="sel-cli"><span>Cliente</span><select id="selCli" aria-label="Cliente"></select></label><button type="button" class="btn-k" data-acc="paleta" title="Buscar o ir a cualquier parte">Buscar… <kbd>Ctrl K</kbd></button></div>
   <div class="cab-der">
     <div class="modo" role="group" aria-label="Ver como">
       <button type="button" data-modo="mlv">Equipo MLV</button>
@@ -437,6 +486,9 @@
 <div id="titular" hidden></div>
 <section id="imprimible" aria-hidden="true"></section>
 
+<div class="hoja-fondo" id="hojaFondo" hidden></div>
+<aside class="hoja" id="hoja" hidden role="dialog" aria-label="Detalle del titular"></aside>
+<dialog id="paleta" class="paleta" aria-label="Buscar o ir a"><input id="paletaInput" type="search" placeholder="Buscar cliente, titular, tratamiento o acción…" autocomplete="off" aria-label="Buscar"><ul id="paletaLista" role="listbox"></ul><div class="p-pie"><span><kbd>↑</kbd> <kbd>↓</kbd> moverse</span><span><kbd>Enter</kbd> abrir</span><span><kbd>Esc</kbd> cerrar</span><span><kbd>1</kbd>–<kbd>7</kbd> secciones · <kbd>/</kbd> buscar</span></div></dialog>
 <dialog id="dlg"><form method="dialog" id="dlgForm"><div class="d-cab"><h2 id="dlgTit"></h2></div><div class="d-cuerpo" id="dlgCuerpo"></div><div class="d-pie" id="dlgPie"></div></form></dialog>
 
 <script>
@@ -875,7 +927,7 @@ const RECORRIDO = [
   { t: 'El inventario manda', x: 'Cada tratamiento con su base legal. El semáforo dice si corresponde pedir consentimiento: verde sí, gris se informa en la política, ámbar revisar, rojo no sirve aunque se pida. T-07 es salud de trabajadores: prohibido con consentimiento (art. 16 bis inc. 3).', foco: '[data-trat="T-07"]', ir: () => { modo = 'mlv'; ruta = 'rat'; } },
   { t: 'El semáforo cambia mientras escribes', x: 'Abre T-03 (huella digital). Marca «Una ley lo exige» o cambia la base y mira cómo cambia el veredicto y sus razones. Cierra el editor para seguir.', foco: '[data-trat="T-03"]', ir: () => { modo = 'mlv'; ruta = 'rat'; } },
   { t: 'Lo que ve la trabajadora', x: 'La marca es la del cliente, no la de MLV. Camila Rojas, trabajadora de la empresa, ya tiene sus datos puestos: pulsa «Continuar», lee la política hasta el final, marca una casilla y envía. Recibirá un comprobante con código.', foco: '.t-cuerpo', ir: () => { modo = 'titular'; iniciarTitular(); Object.assign(T, PROTAGONISTA); } },
-  { t: 'La misma persona, vista por MLV', x: () => (protagonista(cli()).rut === PROTAGONISTA.rut ? 'Lo que Camila acaba de decidir ya está en su ficha: qué autorizó, qué no, con qué versión de la política y cuánto la leyó.' : 'Camila no envió su respuesta, así que mostramos la ficha de otra trabajadora: qué autorizó, qué no, con qué versión de la política y cuánto la leyó.') + ' Desde aquí se anota una revocación recibida por otro medio o se descarga su expediente.', foco: '.sec-cab', ir: () => { const c = cli(); modo = 'mlv'; ruta = 'titulares'; const t = protagonista(c); fichaId = t ? t.id : null; } },
+  { t: 'La misma persona, vista por MLV', x: () => (protagonista(cli()).rut === PROTAGONISTA.rut ? 'Lo que Camila acaba de decidir ya está en su ficha: qué autorizó, qué no, con qué versión de la política y cuánto la leyó.' : 'Camila no envió su respuesta, así que mostramos la ficha de otra trabajadora: qué autorizó, qué no, con qué versión de la política y cuánto la leyó.') + ' Desde aquí se anota una revocación recibida por otro medio o se descarga su expediente.', foco: '#hoja .sec-cab', ir: () => { const c = cli(); modo = 'mlv'; ruta = 'titulares'; const t = protagonista(c); fichaId = t ? t.id : null; } },
   { t: 'Una cadena que delata cambios', x: 'Cada anotación lleva la huella de la anterior. Acabamos de simular que alguien corrió un mes la fecha de una revocación: la verificación falla desde ahí y las filas afectadas quedan en rojo. Nada se guardó.', foco: '.alerta.rojo', ir: () => { modo = 'mlv'; ruta = 'bitacora'; simularAlteracion(cli()); } },
   { t: 'Lo que ve la Agencia', x: 'Acceso de solo lectura con vencimiento. El fiscalizador consulta el expediente de la misma Camila: finalidades, política que vio, lectura medida, huellas. Cada consulta queda anotada.', foco: '#fiscConsulta', ir: () => { const c = cli(); modo = 'fiscal'; const t = protagonista(c); fiscConsulta = t.rut; fiscExp = t; registrar(c, 'acceso', { quien: c.accesoFiscal.nombre, accion: `Consultó el expediente de ${t.id} (recorrido guiado)` }); } },
   { t: 'Eso es la plataforma', x: 'Inventario, política, formulario, registro probatorio, revocación y fiscalizador: un solo flujo. En producción se agregan cuentas con doble factor, servidor en Chile, comprobantes por correo y sello de tiempo diario.', foco: '.resumen', ir: () => { modo = 'mlv'; ruta = 'panel'; } },
@@ -905,7 +957,7 @@ function pintarRecorrido() {
 }
 
 /* ───────── Estado de la pantalla ───────── */
-let modo = 'mlv', ruta = 'panel', fichaId = null, filtroTit = '', filtroEstado = '', filtroBit = '', filtroBitTipo = '', fiscConsulta = '', fiscExp = null, simulacion = null;
+let modo = 'mlv', ruta = 'panel', fichaId = null, filtroTit = '', filtroEstado = '', filtroBit = '', filtroBitTipo = '', fechaCorte = '', fiscConsulta = '', fiscExp = null, simulacion = null;
 let T = null; // flujo del formulario del titular
 
 /* ───────── Pintado general ───────── */
@@ -913,7 +965,7 @@ function render() {
   document.querySelectorAll('[data-modo]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.modo === modo)));
   const enTitular = modo === 'titular';
   $('app').hidden = enTitular; $('barraApp').hidden = enTitular; $('titular').hidden = !enTitular; $('demoAviso').hidden = enTitular;
-  if (enTitular) { pintarTitular(); return; }
+  if (enTitular) { $('hoja').hidden = true; $('hojaFondo').hidden = true; pintarTitular(); return; }
   const c = cli(), r = resumen(c);
   const tabs = modo === 'fiscal'
     ? [['fiscal', 'Panel del fiscalizador']]
@@ -924,6 +976,8 @@ function render() {
   $('selCli').innerHTML = opciones; $('selCliLat').innerHTML = opciones;
   const vistas = { panel: vPanel, rat: vRat, formularios: vFormularios, titulares: vTitulares, bitacora: vBitacora, usuarios: vUsuarios, como: vComo, fiscal: vFiscal };
   $('main').innerHTML = `<div class="vista-entra">${(vistas[ruta] || vPanel)(c, r)}</div>`;
+  document.querySelectorAll('#main tr.clic:not([tabindex])').forEach((tr) => { tr.tabIndex = 0; });
+  pintarHoja(c); animarCifras(c);
   if (ultimoRegistro.id === c.id && c.eventos.length > ultimoRegistro.n) aviso(`Anotado en el registro probatorio · N° ${c.eventos.length}`);
   ultimoRegistro = { id: c.id, n: c.eventos.length };
   guardar();
@@ -1176,7 +1230,6 @@ const polHtml = (txt) => txt.split('\n').map((l) => (l.startsWith('## ') ? `<h4>
 
 /* ───── Titulares ───── */
 function vTitulares(c) {
-  if (fichaId) return vFicha(c, c.titulares.find((t) => t.id === fichaId));
   const fins = [...new Set(c.formularios.flatMap((f) => f.finalidades))];
   const FILTROS = [['', 'Todos'], ['otorgado', 'Con autorización vigente'], ['revocado', 'Con revocación'], ['reconf', 'Con finalidad nueva'], ['sin', 'Sin respuesta']];
   const pasaFiltro = (t) => { if (!filtroEstado) return true; const m = Object.values(estados(c, t.id)); if (filtroEstado === 'sin') return !m.length; if (filtroEstado === 'reconf') return !!porReconfirmar(c, t); return m.some((v) => v.estado === filtroEstado); };
@@ -1195,8 +1248,8 @@ function vTitulares(c) {
 function vFicha(c, t) {
   if (!t) { fichaId = null; return vTitulares(c); }
   const m = estados(c, t.id), evs = c.eventos.filter((e) => e.titular === t.id), rc = porReconfirmar(c, t);
-  return `<button class="btn-txt" data-acc="volverTit">← Todos los titulares</button>
-  <div class="sec-cab" style="margin-top:8px"><div><h1>${esc(t.nombre)}</h1><p>${esc(t.rut)} · ${esc(TITULARES[t.relacion] || '')} · ${esc(t.correo)} · código de comprobante <span class="mono">${esc(t.codigo)}</span></p></div>
+  return `<p class="pista">Ficha del titular · <kbd>Esc</kbd> cierra</p>
+  <div class="sec-cab"><div><h1>${esc(t.nombre)}</h1><p>${esc(t.rut)} · ${esc(TITULARES[t.relacion] || '')} · ${esc(t.correo)} · código de comprobante <span class="mono">${esc(t.codigo)}</span></p></div>
     <div class="fila-btn"><button class="btn" data-acc="revocarOtro">Anotar revocación recibida por otro medio</button><button class="btn" data-acc="descExpediente">Descargar expediente</button><button class="btn primario" data-expediente="${esc(t.id)}">Imprimir o guardar en PDF</button></div></div>
   ${rc ? `<div class="alerta ambar">El formulario agregó ${rc.faltan.map(esc).join(', ')} después de su respuesta (dada con la política v${esc(rc.version)}). Hay que pedirle esa autorización aparte; lo que ya autorizó sigue vigente.</div>` : ''}
   <div class="dos"><div class="caja"><h2>Finalidades</h2><table class="tabla"><thead><tr><th>Finalidad</th><th>Estado</th><th>Desde</th></tr></thead><tbody>${Object.entries(m).map(([id, v]) => `<tr><td>${esc(id)} · ${esc((c.rat.find((x) => x.id === id) || {}).nombre)}</td><td>${chipEstado(v.estado)}</td><td>${fFechaHora((v.rev || v.ev).fecha)}</td></tr>`).join('')}</tbody></table></div>
@@ -1205,8 +1258,12 @@ function vFicha(c, t) {
 
 /* ───── Registro probatorio ───── */
 function vBitacora(c, r) {
-  const eventos = simulacion ? simulacion.eventos : c.eventos;
-  const roto = simulacion ? verificar(eventos) : r.roto;
+  const todos = simulacion ? simulacion.eventos : c.eventos;
+  const eventos = fechaCorte ? todos.filter((e) => e.fecha.slice(0, 10) <= fechaCorte) : todos;
+  const roto = simulacion || fechaCorte ? verificar(eventos) : r.roto;
+  const rc = fechaCorte ? resumen({ ...c, eventos }) : null;
+  const corte = `<label class="corte">Ver el estado al <input type="date" id="fechaCorte" value="${esc(fechaCorte)}" max="${hoyISO()}" aria-label="Fecha de corte"></label>${fechaCorte ? '<button type="button" class="btn chico" data-acc="corteHoy">Volver a hoy</button>' : ''}`;
+  const banda = rc ? `<div class="corte-banda" role="status"><span>Estado al <b>${fFecha(fechaCorte)}</b></span><span><b>${rc.tits}</b> titulares con respuesta</span><span><b>${rc.vig}</b> autorizaciones vigentes</span><span><b>${rc.rev}</b> revocadas</span><span><b>${eventos.length}</b> anotaciones</span>${eventos.length ? `<span>huella de cierre <span class="huella">${esc(eventos[eventos.length - 1].hash.slice(0, 16))}…</span></span>` : '<span>sin anotaciones a esa fecha</span>'}</div>` : '';
   const TIPOS_F = [['', 'Todo'], ['consentimiento', 'Consentimientos'], ['revocacion', 'Revocaciones'], ['acceso', 'Fiscalizador'], ['cambios', 'Política, formularios e inventario']];
   const pasaTipo = (e) => !filtroBitTipo || (filtroBitTipo === 'cambios' ? ['politica', 'formulario', 'rat', 'usuario'].includes(e.tipo) : e.tipo === filtroBitTipo);
   const pasaTexto = (e) => !filtroBit || norm(`${e.n} ${e.fecha} ${TIPOS[e.tipo] || e.tipo} ${describir(c, e).replace(/<[^>]+>/g, ' ')}`).includes(norm(filtroBit));
@@ -1215,7 +1272,8 @@ function vBitacora(c, r) {
   const filas = visibles.slice().reverse().map((e) => `<tr class="${roto && e.n >= roto ? 'mal' : ''}"><td data-et="N°">${e.n}</td><td data-et="Fecha">${fFechaHora(e.fecha)}</td><td data-et="Tipo">${esc(TIPOS[e.tipo] || e.tipo)}</td><td class="cab" data-et="Anotación">${describir(c, e)}</td><td data-et="Huella"><span class="huella" title="Anterior: ${esc(e.prev)}">${esc(e.hash.slice(0, 24))}…</span></td></tr>`).join('');
   return `<div class="sec-cab"><div class="sec-tit"><h1>Registro probatorio</h1><button type="button" class="ayuda" data-ayuda="bitacora" aria-label="Qué es esta sección" title="Qué es esta sección">?</button></div>
     <div class="fila-btn"><input type="search" id="buscarBit" placeholder="Buscar en el registro" value="${esc(filtroBit)}" style="min-width:220px"><button class="btn" data-acc="verificar">Verificar la cadena</button><button class="btn" data-acc="${simulacion ? 'finSim' : 'simular'}">${simulacion ? 'Terminar la simulación' : 'Simular una alteración'}</button><button class="btn" data-acc="descCadena">Descargar el registro (JSON)</button></div></div>
-  ${filtros}
+  <div class="fila-btn" style="margin-bottom:12px">${corte}</div>
+  ${banda}${filtros}
   ${simulacion ? `<div class="alerta rojo"><b>Simulación:</b> se cambió la anotación N° ${simulacion.n} (${esc(simulacion.que)}) sin tocar las huellas. La verificación falla desde la N° ${roto}. Nada de esto se guardó.</div>` : roto ? `<div class="alerta rojo">La cadena está rota desde la anotación N° ${roto}.</div>` : `<div class="alerta verde"><b>Cadena íntegra:</b> ${eventos.length} anotaciones verificadas. Huella de cierre: <span class="huella">${esc(eventos[eventos.length - 1].hash)}</span></div>`}
   <div class="tabla-env"><table class="tabla resp"><thead><tr><th>N°</th><th>Fecha</th><th>Tipo</th><th>Anotación</th><th>Huella</th></tr></thead><tbody>${filas || `<tr><td colspan="5"><div class="vacio">Ninguna anotación coincide. <button class="btn-txt" data-ftrb="">Ver todo</button></div></td></tr>`}</tbody></table></div>
   <p class="nota">En la versión con servidor, la huella de cierre de cada día se sella con un tercero (sello de tiempo) para probar además que nada se reescribió completo después. Los nombres y RUT no van dentro de la cadena: se guarda su huella, así una persona puede pedir la supresión de sus datos sin romper la prueba.</p>`;
@@ -1444,7 +1502,7 @@ function accionTitular(k, el) {
 
 /* ───────── Eventos ───────── */
 document.addEventListener('click', (ev) => {
-  const el = ev.target.closest('[data-modo],[data-ruta],[data-cli],[data-acc],[data-trat],[data-ficha],[data-expediente],[data-abrir-form],[data-t],[data-verpol],[data-rutdemo],[data-usuario],[data-ayuda],[data-ftr],[data-ftrb]');
+  const el = ev.target.closest('[data-modo],[data-ruta],[data-cli],[data-acc],[data-trat],[data-ficha],[data-expediente],[data-abrir-form],[data-t],[data-verpol],[data-rutdemo],[data-usuario],[data-ayuda],[data-ftr],[data-ftrb],[data-pi]');
   if (!el) return;
   const c = cli(), d = el.dataset;
   if (d.modo) {
@@ -1460,7 +1518,8 @@ document.addEventListener('click', (ev) => {
   if (d.ruta) { ruta = d.ruta; fichaId = null; simulacion = null; if (d.filtro !== undefined) { filtroEstado = d.filtro; filtroTit = ''; } render(); if (d.filtro !== undefined || el.closest('.etapas')) window.scrollTo(0, 0); return; }
   if (d.cli) { db.actual = d.cli; fichaId = null; render(); return; }
   if (d.trat) { editarTrat(d.trat); return; }
-  if (d.ficha) { fichaId = d.ficha; render(); window.scrollTo(0, 0); return; }
+  if (d.ficha) { fichaId = d.ficha; render(); return; }
+  if (d.pi !== undefined) { ejecutarPaleta(+d.pi); return; }
   if (d.expediente) { imprimirExpediente(d.expediente); return; }
   if (d.abrirForm) { modo = 'titular'; iniciarTitular(d.abrirForm); render(); window.scrollTo(0, 0); return; }
   if (d.t) { accionTitular(d.t, el); return; }
@@ -1478,8 +1537,10 @@ document.addEventListener('click', (ev) => {
     case 'csvPlantilla': exportarCsv(); break;
     case 'nuevaPol': nuevaPolitica(); break;
     case 'verPol': verPolitica(c); break;
-    case 'volverTit': fichaId = null; render(); break;
+    case 'volverTit': cerrarHoja(); break;
     case 'descExpediente': descargarExpediente(fichaId); break;
+    case 'paleta': abrirPaleta(); break;
+    case 'corteHoy': fechaCorte = ''; render(); break;
     case 'revocarOtro': {
       const t = c.titulares.find((x) => x.id === fichaId), vig = Object.entries(estados(c, t.id)).filter(([, v]) => v.estado === 'otorgado');
       if (!vig.length) { alert('No tiene autorizaciones vigentes.'); break; }
@@ -1529,9 +1590,87 @@ document.addEventListener('change', (ev) => {
   if (el.dataset.trev) { T.rev.sel[el.dataset.trev] = el.checked; return; }
 });
 document.addEventListener('input', (ev) => {
-  const buscadores = { buscarTit: (v) => { filtroTit = v; }, buscarBit: (v) => { filtroBit = v; } };
+  if (ev.target.id === 'paletaInput') { paletaIdx = 0; pintarPaleta(); return; }
+  const buscadores = { buscarTit: (v) => { filtroTit = v; }, buscarBit: (v) => { filtroBit = v; }, fechaCorte: (v) => { fechaCorte = v; } };
   if (!buscadores[ev.target.id]) return;
-  buscadores[ev.target.id](ev.target.value); const id = ev.target.id, pos = ev.target.selectionStart; render(); const b = $(id); if (b) { b.focus(); b.setSelectionRange(pos, pos); }
+  buscadores[ev.target.id](ev.target.value); const id = ev.target.id, pos = ev.target.selectionStart; render(); const b = $(id); if (b) { b.focus(); try { b.setSelectionRange(pos, pos); } catch { /* campos de fecha */ } }
+});
+
+/* ───────── Panel lateral (hoja), paleta Ctrl+K, teclado y movimiento ───────── */
+function pintarHoja(c) {
+  const h = $('hoja'), f = $('hojaFondo');
+  const t = fichaId && modo === 'mlv' && ruta === 'titulares' ? c.titulares.find((x) => x.id === fichaId) : null;
+  if (!t) { h.hidden = true; f.hidden = true; h.innerHTML = ''; delete h.dataset.tit; return; }
+  const yaAbierta = !h.hidden && h.dataset.tit === t.id;
+  h.innerHTML = `<button type="button" class="hoja-x" data-acc="volverTit" aria-label="Cerrar la ficha" title="Cerrar (Esc)">×</button>${vFicha(c, t)}`;
+  h.dataset.tit = t.id; h.hidden = false; f.hidden = false;
+  if (!yaAbierta) { h.scrollTop = 0; const foco = h.querySelector('h1'); if (foco) { foco.tabIndex = -1; foco.focus({ preventScroll: true }); } }
+}
+function cerrarHoja() { const id = fichaId; fichaId = null; render(); const fila = document.querySelector(`#main [data-ficha="${id}"]`); if (fila) fila.focus(); }
+$('hojaFondo').addEventListener('click', cerrarHoja);
+
+let ultimaAnimada = '';
+function animarCifras(c) {
+  const clave = `${modo}|${ruta}|${c.id}`; if (clave === ultimaAnimada) return; ultimaAnimada = clave;
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  document.querySelectorAll('#main .kpi .num, #main .rosca .centro').forEach((el) => {
+    const fin = parseInt(el.textContent, 10); if (!Number.isInteger(fin) || String(fin) !== el.textContent.trim() || fin === 0) return;
+    const t0 = performance.now(), dur = 650;
+    const paso = (t) => { const p = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - p, 3); el.textContent = Math.round(fin * e); if (p < 1) requestAnimationFrame(paso); else el.textContent = fin; };
+    requestAnimationFrame(paso);
+  });
+}
+
+let paletaIdx = 0, paletaOps = [];
+function opcionesPaleta(q) {
+  const c = cli(), n = norm(q || ''), out = [];
+  const add = (grupo, titulo, sub, fn) => out.push({ grupo, titulo, sub, fn });
+  const rutas = [['panel', 'Panel'], ['rat', 'Inventario (RAT)'], ['formularios', 'Formularios y política'], ['titulares', 'Titulares'], ['bitacora', 'Registro probatorio'], ['usuarios', 'Usuarios y permisos'], ['como', 'Cómo funciona']];
+  rutas.forEach(([k, e], i) => add('Sección', e, `tecla ${i + 1}`, () => { modo = 'mlv'; ruta = k; }));
+  add('Ver como', 'Trabajador o titular', 'formulario con la marca del cliente', () => { modo = 'titular'; iniciarTitular(); });
+  add('Ver como', 'Fiscalizador', 'panel de solo lectura', () => { modo = 'fiscal'; fiscExp = null; fiscConsulta = ''; });
+  add('Acción', 'Recorrido guiado', '8 paradas siguiendo a Camila', () => { modo = 'mlv'; irPaso(0); });
+  add('Acción', 'Verificar la cadena', 'registro probatorio', () => { modo = 'mlv'; ruta = 'bitacora'; setTimeout(() => aviso(verificar(cli().eventos) ? 'La cadena está rota' : `Cadena íntegra: ${cli().eventos.length} anotaciones`), 80); });
+  add('Acción', 'Simular una alteración', 'registro probatorio', () => { modo = 'mlv'; ruta = 'bitacora'; simularAlteracion(cli()); });
+  add('Acción', 'Agregar tratamiento', 'inventario', () => { modo = 'mlv'; ruta = 'rat'; setTimeout(() => editarTrat(null), 80); });
+  add('Acción', 'Volver a los datos de ejemplo', 'borra los cambios de este navegador', () => { if (confirm('¿Borrar los cambios y volver a los datos de ejemplo?')) { db = semilla(); fichaId = null; modo = 'mlv'; ruta = 'panel'; } });
+  db.clientes.forEach((k) => add('Cliente', k.nombre, k.rubro, () => { db.actual = k.id; modo = 'mlv'; ruta = 'panel'; }));
+  c.rat.forEach((t) => add('Tratamiento', `${t.id} · ${t.nombre}`, t.area, () => { modo = 'mlv'; ruta = 'rat'; setTimeout(() => editarTrat(t.id), 80); }));
+  c.titulares.forEach((t) => add('Titular', t.nombre, `${t.rut} · ${t.id}`, () => { modo = 'mlv'; ruta = 'titulares'; filtroEstado = ''; filtroTit = ''; fichaId = t.id; }));
+  const lista = n ? out.filter((o) => norm(`${o.grupo} ${o.titulo} ${o.sub}`).includes(n)) : out.filter((o) => o.grupo !== 'Titular' && o.grupo !== 'Tratamiento');
+  return lista.slice(0, 12);
+}
+function pintarPaleta() {
+  paletaOps = opcionesPaleta($('paletaInput').value);
+  paletaIdx = Math.min(paletaIdx, Math.max(0, paletaOps.length - 1));
+  $('paletaLista').innerHTML = paletaOps.length
+    ? paletaOps.map((o, i) => `<li role="option" data-pi="${i}" aria-selected="${i === paletaIdx}"><span class="g">${esc(o.grupo)}</span><span class="t">${esc(o.titulo)}<span class="s">${esc(o.sub)}</span></span></li>`).join('')
+    : '<li class="vacio-p">Nada coincide. Prueba con un nombre, un RUT, «T-03» o «fiscalizador».</li>';
+  const sel = $('paletaLista').querySelector('[aria-selected="true"]'); if (sel) sel.scrollIntoView({ block: 'nearest' });
+}
+function abrirPaleta() { const p = $('paleta'); if (p.open) return; $('paletaInput').value = ''; paletaIdx = 0; pintarPaleta(); p.showModal(); $('paletaInput').focus(); }
+function ejecutarPaleta(i) {
+  const op = paletaOps[i]; if (!op) return;
+  $('paleta').close(); if (modo === 'titular') pararReloj();
+  simulacion = null; op.fn();
+  history.replaceState(null, '', modo === 'mlv' ? location.pathname : '#' + modo);
+  render(); if (pasoRec < 0) window.scrollTo(0, 0);
+}
+function tecladoPaleta(ev) {
+  if (ev.key === 'ArrowDown') { ev.preventDefault(); paletaIdx = Math.min(paletaOps.length - 1, paletaIdx + 1); pintarPaleta(); }
+  else if (ev.key === 'ArrowUp') { ev.preventDefault(); paletaIdx = Math.max(0, paletaIdx - 1); pintarPaleta(); }
+  else if (ev.key === 'Enter') { ev.preventDefault(); ejecutarPaleta(paletaIdx); }
+}
+document.addEventListener('keydown', (ev) => {
+  if ((ev.ctrlKey || ev.metaKey) && ev.key.toLowerCase() === 'k') { ev.preventDefault(); if ($('paleta').open) $('paleta').close(); else abrirPaleta(); return; }
+  if ($('paleta').open) { tecladoPaleta(ev); return; }
+  if ($('dlg').open) return;
+  if (ev.key === 'Escape') { if (!$('hoja').hidden) { ev.preventDefault(); cerrarHoja(); } return; }
+  const enCampo = /^(INPUT|TEXTAREA|SELECT)$/.test(ev.target.tagName) || ev.target.isContentEditable;
+  if (enCampo || ev.altKey || ev.ctrlKey || ev.metaKey) return;
+  if ((ev.key === 'Enter' || ev.key === ' ') && ev.target.matches && ev.target.matches('tr.clic')) { ev.preventDefault(); ev.target.click(); return; }
+  if (ev.key === '/') { const b = document.querySelector('#main input[type="search"]'); if (b) { ev.preventDefault(); b.focus(); b.select(); } return; }
+  if (modo === 'mlv' && /^[1-7]$/.test(ev.key)) { ruta = ['panel', 'rat', 'formularios', 'titulares', 'bitacora', 'usuarios', 'como'][+ev.key - 1]; fichaId = null; simulacion = null; render(); }
 });
 document.addEventListener('scroll', (ev) => { if (ev.target.id === 'polCaja') revisarScroll(); }, true);
 
