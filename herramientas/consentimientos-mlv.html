@@ -20,16 +20,18 @@
     --marca: #0E4C5C; --marca-osc: #0A3A47; --marca-claro: #E3EEF1; --marca-borde: #B7D1D8; --marca-tenue: rgba(14, 76, 92, .12); --marca-texto: #FFFFFF;
     --accion: #0E4C5C; --accion-osc: #0A3A47; --accion-texto: #FFFFFF; --realce: #E3B23C; --realce-f: #FBF3DD;
     --fondo: #F2F5F6; --papel: #FFFFFF; --papel2: #F7FAFA; --hundido: #E6EDEF;
-    --tinta: #121C21; --tinta2: #3A4A52; --suave: #66767E; --linea: #D7E0E3; --linea2: #E6EDEF; --campo: #9BAAB1;
+    --tinta: #121C21; --tinta2: #3A4A52; --suave: #566670; --linea: #D7E0E3; --linea2: #E6EDEF; --campo: #7F8F97;
     --sans-tit: 'Manrope', 'Segoe UI', system-ui, sans-serif; --sans: 'Inter', 'Segoe UI', system-ui, sans-serif; --mono: 'JetBrains Mono', Consolas, ui-monospace, monospace;
     --radio: 10px; --radio-s: 7px; --peso-tit: 700; --esp-tit: -.02em;
+    /* Escala tipográfica (7 pasos): etiqueta, meta, texto, destacado, título, h2, h1 */
+    --t-eti: 12px; --t-meta: 13px; --t-base: 13.5px; --t-lead: 15px; --t-tit: 16px; --t-h2: 18px; --t-h1: 22px;
     --sombra: 0 1px 2px rgba(18, 28, 33, .05), 0 1px 1px rgba(18, 28, 33, .03); --sombra-2: 0 12px 32px -16px rgba(18, 28, 33, .28);
   }
   :root[data-tema="tinta"] {
     --marca: #0F3D3E; --marca-osc: #0A2C2D; --marca-claro: #E4ECEA; --marca-borde: #BBCFCB; --marca-tenue: rgba(15, 61, 62, .12); --marca-texto: #FFFFFF;
     --accion: #B8743A; --accion-osc: #96592A; --accion-texto: #FFFFFF; --realce: #B8743A; --realce-f: #F6EBDF;
     --fondo: #F6F5F1; --papel: #FFFFFF; --papel2: #FBFAF6; --hundido: #ECEAE2;
-    --tinta: #17201F; --tinta2: #3F4A49; --suave: #6B7573; --linea: #DBD7CC; --linea2: #EAE7DE; --campo: #A39F93;
+    --tinta: #17201F; --tinta2: #3F4A49; --suave: #5B6563; --linea: #DBD7CC; --linea2: #EAE7DE; --campo: #8A8679;
     --sans-tit: 'Fraunces', Georgia, serif; --sans: 'Inter', 'Segoe UI', system-ui, sans-serif;
     --radio: 8px; --radio-s: 6px; --peso-tit: 600; --esp-tit: -.01em;
   }
@@ -37,7 +39,7 @@
     --marca: #111318; --marca-osc: #000000; --marca-claro: #ECECEF; --marca-borde: #C9CBD2; --marca-tenue: rgba(17, 19, 24, .1); --marca-texto: #FFFFFF;
     --accion: #D9480F; --accion-osc: #B33A0A; --accion-texto: #FFFFFF; --realce: #D9480F; --realce-f: #FCEAE1;
     --fondo: #F4F4F5; --papel: #FFFFFF; --papel2: #F8F8F9; --hundido: #E9E9EC;
-    --tinta: #111318; --tinta2: #3B3E46; --suave: #6E727C; --linea: #DCDDE2; --linea2: #EAEAEE; --campo: #9A9DA7;
+    --tinta: #111318; --tinta2: #3B3E46; --suave: #5E626B; --linea: #DCDDE2; --linea2: #EAEAEE; --campo: #80838D;
     --sans-tit: 'Space Grotesk', 'Segoe UI', system-ui, sans-serif; --sans: 'Inter', 'Segoe UI', system-ui, sans-serif;
     --radio: 5px; --radio-s: 4px; --peso-tit: 700; --esp-tit: -.01em;
   }
@@ -55,44 +57,44 @@
   body { margin: 0; background: var(--fondo); color: var(--tinta); font: 14px/1.5 var(--sans); font-feature-settings: "tnum", "cv11", "ss01"; min-height: 100vh; display: flex; flex-direction: column; }
   a { color: var(--accion); }
   h1, h2, h3 { font-family: var(--sans-tit); font-weight: var(--peso-tit); color: var(--tinta); letter-spacing: var(--esp-tit); }
-  h2 { font-size: 16px; margin: 0 0 12px; }
-  h3 { font-size: 14.5px; margin: 0 0 8px; }
+  h2 { font-size: var(--t-tit); margin: 0 0 12px; }
+  h3 { font-size: var(--t-lead); margin: 0 0 8px; }
   :focus-visible { outline: 2px solid var(--accion); outline-offset: 2px; border-radius: 3px; }
   [hidden] { display: none !important; }
   .sr { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
-  code, .mono { font-family: var(--mono); font-size: 12px; }
+  code, .mono { font-family: var(--mono); font-size: var(--t-eti); }
   svg.ico { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex: none; }
 
   /* Franja de demostración */
-  .demo-aviso { background: var(--tinta); color: #CBD5DB; font-size: 12.5px; padding: 6px 20px; display: flex; justify-content: center; align-items: center; gap: 10px 24px; flex-wrap: wrap; }
+  .demo-aviso { background: var(--tinta); color: #CBD5DB; font-size: var(--t-meta); padding: 6px 20px; display: flex; justify-content: center; align-items: center; gap: 10px 24px; flex-wrap: wrap; }
   .demo-aviso b { color: #fff; font-weight: 600; }
   .tema-sel { display: inline-flex; align-items: center; gap: 6px; color: #9FB0B8; }
-  .tema-sel select { font: inherit; font-size: 12px; padding: 2px 6px; border-radius: 5px; background: rgba(255,255,255,.08); color: #fff; border: 1px solid rgba(255,255,255,.18); }
+  .tema-sel select { font: inherit; font-size: var(--t-eti); padding: 2px 6px; border-radius: 5px; background: rgba(255,255,255,.08); color: #fff; border: 1px solid rgba(255,255,255,.18); }
 
   /* Barra superior */
   .barra-app { background: var(--papel); border-bottom: 1px solid var(--linea); height: 58px; display: flex; align-items: center; padding: 0 20px; gap: 24px; position: sticky; top: 0; z-index: 20; }
   .marca-app { display: flex; align-items: center; gap: 11px; text-decoration: none; color: var(--tinta); min-width: 0; }
   .sello-logo { width: 34px; height: 34px; flex: none; }
-  .firma { display: block; font-family: var(--sans-tit); font-weight: var(--peso-tit); font-size: 16px; letter-spacing: var(--esp-tit); line-height: 1.1; }
-  .sub { display: block; color: var(--suave); font-size: 11px; letter-spacing: .04em; margin-top: 2px; }
+  .firma { display: block; font-family: var(--sans-tit); font-weight: var(--peso-tit); font-size: var(--t-tit); letter-spacing: var(--esp-tit); line-height: 1.1; }
+  .sub { display: block; color: var(--suave); font-size: var(--t-eti); letter-spacing: .04em; margin-top: 2px; }
   .cab-centro { flex: 1; display: flex; justify-content: center; min-width: 0; }
-  .sel-cli { display: inline-flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--suave); background: var(--papel2); border: 1px solid var(--linea); border-radius: var(--radio-s); padding: 4px 6px 4px 12px; max-width: 100%; }
-  .sel-cli select { font: inherit; font-size: 13.5px; font-weight: 600; color: var(--tinta); border: 0; background: transparent; padding: 4px 4px; max-width: 320px; }
+  .sel-cli { display: inline-flex; align-items: center; gap: 8px; font-size: var(--t-meta); color: var(--suave); background: var(--papel2); border: 1px solid var(--linea); border-radius: var(--radio-s); padding: 4px 6px 4px 12px; max-width: 100%; }
+  .sel-cli select { font: inherit; font-size: var(--t-base); font-weight: 600; color: var(--tinta); border: 0; background: transparent; padding: 4px 4px; max-width: 320px; }
   .cab-der { display: flex; align-items: center; gap: 14px; }
   .modo { display: inline-flex; background: var(--hundido); border-radius: var(--radio-s); padding: 3px; }
-  .modo button { font: inherit; font-size: 12.5px; font-weight: 500; border: 0; background: none; padding: 6px 11px; cursor: pointer; color: var(--tinta2); border-radius: calc(var(--radio-s) - 2px); white-space: nowrap; }
+  .modo button { font: inherit; font-size: var(--t-meta); font-weight: 500; border: 0; background: none; padding: 6px 11px; cursor: pointer; color: var(--tinta2); border-radius: calc(var(--radio-s) - 2px); white-space: nowrap; }
   .modo button:hover { color: var(--tinta); }
   .modo button[aria-pressed="true"] { background: var(--papel); color: var(--tinta); font-weight: 600; box-shadow: var(--sombra); }
-  .guardado { font-size: 12px; color: var(--suave); display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+  .guardado { font-size: var(--t-eti); color: var(--suave); display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
   .guardado::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--verde-v); }
   .guardado.mal { color: var(--ambar); }
   .guardado.mal::before { background: var(--ambar-v); }
-  .avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--marca); color: var(--marca-texto); display: grid; place-items: center; font-size: 12px; font-weight: 700; letter-spacing: .02em; flex: none; }
+  .avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--marca); color: var(--marca-texto); display: grid; place-items: center; font-size: var(--t-eti); font-weight: 700; letter-spacing: .02em; flex: none; }
   @media (max-width: 900px) {
     .cab-centro { display: none; } .guardado { display: none; } .sub { display: none; }
     .barra-app { height: auto; min-height: 52px; padding: 8px 14px; gap: 8px 12px; flex-wrap: wrap; }
     .cab-der { width: 100%; justify-content: space-between; }
-    .modo { flex: 1; } .modo button { flex: 1; padding: 7px 6px; font-size: 12px; text-align: center; }
+    .modo { flex: 1; } .modo button { flex: 1; padding: 7px 6px; font-size: var(--t-eti); text-align: center; }
   }
   @media (max-width: 480px) { .avatar { display: none; } }
 
@@ -100,15 +102,15 @@
   .cuerpo { display: flex; flex: 1; min-height: 0; }
   .lateral { width: 232px; flex: none; border-right: 1px solid var(--linea); background: var(--papel); padding: 14px 10px; position: sticky; top: 58px; align-self: flex-start; height: calc(100vh - 58px); overflow: auto; display: flex; flex-direction: column; }
   .lateral nav { display: flex; flex-direction: column; gap: 2px; }
-  .lateral nav button { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; font: inherit; font-size: 13.5px; font-weight: 500; color: var(--tinta2); background: none; border: 0; border-radius: var(--radio-s); padding: 9px 10px; cursor: pointer; }
+  .lateral nav button { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; font: inherit; font-size: var(--t-base); font-weight: 500; color: var(--tinta2); background: none; border: 0; border-radius: var(--radio-s); padding: 9px 10px; cursor: pointer; }
   .lateral nav button:hover { background: var(--hundido); color: var(--tinta); }
   .lateral nav button[aria-current="page"] { background: var(--marca-claro); color: var(--marca); font-weight: 600; }
   .lateral nav button .ico { color: var(--suave); }
   .lateral nav button[aria-current="page"] .ico { color: var(--marca); }
-  .lateral nav .cuenta-p { margin-left: auto; min-width: 20px; padding: 0 6px; border-radius: 999px; background: var(--hundido); color: var(--tinta2); font-size: 11px; font-weight: 600; text-align: center; line-height: 18px; }
+  .lateral nav .cuenta-p { margin-left: auto; min-width: 20px; padding: 0 6px; border-radius: 999px; background: var(--hundido); color: var(--tinta2); font-size: var(--t-eti); font-weight: 600; text-align: center; line-height: 18px; }
   .lateral nav .cuenta-p.rojo { background: var(--rojo-f); color: var(--rojo); }
   .lateral nav .cuenta-p.ambar { background: var(--ambar-f); color: var(--ambar); }
-  .lateral-pie { margin-top: auto; padding: 12px 10px 4px; font-size: 11.5px; color: var(--suave); line-height: 1.5; border-top: 1px solid var(--linea2); }
+  .lateral-pie { margin-top: auto; padding: 12px 10px 4px; font-size: var(--t-eti); color: var(--suave); line-height: 1.5; border-top: 1px solid var(--linea2); }
   .sel-cli-lat { display: none; }
   main#main { flex: 1; min-width: 0; padding: 24px 32px 48px; max-width: 1360px; }
   @media (max-width: 900px) {
@@ -117,7 +119,7 @@
     .lateral nav { min-width: 0; }
     .sel-cli-lat select { max-width: 100%; flex: 1; }
     .lateral nav { flex-direction: row; overflow-x: auto; gap: 4px; padding-bottom: 2px; }
-    .lateral nav button { width: auto; white-space: nowrap; padding: 8px 10px; font-size: 13px; }
+    .lateral nav button { width: auto; white-space: nowrap; padding: 8px 10px; font-size: var(--t-meta); }
     .lateral nav button .ico { display: none; }
     .lateral-pie { display: none; }
     .sel-cli-lat { display: flex; margin: 0 0 8px; }
@@ -125,29 +127,29 @@
   }
 
   /* Botones y campos */
-  .btn { font: inherit; font-size: 13.5px; font-weight: 500; line-height: 1.3; color: var(--tinta); background: var(--papel); border: 1px solid var(--linea); border-radius: var(--radio-s); padding: 8px 14px; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 7px; box-shadow: var(--sombra); transition: background .15s, border-color .15s, color .15s; }
+  .btn { font: inherit; font-size: var(--t-base); font-weight: 500; line-height: 1.3; color: var(--tinta); background: var(--papel); border: 1px solid var(--linea); border-radius: var(--radio-s); padding: 8px 14px; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 7px; box-shadow: var(--sombra); transition: background .15s, border-color .15s, color .15s; }
   .btn:hover { border-color: var(--campo); background: var(--papel2); }
   .btn.primario { background: var(--accion); border-color: var(--accion); color: var(--accion-texto); box-shadow: 0 1px 2px rgba(0,0,0,.12); }
   .btn.primario:hover { background: var(--accion-osc); border-color: var(--accion-osc); color: var(--accion-texto); }
   .btn.peligro { color: var(--rojo); }
   .btn.peligro:hover { border-color: var(--rojo); }
-  .btn.chico { font-size: 12.5px; padding: 5px 10px; }
+  .btn.chico { font-size: var(--t-meta); padding: 5px 10px; }
   .btn:disabled { opacity: .5; cursor: not-allowed; }
-  .btn-txt { font: inherit; font-size: 13px; font-weight: 500; background: none; border: 0; color: var(--accion); cursor: pointer; padding: 2px 0; text-decoration: underline; text-underline-offset: 3px; text-decoration-color: color-mix(in srgb, var(--accion) 35%, transparent); }
+  .btn-txt { font: inherit; font-size: var(--t-meta); font-weight: 500; background: none; border: 0; color: var(--accion); cursor: pointer; padding: 2px 0; text-decoration: underline; text-underline-offset: 3px; text-decoration-color: color-mix(in srgb, var(--accion) 35%, transparent); }
   .btn-txt:hover { text-decoration-color: var(--accion); }
   .ayuda { width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--linea); background: var(--papel); color: var(--suave); font: 600 12px/1 var(--sans); cursor: pointer; display: inline-grid; place-items: center; flex: none; }
   .ayuda:hover { color: var(--marca); border-color: var(--marca-borde); background: var(--marca-claro); }
-  input, select, textarea { font: inherit; font-size: 14px; color: var(--tinta); background: var(--papel); border: 1px solid var(--campo); border-radius: var(--radio-s); padding: 8px 11px; min-width: 0; max-width: 100%; }
+  input, select, textarea { font: inherit; font-size: var(--t-base); color: var(--tinta); background: var(--papel); border: 1px solid var(--campo); border-radius: var(--radio-s); padding: 8px 11px; min-width: 0; max-width: 100%; }
   input:focus, select:focus, textarea:focus { border-color: var(--accion); outline: none; box-shadow: 0 0 0 3px color-mix(in srgb, var(--accion) 18%, transparent); }
   input[aria-invalid="true"] { border-color: var(--rojo); }
   input[type=checkbox], input[type=radio] { width: 17px; height: 17px; accent-color: var(--accion); margin: 0; flex: none; }
   textarea { resize: vertical; min-height: 70px; width: 100%; }
-  label.campo { display: flex; flex-direction: column; gap: 5px; font-size: 12px; color: var(--suave); min-width: 0; }
+  label.campo { display: flex; flex-direction: column; gap: 5px; font-size: var(--t-eti); color: var(--suave); min-width: 0; }
   label.campo > span { font-weight: 600; letter-spacing: .01em; }
   label.campo input, label.campo select, label.campo textarea { width: 100%; }
-  label.marca { display: flex; align-items: flex-start; gap: 9px; font-size: 14px; color: var(--tinta2); cursor: pointer; line-height: 1.4; }
+  label.marca { display: flex; align-items: flex-start; gap: 9px; font-size: var(--t-base); color: var(--tinta2); cursor: pointer; line-height: 1.4; }
   label.marca input { margin-top: 2px; }
-  label.marca small { display: block; color: var(--suave); font-size: 12.5px; }
+  label.marca small { display: block; color: var(--suave); font-size: var(--t-meta); }
   .rejilla { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px 14px; }
   .fila-btn { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 
@@ -157,9 +159,9 @@
   .dos { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 16px; align-items: start; }
   @media (max-width: 980px) { .dos { grid-template-columns: 1fr; } }
   @media (min-width: 981px) { .dos.ancha { grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); } }
-  .nota { font-size: 12.5px; color: var(--suave); }
-  .franja { margin: 0 0 18px; background: var(--marca-claro); border: 1px solid var(--marca-borde); color: var(--marca-osc); border-radius: var(--radio-s); padding: 10px 14px; font-size: 13.5px; }
-  .alerta { border-radius: var(--radio-s); padding: 10px 14px 10px 38px; font-size: 13.5px; border: 1px solid; margin: 0 0 10px; position: relative; }
+  .nota { font-size: var(--t-meta); color: var(--suave); }
+  .franja { margin: 0 0 18px; background: var(--marca-claro); border: 1px solid var(--marca-borde); color: var(--marca-osc); border-radius: var(--radio-s); padding: 10px 14px; font-size: var(--t-base); }
+  .alerta { border-radius: var(--radio-s); padding: 10px 14px 10px 38px; font-size: var(--t-base); border: 1px solid; margin: 0 0 10px; position: relative; }
   .alerta::before { content: ""; position: absolute; left: 14px; top: 15px; width: 12px; height: 12px; border-radius: 50%; }
   .alerta.rojo { background: var(--rojo-f); border-color: var(--rojo-b); color: #7F1D1D; }
   .alerta.rojo::before { background: var(--rojo-v); }
@@ -171,16 +173,16 @@
 
   .sec-cab { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px 20px; margin-bottom: 18px; }
   .sec-tit { display: flex; align-items: center; gap: 10px; }
-  .sec-cab h1 { font-size: 22px; line-height: 1.2; margin: 0; }
-  .sec-cab p { margin: 6px 0 0; color: var(--tinta2); max-width: 780px; font-size: 13.5px; }
+  .sec-cab h1 { font-size: var(--t-h1); line-height: 1.2; margin: 0; }
+  .sec-cab p { margin: 6px 0 0; color: var(--tinta2); max-width: 780px; font-size: var(--t-base); }
 
   /* Indicadores */
   .resumen { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; margin: 0 0 20px; }
   .kpi { background: var(--papel); border: 1px solid var(--linea); border-radius: var(--radio); padding: 14px 16px; min-width: 0; box-shadow: var(--sombra); }
-  .kpi .eti { font-size: 11px; color: var(--suave); text-transform: uppercase; letter-spacing: .07em; font-weight: 600; }
+  .kpi .eti { font-size: var(--t-eti); color: var(--suave); text-transform: uppercase; letter-spacing: .07em; font-weight: 600; }
   .kpi .num { font: var(--peso-tit) 30px/1.1 var(--sans-tit); margin-top: 8px; letter-spacing: var(--esp-tit); font-variant-numeric: tabular-nums; }
-  .kpi .num small { font-size: 15px; font-weight: 500; color: var(--suave); }
-  .kpi .det { font-size: 12.5px; color: var(--tinta2); margin-top: 4px; }
+  .kpi .num small { font-size: var(--t-lead); font-weight: 500; color: var(--suave); }
+  .kpi .det { font-size: var(--t-meta); color: var(--tinta2); margin-top: 4px; }
   .kpi.oscuro { background: var(--marca); border-color: var(--marca); color: var(--marca-texto); }
   .kpi.oscuro .eti, .kpi.oscuro .det { color: color-mix(in srgb, var(--marca-texto) 70%, var(--marca)); }
   .kpi.oscuro .num { color: var(--marca-texto); }
@@ -193,22 +195,22 @@
   .cli[aria-pressed="true"] { border-color: var(--marca); box-shadow: 0 0 0 3px var(--marca-tenue); }
   .cli .top { display: flex; gap: 11px; align-items: center; }
   .sello { width: 38px; height: 38px; border-radius: var(--radio-s); color: #fff; display: grid; place-items: center; font: 700 13px/1 var(--sans-tit); flex: none; letter-spacing: .03em; }
-  .cli b { display: block; font-size: 14.5px; }
-  .cli .mini { font-size: 12.5px; color: var(--suave); }
-  .cli .cifras { display: flex; gap: 8px 14px; margin-top: 12px; font-size: 12.5px; color: var(--tinta2); flex-wrap: wrap; align-items: center; }
-  .cli .cifras b { display: inline; font-size: 13px; }
+  .cli b { display: block; font-size: var(--t-lead); }
+  .cli .mini { font-size: var(--t-meta); color: var(--suave); }
+  .cli .cifras { display: flex; gap: 8px 14px; margin-top: 12px; font-size: var(--t-meta); color: var(--tinta2); flex-wrap: wrap; align-items: center; }
+  .cli .cifras b { display: inline; font-size: var(--t-meta); }
 
   /* Tablas */
   .tabla { width: 100%; border-collapse: separate; border-spacing: 0; background: var(--papel); border: 1px solid var(--linea); border-radius: var(--radio); font-variant-numeric: tabular-nums; box-shadow: var(--sombra); }
-  .tabla th { text-align: left; font-size: 11px; font-weight: 600; color: var(--suave); letter-spacing: .07em; text-transform: uppercase; padding: 9px 12px; border-bottom: 1px solid var(--linea); background: var(--papel2); }
+  .tabla th { text-align: left; font-size: var(--t-eti); font-weight: 600; color: var(--suave); letter-spacing: .07em; text-transform: uppercase; padding: 9px 12px; border-bottom: 1px solid var(--linea); background: var(--papel2); }
   .tabla th:first-child { border-top-left-radius: var(--radio); }
   .tabla th:last-child { border-top-right-radius: var(--radio); }
-  .tabla td { padding: 10px 12px; border-bottom: 1px solid var(--linea2); vertical-align: top; font-size: 13.5px; }
+  .tabla td { padding: 10px 12px; border-bottom: 1px solid var(--linea2); vertical-align: top; font-size: var(--t-base); }
   .tabla tbody tr:last-child td { border-bottom: 0; }
   .tabla tr.clic { cursor: pointer; }
   .tabla tr.clic:hover td { background: var(--papel2); }
   .tabla tr.mal td { background: var(--rojo-f); }
-  .mini { display: block; font-size: 12.5px; color: var(--suave); }
+  .mini { display: block; font-size: var(--t-meta); color: var(--suave); }
   .vacio { padding: 36px 20px; text-align: center; color: var(--suave); background: var(--papel); border: 1px dashed var(--linea); border-radius: var(--radio); }
   .tabla-env { overflow-x: auto; }
   @media screen and (max-width: 760px) {
@@ -217,7 +219,7 @@
     .tabla.resp { background: none; border: 0; box-shadow: none; }
     .tabla.resp tr { background: var(--papel); border: 1px solid var(--linea); border-radius: var(--radio); margin-bottom: 12px; padding: 4px 14px; box-shadow: var(--sombra); }
     .tabla.resp td { display: flex; justify-content: space-between; gap: 12px; padding: 8px 0; text-align: right; }
-    .tabla.resp td::before { content: attr(data-et); flex: none; color: var(--suave); font-size: 12px; text-align: left; }
+    .tabla.resp td::before { content: attr(data-et); flex: none; color: var(--suave); font-size: var(--t-eti); text-align: left; }
     .tabla.resp td.cab { display: block; text-align: left; }
     .tabla.resp td.cab::before { display: none; }
     .tabla.resp td > * { min-width: 0; }
@@ -226,27 +228,27 @@
   }
 
   /* Chips de estado */
-  .chip { display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; font-weight: 600; padding: 2px 9px 2px 7px; border-radius: 999px; border: 1px solid; white-space: nowrap; line-height: 1.5; }
+  .chip { display: inline-flex; align-items: center; gap: 5px; font-size: var(--t-eti); font-weight: 600; padding: 2px 9px 2px 7px; border-radius: 999px; border: 1px solid; white-space: nowrap; line-height: 1.5; }
   .chip::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
   .chip.verde { background: var(--verde-f); border-color: var(--verde-b); color: var(--verde); }
   .chip.ambar { background: var(--ambar-f); border-color: var(--ambar-b); color: var(--ambar); }
   .chip.rojo { background: var(--rojo-f); border-color: var(--rojo-b); color: var(--rojo); }
   .chip.gris { background: var(--gris-f); border-color: var(--linea); color: var(--suave); }
   .chip.azul { background: var(--marca-claro); border-color: var(--marca-borde); color: var(--marca-osc); }
-  .razones { margin: 6px 0 0; padding-left: 18px; font-size: 12.5px; color: var(--tinta2); }
+  .razones { margin: 6px 0 0; padding-left: 18px; font-size: var(--t-meta); color: var(--tinta2); }
   .razones li + li { margin-top: 3px; }
 
   /* Línea de tiempo */
   .tiempo { list-style: none; margin: 0; padding: 0; border-left: 2px solid var(--linea); }
-  .tiempo li { position: relative; padding: 0 0 14px 18px; font-size: 13.5px; }
+  .tiempo li { position: relative; padding: 0 0 14px 18px; font-size: var(--t-base); }
   .tiempo li::before { content: ""; position: absolute; left: -7px; top: 5px; width: 12px; height: 12px; border-radius: 50%; background: var(--papel); border: 2px solid var(--marca); box-shadow: 0 0 0 3px var(--papel); }
   .tiempo li.revoca::before { border-color: var(--rojo-v); }
   .tiempo li.acceso::before { border-color: var(--suave); }
-  .tiempo .cuando { font-size: 11.5px; color: var(--suave); font-family: var(--mono); }
-  .huella { font-family: var(--mono); font-size: 11.5px; color: var(--suave); word-break: break-all; }
+  .tiempo .cuando { font-size: var(--t-eti); color: var(--suave); font-family: var(--mono); }
+  .huella { font-family: var(--mono); font-size: var(--t-eti); color: var(--suave); word-break: break-all; }
 
   /* Aviso flotante */
-  .aviso-flot { position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%) translateY(10px); background: var(--tinta); color: #fff; font-size: 13px; padding: 10px 16px; border-radius: 999px; box-shadow: var(--sombra-2); opacity: 0; transition: opacity .18s, transform .18s; pointer-events: none; z-index: 50; display: flex; align-items: center; gap: 8px; max-width: calc(100vw - 32px); }
+  .aviso-flot { position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%) translateY(10px); background: var(--tinta); color: #fff; font-size: var(--t-meta); padding: 10px 16px; border-radius: 999px; box-shadow: var(--sombra-2); opacity: 0; transition: opacity .18s, transform .18s; pointer-events: none; z-index: 50; display: flex; align-items: center; gap: 8px; max-width: calc(100vw - 32px); }
   .aviso-flot.ver { opacity: 1; transform: translateX(-50%) translateY(0); }
   .aviso-flot .ico { color: var(--verde-v); }
 
@@ -255,8 +257,8 @@
   #titular:not([hidden]) ~ .recorrido, body:has(#titular:not([hidden])) .recorrido { top: 0; }
   .recorrido .rec-num { font: 700 26px/1 var(--sans-tit); letter-spacing: -.02em; opacity: .95; display: flex; align-items: baseline; gap: 4px; }
   .recorrido .rec-num small { font: 600 11px/1 var(--sans); letter-spacing: .1em; text-transform: uppercase; opacity: .7; }
-  .recorrido h3 { font-size: 15px; margin: 0 0 2px; color: var(--marca-texto); }
-  .recorrido p { margin: 0; font-size: 13px; line-height: 1.45; color: color-mix(in srgb, var(--marca-texto) 82%, var(--marca)); max-width: 880px; }
+  .recorrido h3 { font-size: var(--t-lead); margin: 0 0 2px; color: var(--marca-texto); }
+  .recorrido p { margin: 0; font-size: var(--t-meta); line-height: 1.45; color: color-mix(in srgb, var(--marca-texto) 82%, var(--marca)); max-width: 880px; }
   .rec-der { display: flex; align-items: center; gap: 10px; }
   .rec-puntos { display: flex; gap: 5px; margin-right: 6px; }
   .rec-puntos i { width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,.28); display: block; transition: background .2s, transform .2s; }
@@ -294,36 +296,36 @@
 
   /* ───── Vista del titular (formulario con la marca del cliente) ───── */
   .titular-fondo { background: radial-gradient(1100px 480px at 50% -8%, color-mix(in srgb, var(--marca-cli, #234) 20%, transparent), transparent 70%), #EEF1F4; min-height: 100vh; padding: 0 0 40px; font-family: var(--sans); }
-  .barra-demo { background: #FFFBEB; border-bottom: 1px solid var(--ambar-b); color: #713F12; font-size: 13px; padding: 8px 16px; display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; justify-content: center; }
-  .barra-demo select { font-size: 13px; padding: 4px 8px; }
+  .barra-demo { background: #FFFBEB; border-bottom: 1px solid var(--ambar-b); color: #713F12; font-size: var(--t-meta); padding: 8px 16px; display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; justify-content: center; }
+  .barra-demo select { font-size: var(--t-meta); padding: 4px 8px; }
   .t-marco { max-width: 660px; margin: 28px auto 0; padding: 0 16px; }
   .t-cab { background: var(--marca-cli, #234); color: #fff; border-radius: 16px 16px 0 0; padding: 20px 22px; display: flex; align-items: center; gap: 14px; }
-  .t-cab .sello { background: rgba(255,255,255,.18); width: 46px; height: 46px; font-size: 16px; }
-  .t-cab b { display: block; font-size: 17px; font-family: var(--sans-tit); }
-  .t-cab span { font-size: 13px; opacity: .85; }
+  .t-cab .sello { background: rgba(255,255,255,.18); width: 46px; height: 46px; font-size: var(--t-tit); }
+  .t-cab b { display: block; font-size: var(--t-tit); font-family: var(--sans-tit); }
+  .t-cab span { font-size: var(--t-meta); opacity: .85; }
   .t-cuerpo { background: #fff; border: 1px solid #D9DDE3; border-top: 0; border-radius: 0 0 16px 16px; padding: 22px; box-shadow: var(--sombra-2); }
   .t-pasos { display: flex; gap: 6px; margin: 0 0 18px; }
   .t-pasos span { flex: 1; height: 5px; border-radius: 3px; background: #E2E6EB; }
   .t-pasos span.hecho { background: var(--marca-cli, #234); }
-  .t-cuerpo h2 { font-size: 20px; margin: 0 0 6px; }
-  .t-cuerpo .lead { color: #4A5563; font-size: 14.5px; margin: 0 0 16px; }
-  .t-btn { font: inherit; font-weight: 600; font-size: 15px; background: var(--marca-cli, #234); color: #fff; border: 0; border-radius: 10px; padding: 12px 18px; cursor: pointer; min-height: 44px; box-shadow: 0 4px 12px -6px color-mix(in srgb, var(--marca-cli, #234) 70%, transparent); }
+  .t-cuerpo h2 { font-size: var(--t-h2); margin: 0 0 6px; }
+  .t-cuerpo .lead { color: #4A5563; font-size: var(--t-lead); margin: 0 0 16px; }
+  .t-btn { font: inherit; font-weight: 600; font-size: var(--t-lead); background: var(--marca-cli, #234); color: #fff; border: 0; border-radius: 10px; padding: 12px 18px; cursor: pointer; min-height: 44px; box-shadow: 0 4px 12px -6px color-mix(in srgb, var(--marca-cli, #234) 70%, transparent); }
   .t-btn:disabled { opacity: .45; cursor: not-allowed; box-shadow: none; }
   .t-btn.sec { background: #fff; color: #2A3440; border: 1px solid #C9CED5; font-weight: 500; box-shadow: none; }
-  .pol-caja { border: 1px solid #D9DDE3; border-radius: 10px; height: 300px; overflow-y: auto; padding: 14px 16px; font-size: 13.5px; line-height: 1.55; color: #2A3440; background: #FAFBFC; }
-  .pol-caja h4 { margin: 12px 0 4px; font-size: 14px; }
+  .pol-caja { border: 1px solid #D9DDE3; border-radius: 10px; height: 300px; overflow-y: auto; padding: 14px 16px; font-size: var(--t-base); line-height: 1.55; color: #2A3440; background: #FAFBFC; }
+  .pol-caja h4 { margin: 12px 0 4px; font-size: var(--t-base); }
   .pol-caja p { margin: 0 0 8px; }
-  .pol-avance { font-size: 12.5px; color: #5D6773; margin: 6px 0 12px; }
+  .pol-avance { font-size: var(--t-meta); color: #5D6773; margin: 6px 0 12px; }
   .fin { border: 1px solid #D9DDE3; border-radius: 12px; padding: 13px 15px; margin-bottom: 10px; transition: border-color .15s, box-shadow .15s; }
   .fin.marcada { border-color: var(--marca-cli, #234); box-shadow: 0 0 0 1px var(--marca-cli, #234); background: color-mix(in srgb, var(--marca-cli, #234) 4%, #fff); }
-  .fin .det { font-size: 12.8px; color: #5D6773; margin: 6px 0 0 26px; }
+  .fin .det { font-size: var(--t-meta); color: #5D6773; margin: 6px 0 0 26px; }
   .fin .det div + div { margin-top: 2px; }
-  .aviso-lab { background: #F3F6F9; border-left: 3px solid var(--marca-cli, #234); padding: 9px 12px; font-size: 13.2px; color: #33404D; border-radius: 0 8px 8px 0; margin: 0 0 14px; }
-  .t-pie { text-align: center; font-size: 12px; color: #6B7480; margin-top: 14px; }
+  .aviso-lab { background: #F3F6F9; border-left: 3px solid var(--marca-cli, #234); padding: 9px 12px; font-size: var(--t-meta); color: #33404D; border-radius: 0 8px 8px 0; margin: 0 0 14px; }
+  .t-pie { text-align: center; font-size: var(--t-eti); color: #6B7480; margin-top: 14px; }
   .t-tabs { display: flex; gap: 4px; margin: 0 0 18px; border-bottom: 1px solid #E2E6EB; }
-  .t-tabs button { font: inherit; font-size: 14px; background: none; border: 0; padding: 9px 12px; cursor: pointer; color: #4A5563; border-bottom: 2px solid transparent; margin-bottom: -1px; min-height: 44px; }
+  .t-tabs button { font: inherit; font-size: var(--t-base); background: none; border: 0; padding: 9px 12px; cursor: pointer; color: #4A5563; border-bottom: 2px solid transparent; margin-bottom: -1px; min-height: 44px; }
   .t-tabs button[aria-current="page"] { color: #1B2530; border-color: var(--marca-cli, #234); font-weight: 600; }
-  .comprobante { border: 1px dashed #B9C0C8; border-radius: 12px; padding: 14px 16px; background: #FAFBFC; font-size: 13.5px; }
+  .comprobante { border: 1px dashed #B9C0C8; border-radius: 12px; padding: 14px 16px; background: #FAFBFC; font-size: var(--t-base); }
   .codigo { font: 700 22px/1.2 var(--mono); letter-spacing: .08em; color: #1B2530; }
 
   /* ───── Vista del fiscalizador ───── */
@@ -337,52 +339,52 @@
   @media (max-width: 980px) { .fisc-grid { grid-template-columns: 1fr; } }
   .barra { height: 8px; background: var(--hundido); border-radius: 5px; overflow: hidden; display: flex; }
   .barra i { display: block; height: 100%; }
-  .leyenda { display: flex; gap: 12px; flex-wrap: wrap; font-size: 12px; color: var(--suave); margin-top: 6px; }
+  .leyenda { display: flex; gap: 12px; flex-wrap: wrap; font-size: var(--t-eti); color: var(--suave); margin-top: 6px; }
   .leyenda i { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 4px; vertical-align: -1px; }
 
   /* Panel: indicadores clicables, etapas del caso y gráficos (SVG propio, sin dependencias) */
   button.kpi { font: inherit; color: inherit; text-align: left; cursor: pointer; display: block; width: 100%; }
   button.kpi:hover { border-color: var(--marca-borde); box-shadow: var(--sombra-2); }
-  button.kpi:focus-visible { outline: 2px solid var(--realce); outline-offset: 2px; }
+  button.kpi:focus-visible { outline: 2px solid var(--accion); outline-offset: 2px; }
   .kpi .eti, .kpi .num, .kpi .det { display: block; }
-  .kpi .ir { display: block; font-size: 12px; color: var(--accion); margin-top: 8px; text-decoration: underline; text-underline-offset: 3px; text-decoration-color: color-mix(in srgb, var(--accion) 40%, transparent); }
+  .kpi .ir { display: block; font-size: var(--t-eti); color: var(--accion); margin-top: 8px; text-decoration: underline; text-underline-offset: 3px; text-decoration-color: color-mix(in srgb, var(--accion) 40%, transparent); }
   .kpi.oscuro .ir { color: var(--marca-texto); opacity: .85; text-decoration-color: color-mix(in srgb, var(--marca-texto) 40%, transparent); }
   .etapas { list-style: none; margin: 0 0 16px; padding: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); background: var(--papel); border: 1px solid var(--linea); border-radius: var(--radio); box-shadow: var(--sombra); overflow: hidden; }
   .etapas li { position: relative; min-width: 0; }
   .etapas li + li::before { content: ""; position: absolute; left: 0; top: 14px; bottom: 14px; width: 1px; background: var(--linea2); }
   .etapas button { width: 100%; font: inherit; color: inherit; background: none; border: 0; text-align: left; padding: 14px 16px; cursor: pointer; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 1px 12px; align-items: center; }
   .etapas button:hover { background: var(--papel2); }
-  .etapas button:focus-visible { outline: 2px solid var(--realce); outline-offset: -2px; }
-  .e-num { grid-row: span 3; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font: 700 12px/1 var(--sans-tit); color: #fff; background: var(--verde-v); }
-  .e-num.ambar { background: var(--ambar-v); } .e-num.rojo { background: var(--rojo-v); }
-  .e-tit { font-size: 11px; color: var(--suave); text-transform: uppercase; letter-spacing: .07em; font-weight: 600; }
+  .etapas button:focus-visible { outline: 2px solid var(--accion); outline-offset: -2px; }
+  .e-num { grid-row: span 3; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font: 700 12px/1 var(--sans-tit); color: #fff; background: var(--verde); }
+  .e-num.ambar { background: var(--ambar); } .e-num.rojo { background: var(--rojo); }
+  .e-tit { font-size: var(--t-eti); color: var(--suave); text-transform: uppercase; letter-spacing: .07em; font-weight: 600; }
   .e-val { font: var(--peso-tit) 15px/1.25 var(--sans-tit); letter-spacing: var(--esp-tit); }
-  .e-det { font-size: 12px; color: var(--tinta2); }
+  .e-det { font-size: var(--t-eti); color: var(--tinta2); }
   @media (max-width: 1050px) { .etapas { grid-template-columns: repeat(2, minmax(0, 1fr)); } .etapas li + li::before { display: none; } .etapas li { border-top: 1px solid var(--linea2); } .etapas li:nth-child(-n+2) { border-top: 0; } }
   @media (max-width: 600px) { .etapas { grid-template-columns: 1fr; } .etapas li:nth-child(2) { border-top: 1px solid var(--linea2); } }
   .graficos { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr) minmax(0, .95fr); gap: 16px; margin: 0 0 16px; }
   @media (max-width: 1050px) { .graficos { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
   @media (max-width: 700px) { .graficos { grid-template-columns: 1fr; } }
-  .graficos .caja h3 { margin: 0 0 10px; font-size: 14px; }
+  .graficos .caja h3 { margin: 0 0 10px; font-size: var(--t-base); }
   .graf { width: 100%; height: auto; display: block; overflow: visible; }
   .g-reja { stroke: var(--linea2); stroke-width: 1; }
   .g-eje { font: 10px var(--sans); fill: var(--suave); }
   .g-area { fill: var(--marca-tenue); }
   .g-linea { fill: none; stroke: var(--marca); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
-  .g-linea.rojo { stroke: var(--rojo-v); }
-  .g-punto { fill: var(--papel); stroke: var(--marca); stroke-width: 2; } .g-punto.rojo { stroke: var(--rojo-v); }
+  .g-linea.rojo { stroke: var(--rojo); }
+  .g-punto { fill: var(--papel); stroke: var(--marca); stroke-width: 2; } .g-punto.rojo { stroke: var(--rojo); }
   .rosca { display: flex; gap: 18px; align-items: center; }
   .rosca svg { width: 124px; height: 124px; flex: none; }
   .rosca .centro { font: var(--peso-tit) 28px var(--sans-tit); fill: var(--tinta); letter-spacing: var(--esp-tit); }
   .rosca .centro-eti { font: 9.5px var(--sans); fill: var(--suave); letter-spacing: .05em; }
-  .rosca ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 7px; font-size: 12.5px; color: var(--tinta2); min-width: 0; flex: 1; }
+  .rosca ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 7px; font-size: var(--t-meta); color: var(--tinta2); min-width: 0; flex: 1; }
   .rosca li { display: flex; align-items: center; gap: 8px; } .rosca li i { width: 9px; height: 9px; border-radius: 2px; flex: none; } .rosca li b { margin-left: auto; font-variant-numeric: tabular-nums; color: var(--tinta); }
   .fin-fila { margin-bottom: 11px; }
-  .fin-fila .cab { display: flex; justify-content: space-between; gap: 10px; font-size: 13px; margin-bottom: 5px; }
+  .fin-fila .cab { display: flex; justify-content: space-between; gap: 10px; font-size: var(--t-meta); margin-bottom: 5px; }
   .fin-fila .cab span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
   .fin-fila .cab .cifra { color: var(--suave); font-variant-numeric: tabular-nums; flex: none; }
   .filtros { display: flex; gap: 6px; flex-wrap: wrap; margin: 0 0 12px; }
-  .filtros button { font: inherit; font-size: 12.5px; font-weight: 500; padding: 5px 11px; border-radius: 999px; border: 1px solid var(--linea); background: var(--papel); color: var(--tinta2); cursor: pointer; }
+  .filtros button { font: inherit; font-size: var(--t-meta); font-weight: 500; padding: 5px 11px; border-radius: 999px; border: 1px solid var(--linea); background: var(--papel); color: var(--tinta2); cursor: pointer; }
   .filtros button:hover { border-color: var(--campo); }
   .filtros button[aria-pressed="true"] { background: var(--marca-claro); border-color: var(--marca-borde); color: var(--marca); font-weight: 600; }
 
@@ -400,7 +402,7 @@
   .tabla tr.clic:focus-visible { outline: none; }
   .tabla tr.clic:focus-visible td { background: var(--marca-claro); box-shadow: inset 0 2px 0 var(--realce), inset 0 -2px 0 var(--realce); }
   kbd { font: 11px/1 var(--mono); border: 1px solid var(--linea); border-bottom-width: 2px; border-radius: 4px; padding: 2px 5px; background: var(--papel2); color: var(--tinta2); white-space: nowrap; }
-  .btn-k { display: inline-flex; align-items: center; gap: 8px; font: inherit; font-size: 12.5px; color: var(--suave); background: var(--papel2); border: 1px solid var(--linea); border-radius: var(--radio-s); padding: 5px 8px 5px 10px; cursor: pointer; margin-left: 10px; }
+  .btn-k { display: inline-flex; align-items: center; gap: 8px; font: inherit; font-size: var(--t-meta); color: var(--suave); background: var(--papel2); border: 1px solid var(--linea); border-radius: var(--radio-s); padding: 5px 8px 5px 10px; cursor: pointer; margin-left: 10px; }
   .btn-k:hover { color: var(--tinta); border-color: var(--campo); }
   @media (max-width: 900px) { .btn-k kbd { display: none; } }
 
@@ -408,33 +410,41 @@
   .hoja-fondo { position: fixed; inset: 0; background: rgba(18, 28, 33, .28); z-index: 30; animation: aparece .18s ease-out; }
   .hoja { position: fixed; top: 0; right: 0; bottom: 0; width: min(600px, 100vw); background: var(--papel); border-left: 1px solid var(--linea); box-shadow: -16px 0 48px -24px rgba(18, 28, 33, .45); z-index: 31; overflow: auto; padding: 22px 26px 36px; animation: hoja-entra .24s cubic-bezier(.2, 0, 0, 1); }
   .hoja .sec-cab { flex-direction: column; align-items: flex-start; gap: 12px; padding-right: 36px; }
-  .hoja .sec-cab h1 { font-size: 20px; }
+  .hoja .sec-cab h1 { font-size: var(--t-h2); }
   .hoja .dos { grid-template-columns: 1fr; }
-  .hoja-x { position: absolute; top: 14px; right: 16px; width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--linea); background: var(--papel); color: var(--tinta2); font-size: 18px; line-height: 1; cursor: pointer; }
+  .hoja-x { position: absolute; top: 14px; right: 16px; width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--linea); background: var(--papel); color: var(--tinta2); font-size: var(--t-h2); line-height: 1; cursor: pointer; }
   .hoja-x:hover { background: var(--papel2); color: var(--tinta); }
-  .hoja .pista { font-size: 11.5px; color: var(--suave); margin: 0 0 10px; }
+  .hoja .pista { font-size: var(--t-eti); color: var(--suave); margin: 0 0 10px; }
   @keyframes hoja-entra { from { transform: translateX(28px); opacity: 0; } to { transform: none; opacity: 1; } }
 
   /* Paleta de comandos (Ctrl+K) */
   .paleta { width: min(640px, calc(100vw - 24px)); margin-top: 10vh; border-radius: 14px; }
-  .paleta input { width: 100%; border: 0; border-bottom: 1px solid var(--linea); border-radius: 14px 14px 0 0; padding: 16px 18px; font-size: 16px; outline: none; background: var(--papel); }
+  .paleta input { width: 100%; border: 0; border-bottom: 1px solid var(--linea); border-radius: 14px 14px 0 0; padding: 16px 18px; font-size: var(--t-tit); outline: none; background: var(--papel); }
   .paleta ul { list-style: none; margin: 0; padding: 6px; max-height: 52vh; overflow: auto; }
-  .paleta li { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 12px; align-items: baseline; padding: 9px 12px; border-radius: var(--radio-s); cursor: pointer; font-size: 13.5px; }
+  .paleta li { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 12px; align-items: baseline; padding: 9px 12px; border-radius: var(--radio-s); cursor: pointer; font-size: var(--t-base); }
   .paleta li[aria-selected="true"], .paleta li:hover { background: var(--marca-claro); }
-  .paleta li .g { font-size: 11px; text-transform: uppercase; letter-spacing: .07em; color: var(--suave); font-weight: 600; }
-  .paleta li .s { color: var(--suave); font-size: 12.5px; margin-left: 8px; }
+  .paleta li .g { font-size: var(--t-eti); text-transform: uppercase; letter-spacing: .07em; color: var(--suave); font-weight: 600; }
+  .paleta li .s { color: var(--suave); font-size: var(--t-meta); margin-left: 8px; }
   .paleta li .t { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .paleta .p-pie { display: flex; gap: 18px; padding: 8px 18px; border-top: 1px solid var(--linea2); font-size: 11.5px; color: var(--suave); background: var(--papel2); border-radius: 0 0 14px 14px; }
-  .paleta .vacio-p { padding: 26px; text-align: center; color: var(--suave); font-size: 13px; }
+  .paleta .p-pie { display: flex; gap: 18px; padding: 8px 18px; border-top: 1px solid var(--linea2); font-size: var(--t-eti); color: var(--suave); background: var(--papel2); border-radius: 0 0 14px 14px; }
+  .paleta .vacio-p { padding: 26px; text-align: center; color: var(--suave); font-size: var(--t-meta); }
 
   /* Viaje en el tiempo del registro */
-  .corte { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--tinta2); }
-  .corte input { padding: 6px 9px; font-size: 13px; }
-  .corte-banda { background: var(--marca-claro); border: 1px solid var(--marca-borde); color: var(--marca-osc); border-radius: var(--radio-s); padding: 10px 14px; font-size: 13.5px; margin: 0 0 10px; display: flex; flex-wrap: wrap; gap: 6px 18px; align-items: center; }
-  .corte-banda b { font-size: 15px; }
+  .corte { display: inline-flex; align-items: center; gap: 8px; font-size: var(--t-meta); color: var(--tinta2); }
+  .corte input { padding: 6px 9px; font-size: var(--t-meta); }
+  .corte-banda { background: var(--marca-claro); border: 1px solid var(--marca-borde); color: var(--marca-osc); border-radius: var(--radio-s); padding: 10px 14px; font-size: var(--t-base); margin: 0 0 10px; display: flex; flex-wrap: wrap; gap: 6px 18px; align-items: center; }
+  .corte-banda b { font-size: var(--t-lead); }
 
+  /* Accesibilidad: saltar al contenido, texto solo para lectores de pantalla, placeholders legibles, objetivos táctiles */
+  .saltar { position: absolute; left: 12px; top: -48px; z-index: 50; background: var(--accion); color: var(--accion-texto); padding: 8px 14px; border-radius: var(--radio-s); font-size: var(--t-base); text-decoration: none; transition: top .15s; }
+  .saltar:focus { top: 12px; }
+  .sr-solo { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  ::placeholder { color: var(--suave); opacity: 1; }
+  .filtros button, .btn.chico { min-height: 32px; }
+  .kpi.destacado { border-left: 4px solid var(--marca); }
+  .t-link { font: inherit; font-size: var(--t-base); background: none; border: 0; color: var(--marca-cli, #234); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; padding: 10px 4px; min-height: 44px; }
   @media (prefers-reduced-motion: reduce) { .g-linea { stroke-dashoffset: 0; } .g-linea, .g-area, .g-punto, .barra i, .rosca path, .hoja, .hoja-fondo { animation: none; } }
-  .dl { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 6px 14px; font-size: 13.5px; margin: 0; }
+  .dl { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 6px 14px; font-size: var(--t-base); margin: 0; }
   .dl dt { color: var(--suave); }
   .dl dd { margin: 0; }
   @media (max-width: 600px) { .dl { grid-template-columns: 1fr; } .dl dd { margin-bottom: 6px; } }
@@ -458,6 +468,7 @@
 <div class="demo-aviso" id="demoAviso"><span><b>Prototipo con datos ficticios.</b> Todo se guarda solo en este navegador; ninguna empresa, persona ni RUT es real.</span>
   <label class="tema-sel">Estilo <select id="selTema"><option value="sello">Sello · petróleo</option><option value="tinta">Tinta y papel</option><option value="instrumento">Instrumento</option></select></label></div>
 
+<a class="saltar" href="#main">Saltar al contenido</a>
 <header class="barra-app" id="barraApp">
   <a class="marca-app" href="../index.html"><svg class="sello-logo" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="18" fill="var(--marca)"/><circle cx="20" cy="20" r="12.5" fill="none" stroke="rgba(255,255,255,.38)" stroke-width="1.5" stroke-dasharray="3 2.2"/><path d="M13.5 20.5l4.2 4.2L27 15.5" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span><span class="firma">Consentimientos</span><span class="sub">Plataforma de MLV Abogados · Ley 21.719</span></span></a>
   <div class="cab-centro"><label class="sel-cli"><span>Cliente</span><select id="selCli" aria-label="Cliente"></select></label><button type="button" class="btn-k" data-acc="paleta" title="Buscar o ir a cualquier parte">Buscar… <kbd>Ctrl K</kbd></button></div>
@@ -487,7 +498,7 @@
 <section id="imprimible" aria-hidden="true"></section>
 
 <div class="hoja-fondo" id="hojaFondo" hidden></div>
-<aside class="hoja" id="hoja" hidden role="dialog" aria-label="Detalle del titular"></aside>
+<aside class="hoja" id="hoja" hidden role="dialog" aria-modal="true" aria-label="Detalle del titular"></aside>
 <dialog id="paleta" class="paleta" aria-label="Buscar o ir a"><input id="paletaInput" type="search" placeholder="Buscar cliente, titular, tratamiento o acción…" autocomplete="off" aria-label="Buscar"><ul id="paletaLista" role="listbox"></ul><div class="p-pie"><span><kbd>↑</kbd> <kbd>↓</kbd> moverse</span><span><kbd>Enter</kbd> abrir</span><span><kbd>Esc</kbd> cerrar</span><span><kbd>1</kbd>–<kbd>7</kbd> secciones · <kbd>/</kbd> buscar</span></div></dialog>
 <dialog id="dlg"><form method="dialog" id="dlgForm"><div class="d-cab"><h2 id="dlgTit"></h2></div><div class="d-cuerpo" id="dlgCuerpo"></div><div class="d-pie" id="dlgPie"></div></form></dialog>
 
@@ -812,21 +823,21 @@ function vUsuarios(c) {
     <td data-et=""><button class="btn-txt" data-usuario="${esc(u.id)}">Editar</button></td></tr>`).join('');
   const a = c.accesoFiscal;
   const roles = Object.entries(ROLES);
-  const matriz = `<table class="tabla" style="min-width:620px"><thead><tr><th style="min-width:220px">Permiso</th>${roles.map(([k, r]) => `<th style="text-align:center;font-size:10.5px">${esc(r.nombre)}</th>`).join('')}</tr></thead><tbody>${PERMISOS.map(([p, v]) => `<tr><td style="font-size:13px">${esc(p)}</td>${v.map((x) => `<td style="text-align:center;font-weight:600;color:${x === '✓' ? 'var(--verde)' : x === '◐' ? 'var(--ambar)' : 'var(--suave)'}">${x}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+  const matriz = `<table class="tabla" style="min-width:620px"><thead><tr><th style="min-width:220px">Permiso</th>${roles.map(([k, r]) => `<th style="text-align:center;font-size:var(--t-eti)">${esc(r.nombre)}</th>`).join('')}</tr></thead><tbody>${PERMISOS.map(([p, v]) => `<tr><td style="font-size:var(--t-meta)">${esc(p)}</td>${v.map((x) => `<td style="text-align:center;font-weight:600;color:${x === '✓' ? 'var(--verde)' : x === '◐' ? 'var(--ambar)' : 'var(--suave)'}">${x}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
   return `<div class="sec-cab"><div class="sec-tit"><h1>Usuarios y permisos</h1><button type="button" class="ayuda" data-ayuda="usuarios" aria-label="Qué es esta sección" title="Qué es esta sección">?</button></div>
     <div class="fila-btn"><button class="btn" data-acc="verIngreso">Ver la pantalla de ingreso</button><button class="btn" data-acc="accesoFiscal">Crear acceso temporal</button><button class="btn primario" data-acc="invitar">Invitar usuario</button></div></div>
   <div class="franja"><b>Demostración.</b> Aquí se muestra cómo quedaría la administración de cuentas. En el prototipo no hay claves ni inicio de sesión real: las cuentas, el doble factor y los permisos se activan en producción.</div>
-  <div class="tabla-env"><table class="tabla resp"><thead><tr><th>Usuario</th><th>Rol</th><th>Alcance</th><th>Estado</th><th>Doble factor</th><th>Último acceso</th><th><span class="sr">Acción</span></th></tr></thead><tbody>${filas}</tbody></table></div>
+  <div class="tabla-env"><table class="tabla resp"><thead><tr><th scope="col">Usuario</th><th scope="col">Rol</th><th scope="col">Alcance</th><th scope="col">Estado</th><th scope="col">Doble factor</th><th scope="col">Último acceso</th><th scope="col"><span class="sr">Acción</span></th></tr></thead><tbody>${filas}</tbody></table></div>
   <div class="dos ancha" style="margin-top:16px">
     <div class="caja"><h2>Qué puede hacer cada rol</h2><div class="tabla-env">${matriz}</div><p class="nota">✓ puede · ◐ solo en los clientes o datos que tiene asignados · — no puede. Las reglas del semáforo solo las cambia el Administrador MLV: es el criterio jurídico del estudio.</p></div>
     <div class="caja"><h2>Accesos temporales del fiscalizador</h2>
-      <table class="tabla"><thead><tr><th>Quién</th><th>Vigencia</th><th>Estado</th></tr></thead><tbody>
+      <table class="tabla"><thead><tr><th scope="col">Quién</th><th scope="col">Vigencia</th><th scope="col">Estado</th></tr></thead><tbody>
         <tr><td><b>${esc(a.nombre)}</b><span class="mini">${esc(a.organismo)}</span></td><td>${fFecha(a.desde)} al ${fFecha(a.hasta)}</td><td>${chip('verde', 'Vigente')}</td></tr>
         <tr><td><b>Fiscalizador (demostración anterior)</b><span class="mini">${esc(a.organismo)}</span></td><td>2 jun. 2026 al 9 jun. 2026</td><td>${chip('gris', 'Vencido')}</td></tr>
       </tbody></table>
       <p class="nota">El acceso es de solo lectura, personal, con fecha de término y queda anotado en el registro cada vez que se usa (${c.eventos.filter((e) => e.tipo === 'acceso').length} consultas registradas para este cliente). Lo crea el encargado del cliente o MLV cuando la Agencia lo pide.</p>
       <h3 style="margin-top:16px">Seguridad de las cuentas (producción)</h3>
-      <ul style="margin:0;padding-left:18px;font-size:13.5px;line-height:1.6;color:var(--tinta2)"><li>Clave individual más doble factor obligatorio para MLV y encargados.</li><li>Sesión que se cierra sola a los 30 minutos sin uso.</li><li>Registro de inicios de sesión y de cada acción, con usuario, fecha e IP.</li><li>Baja inmediata de un usuario: sus accesos se cierran al momento.</li></ul></div>
+      <ul style="margin:0;padding-left:18px;font-size:var(--t-base);line-height:1.6;color:var(--tinta2)"><li>Clave individual más doble factor obligatorio para MLV y encargados.</li><li>Sesión que se cierra sola a los 30 minutos sin uso.</li><li>Registro de inicios de sesión y de cada acción, con usuario, fecha e IP.</li><li>Baja inmediata de un usuario: sus accesos se cierran al momento.</li></ul></div>
   </div>`;
 }
 function dialogoUsuario(id) {
@@ -861,7 +872,7 @@ function dialogoAccesoFiscal() {
 function dialogoIngreso() {
   const c = cli();
   abrirDialogo('Pantalla de ingreso (demostración)', `<div style="max-width:380px;margin:6px auto 0;padding:26px 24px;border:1px solid var(--linea);border-radius:14px;background:var(--papel2)">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px"><span class="logo" style="width:34px;height:34px;font-size:12px">MLV</span><div><b>Plataforma de consentimientos</b><span class="mini">${esc(c.nombre)}</span></div></div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px"><span class="logo" style="width:34px;height:34px;font-size:var(--t-eti)">MLV</span><div><b>Plataforma de consentimientos</b><span class="mini">${esc(c.nombre)}</span></div></div>
       <div style="display:grid;gap:10px"><label class="campo"><span>Correo</span><input value="personas@cordillera.ejemplo" readonly></label><label class="campo"><span>Clave</span><input type="password" value="••••••••••" readonly></label><label class="campo"><span>Código del doble factor (aplicación o SMS)</span><input value="483 920" readonly></label></div>
       <button type="button" class="btn primario" style="width:100%;margin-top:14px" disabled>Entrar</button>
       <p class="nota" style="text-align:center;margin:12px 0 0">Solo de muestra: en el prototipo no hay inicio de sesión.</p></div>`, [['ok', 'Cerrar', 'primario']]);
@@ -1005,7 +1016,7 @@ function vPanel(c, r) {
   <div class="cartera">${cartera}</div>
   ${etapasCaso(c, r)}
   <div class="resumen">
-    <button type="button" class="kpi oscuro" data-ruta="titulares" data-filtro=""><span class="eti">${esc(c.nombre)}</span><span class="num">${r.tits}</span><span class="det">titulares con respuesta registrada</span><span class="ir">Ver titulares</span></button>
+    <button type="button" class="kpi destacado" data-ruta="titulares" data-filtro=""><span class="eti">${esc(c.nombre)}</span><span class="num">${r.tits}</span><span class="det">titulares con respuesta registrada</span><span class="ir">Ver titulares</span></button>
     <button type="button" class="kpi" data-ruta="titulares" data-filtro="otorgado"><span class="eti">Autorizaciones vigentes</span><span class="num">${r.vig}</span><span class="det">pares titular–finalidad</span><span class="ir">Ver quiénes</span></button>
     <button type="button" class="kpi" data-ruta="titulares" data-filtro="revocado"><span class="eti">Revocadas</span><span class="num">${r.rev}</span><span class="det">${r.rech} finalidades no autorizadas</span><span class="ir">Ver quiénes</span></button>
     <button type="button" class="kpi" data-ruta="titulares" data-filtro="reconf"><span class="eti">Finalidad nueva sin responder</span><span class="num">${r.reconf.length}</span><span class="det">titulares por consultar</span><span class="ir">Ver quiénes</span></button>
@@ -1017,7 +1028,7 @@ function vPanel(c, r) {
     <div class="caja"><h3>Titulares por situación</h3>${graficoRosca(c)}</div>
   </div>
   <div class="dos">
-    <div class="caja"><h2>Alertas</h2>${alertas || '<p class="nota">Sin alertas.</p>'}</div>
+    <div class="caja"><h2>Alertas</h2>${alertas || '<p class="nota">Sin alertas: el inventario y el registro están al día.</p>'}</div>
     <div class="caja"><h2>Últimos movimientos</h2><ul class="tiempo">${recientes}</ul><button class="btn-txt" data-ruta="bitacora">Ver el registro completo</button></div>
   </div>`;
 }
@@ -1054,20 +1065,20 @@ function graficoEvolucion(c) {
     ${resp.map((v, i) => `<circle cx="${x(i).toFixed(1)}" cy="${y(v).toFixed(1)}" r="3.2" class="g-punto"><title>${meses[i].eti}: ${v} respuesta${v === 1 ? '' : 's'}</title></circle>`).join('')}
     ${revs.map((v, i) => (v ? `<circle cx="${x(i).toFixed(1)}" cy="${y(v).toFixed(1)}" r="3.2" class="g-punto rojo"><title>${meses[i].eti}: ${v} revocación${v === 1 ? '' : 'es'}</title></circle>` : '')).join('')}
     ${meses.map((m, i) => `<text x="${x(i).toFixed(1)}" y="${H - 7}" class="g-eje" text-anchor="middle">${m.eti}</text>`).join('')}
-  </svg><div class="leyenda"><span><i style="background:var(--marca)"></i>Respuestas al formulario</span><span><i style="background:var(--rojo-v)"></i>Revocaciones</span></div>`;
+  </svg><p class="sr-solo">${meses.map((m, i) => `${m.eti}: ${resp[i]} respuestas, ${revs[i]} revocaciones`).join('; ')}.</p><div class="leyenda"><span><i style="background:var(--marca)"></i>Respuestas al formulario</span><span><i style="background:var(--rojo)"></i>Revocaciones</span></div>`;
 }
 function barrasFinalidades(c, r) {
-  const ids = Object.keys(r.porFin); if (!ids.length) return '<p class="nota">Sin respuestas todavía.</p>';
+  const ids = Object.keys(r.porFin); if (!ids.length) return '<p class="nota">Sin respuestas todavía. Aparecerán cuando alguien envíe el formulario.</p>';
   return ids.map((id) => { const v = r.porFin[id], tot = v.otorgado + v.revocado + v.rechazado || 1, nom = (c.rat.find((t) => t.id === id) || {}).nombre || id;
     return `<div class="fin-fila"><div class="cab"><span title="${esc(nom)}"><b>${esc(id)}</b> · ${esc(nom)}</span><span class="cifra">${v.otorgado} de ${tot}</span></div>
-    <div class="barra" title="${v.otorgado} vigentes · ${v.revocado} revocadas · ${v.rechazado} no autorizadas"><i style="width:${(v.otorgado / tot * 100).toFixed(1)}%;background:var(--verde-v)"></i><i style="width:${(v.revocado / tot * 100).toFixed(1)}%;background:var(--rojo-v)"></i><i style="width:${(v.rechazado / tot * 100).toFixed(1)}%;background:#B8B4AA"></i></div></div>`; }).join('')
-    + `<div class="leyenda"><span><i style="background:var(--verde-v)"></i>Vigente</span><span><i style="background:var(--rojo-v)"></i>Revocada</span><span><i style="background:#B8B4AA"></i>No autorizó</span></div>`;
+    <div class="barra" title="${v.otorgado} vigentes · ${v.revocado} revocadas · ${v.rechazado} no autorizadas"><i style="width:${(v.otorgado / tot * 100).toFixed(1)}%;background:var(--verde)"></i><i style="width:${(v.revocado / tot * 100).toFixed(1)}%;background:var(--rojo)"></i><i style="width:${(v.rechazado / tot * 100).toFixed(1)}%;background:#857F72"></i></div></div>`; }).join('')
+    + `<div class="leyenda"><span><i style="background:var(--verde)"></i>Vigente</span><span><i style="background:var(--rojo)"></i>Revocada</span><span><i style="background:#857F72"></i>No autorizó</span></div>`;
 }
 const situacionTit = (c, t) => { const m = Object.values(estados(c, t.id)); return !m.length ? 'sin' : m.some((v) => v.estado === 'otorgado') ? 'vigente' : m.some((v) => v.estado === 'revocado') ? 'revocado' : 'rechazado'; };
 function graficoRosca(c) {
   const cat = { vigente: 0, revocado: 0, rechazado: 0, sin: 0 };
   for (const t of c.titulares) cat[situacionTit(c, t)]++;
-  const total = c.titulares.length, partes = [['vigente', 'Con alguna autorización vigente', 'var(--verde-v)'], ['revocado', 'Retiraron todas', 'var(--rojo-v)'], ['rechazado', 'No autorizaron ninguna', '#B8B4AA'], ['sin', 'Sin respuesta', 'var(--hundido)']];
+  const total = c.titulares.length, partes = [['vigente', 'Con alguna autorización vigente', 'var(--verde)'], ['revocado', 'Retiraron todas', 'var(--rojo)'], ['rechazado', 'No autorizaron ninguna', '#857F72'], ['sin', 'Sin respuesta', 'var(--campo)']];
   const R = 50, ri = 36, cx = 60, cy = 60; let ang = -Math.PI / 2;
   const p = (rad, a) => `${(cx + rad * Math.cos(a)).toFixed(2)},${(cy + rad * Math.sin(a)).toFixed(2)}`;
   const arcos = partes.map(([k, eti, color]) => { const n = cat[k]; if (!n || !total) return ''; const a = n / total * Math.PI * 2, a2 = ang + a, grande = a > Math.PI ? 1 : 0;
@@ -1108,7 +1119,7 @@ function vRat(c) {
     <td data-et="ID consentimiento">${fs.length ? `<span class="mono">C-${esc(t.id)}</span><span class="mini">${fs.map(esc).join(', ')}</span>` : '—'}</td></tr>`; }).join('');
   return `<div class="sec-cab"><div class="sec-tit"><h1>Inventario y RAT</h1><button type="button" class="ayuda" data-ayuda="rat" aria-label="Qué es esta sección" title="Qué es esta sección">?</button></div>
     <div class="fila-btn"><button class="btn primario" data-acc="nuevoTrat">Agregar tratamiento</button><button class="btn" data-acc="csvPlantilla">Exportar a Excel (CSV)</button><label class="btn">Importar CSV<input type="file" accept=".csv,text/csv" id="csvImport" hidden></label></div></div>
-  <div class="tabla-env"><table class="tabla resp"><thead><tr><th>Tratamiento</th><th>Datos</th><th>Base</th><th>¿Pedir consentimiento?</th><th>ID consentimiento</th></tr></thead><tbody>${filas}</tbody></table></div>
+  <div class="tabla-env"><table class="tabla resp"><thead><tr><th scope="col">Tratamiento</th><th scope="col">Datos</th><th scope="col">Base</th><th scope="col">¿Pedir consentimiento?</th><th scope="col">ID consentimiento</th></tr></thead><tbody>${filas}</tbody></table></div>
   <p class="nota">Haz clic en un tratamiento para editarlo. El semáforo es una ayuda para el abogado, no reemplaza su análisis. Cada cambio queda anotado en el registro probatorio.</p>`;
 }
 
@@ -1213,14 +1224,14 @@ function vFormularios(c) {
       <p class="nota">Los cambios en estos datos entran a la política al publicar la siguiente versión.</p></div>
     <div class="caja"><h2>Política de privacidad</h2>
       <p style="margin:0 0 8px">Vigente: <b>v${esc(pol.version)}</b> desde ${fFecha(pol.fecha)} · <span class="huella">huella ${corta(pol.hash)}</span></p>
-      <table class="tabla"><thead><tr><th>Versión</th><th>Publicada</th><th>Huella SHA-256</th></tr></thead><tbody>${c.politicas.slice().reverse().map((p) => `<tr><td>v${esc(p.version)}</td><td>${fFechaHora(p.fecha)}</td><td class="huella">${esc(p.hash)}</td></tr>`).join('')}</tbody></table>
+      <table class="tabla"><thead><tr><th scope="col">Versión</th><th scope="col">Publicada</th><th scope="col">Huella SHA-256</th></tr></thead><tbody>${c.politicas.slice().reverse().map((p) => `<tr><td>v${esc(p.version)}</td><td>${fFechaHora(p.fecha)}</td><td class="huella">${esc(p.hash)}</td></tr>`).join('')}</tbody></table>
       <div class="fila-btn" style="margin-top:12px"><button class="btn" data-acc="nuevaPol">Publicar nueva versión</button><button class="btn-txt" data-acc="verPol">Ver el texto vigente</button></div>
       <p class="nota">El borrador se arma desde el inventario con los puntos del art. 14 ter; MLV lo revisa antes de publicarlo.</p></div></div></div>`;
 }
 function nuevaPolitica() {
   const c = cli(), pol = polVigente(c);
   const sig = (() => { const [a, b] = pol.version.split('.').map(Number); return `${a}.${(b || 0) + 1}`; })();
-  abrirDialogo(`Publicar política v${sig}`, `<p class="nota">Borrador generado desde el inventario actual. Revísalo y ajústalo.</p><label class="campo"><span>Versión</span><input name="version" value="${sig}"></label><label class="campo" style="margin-top:10px"><span>Texto</span><textarea name="texto" style="min-height:340px;font-size:13px">${esc(textoPolitica(c))}</textarea></label>`,
+  abrirDialogo(`Publicar política v${sig}`, `<p class="nota">Borrador generado desde el inventario actual. Revísalo y ajústalo.</p><label class="campo"><span>Versión</span><input name="version" value="${sig}"></label><label class="campo" style="margin-top:10px"><span>Texto</span><textarea name="texto" style="min-height:340px;font-size:var(--t-meta)">${esc(textoPolitica(c))}</textarea></label>`,
     [['cancelar', 'Cancelar'], ['ok', 'Publicar', 'primario']], (f) => { const v = leerForm(f); if (!v.version.trim() || c.politicas.some((p) => p.version === v.version.trim())) { alert('Esa versión ya existe.'); return false; } publicarPolitica(c, v.version.trim(), v.texto); render(); });
 }
 function verPolitica(c, p = polVigente(c)) {
@@ -1240,9 +1251,9 @@ function vTitulares(c) {
     ${fins.map((id) => `<td data-et="${esc(id)}">${m[id] ? chipEstado(m[id].estado) : chip('gris', '—')}</td>`).join('')}
     <td data-et="Última respuesta">${u ? fFecha(u.fecha) + `<span class="mini">política v${esc(u.det.politica.version)}</span>` : '—'}${rc ? ' ' + chip('ambar', 'Finalidad nueva') : ''}</td></tr>`; }).join('');
   return `<div class="sec-cab"><div class="sec-tit"><h1>Titulares</h1><button type="button" class="ayuda" data-ayuda="titulares" aria-label="Qué es esta sección" title="Qué es esta sección">?</button></div>
-    <input type="search" id="buscarTit" placeholder="Buscar por nombre o RUT" value="${esc(filtroTit)}" style="min-width:260px"></div>
+    <input type="search" id="buscarTit" aria-label="Buscar titular por nombre o RUT" placeholder="Buscar por nombre o RUT" value="${esc(filtroTit)}" style="min-width:260px"></div>
   ${filtros}
-  <div class="tabla-env"><table class="tabla resp"><thead><tr><th>Titular</th>${fins.map((id) => `<th title="${esc((c.rat.find((t) => t.id === id) || {}).nombre)}">${esc(id)}</th>`).join('')}<th>Última respuesta</th></tr></thead><tbody>${filas || `<tr><td colspan="9"><div class="vacio">Sin titulares con ese filtro. <button class="btn-txt" data-ftr="">Ver todos</button></div></td></tr>`}</tbody></table></div>
+  <div class="tabla-env"><table class="tabla resp"><thead><tr><th scope="col">Titular</th>${fins.map((id) => `<th scope="col" title="${esc((c.rat.find((t) => t.id === id) || {}).nombre)}">${esc(id)}</th>`).join('')}<th scope="col">Última respuesta</th></tr></thead><tbody>${filas || `<tr><td colspan="9"><div class="vacio">Ningún titular coincide con este filtro. <button class="btn-txt" data-ftr="">Ver todos los titulares</button></div></td></tr>`}</tbody></table></div>
   <p class="nota">${fins.map((id) => `<b>${esc(id)}</b> ${esc((c.rat.find((t) => t.id === id) || {}).nombre)}`).join(' · ')}</p>`;
 }
 function vFicha(c, t) {
@@ -1252,7 +1263,7 @@ function vFicha(c, t) {
   <div class="sec-cab"><div><h1>${esc(t.nombre)}</h1><p>${esc(t.rut)} · ${esc(TITULARES[t.relacion] || '')} · ${esc(t.correo)} · código de comprobante <span class="mono">${esc(t.codigo)}</span></p></div>
     <div class="fila-btn"><button class="btn" data-acc="revocarOtro">Anotar revocación recibida por otro medio</button><button class="btn" data-acc="descExpediente">Descargar expediente</button><button class="btn primario" data-expediente="${esc(t.id)}">Imprimir o guardar en PDF</button></div></div>
   ${rc ? `<div class="alerta ambar">El formulario agregó ${rc.faltan.map(esc).join(', ')} después de su respuesta (dada con la política v${esc(rc.version)}). Hay que pedirle esa autorización aparte; lo que ya autorizó sigue vigente.</div>` : ''}
-  <div class="dos"><div class="caja"><h2>Finalidades</h2><table class="tabla"><thead><tr><th>Finalidad</th><th>Estado</th><th>Desde</th></tr></thead><tbody>${Object.entries(m).map(([id, v]) => `<tr><td>${esc(id)} · ${esc((c.rat.find((x) => x.id === id) || {}).nombre)}</td><td>${chipEstado(v.estado)}</td><td>${fFechaHora((v.rev || v.ev).fecha)}</td></tr>`).join('')}</tbody></table></div>
+  <div class="dos"><div class="caja"><h2>Finalidades</h2><table class="tabla"><thead><tr><th scope="col">Finalidad</th><th scope="col">Estado</th><th scope="col">Desde</th></tr></thead><tbody>${Object.entries(m).map(([id, v]) => `<tr><td>${esc(id)} · ${esc((c.rat.find((x) => x.id === id) || {}).nombre)}</td><td>${chipEstado(v.estado)}</td><td>${fFechaHora((v.rev || v.ev).fecha)}</td></tr>`).join('')}</tbody></table></div>
   <div class="caja"><h2>Historial</h2><ul class="tiempo">${evs.map((e) => `<li class="${e.tipo === 'revocacion' ? 'revoca' : ''}"><div class="cuando">${fFechaHora(e.fecha)} · anotación N° ${e.n}</div>${describir(c, e)}${e.tipo === 'consentimiento' ? `<div class="mini">Política ${e.det.lectura.alFinal ? 'leída hasta el final' : 'abierta, sin llegar al final'} · ${e.det.lectura.segundos} s en pantalla · ${esc(e.det.canal)}</div>` : ''}<div class="huella">${esc(e.hash)}</div></li>`).join('')}</ul></div></div>`;
 }
 
@@ -1271,11 +1282,11 @@ function vBitacora(c, r) {
   const filtros = `<div class="filtros" role="group" aria-label="Filtrar el registro">${TIPOS_F.map(([k, e]) => `<button type="button" data-ftrb="${k}" aria-pressed="${k === filtroBitTipo}">${e}</button>`).join('')}${filtroBit || filtroBitTipo ? `<span class="mini" style="display:inline-flex;align-items:center;margin-left:4px">${visibles.length} de ${eventos.length}</span>` : ''}</div>`;
   const filas = visibles.slice().reverse().map((e) => `<tr class="${roto && e.n >= roto ? 'mal' : ''}"><td data-et="N°">${e.n}</td><td data-et="Fecha">${fFechaHora(e.fecha)}</td><td data-et="Tipo">${esc(TIPOS[e.tipo] || e.tipo)}</td><td class="cab" data-et="Anotación">${describir(c, e)}</td><td data-et="Huella"><span class="huella" title="Anterior: ${esc(e.prev)}">${esc(e.hash.slice(0, 24))}…</span></td></tr>`).join('');
   return `<div class="sec-cab"><div class="sec-tit"><h1>Registro probatorio</h1><button type="button" class="ayuda" data-ayuda="bitacora" aria-label="Qué es esta sección" title="Qué es esta sección">?</button></div>
-    <div class="fila-btn"><input type="search" id="buscarBit" placeholder="Buscar en el registro" value="${esc(filtroBit)}" style="min-width:220px"><button class="btn" data-acc="verificar">Verificar la cadena</button><button class="btn" data-acc="${simulacion ? 'finSim' : 'simular'}">${simulacion ? 'Terminar la simulación' : 'Simular una alteración'}</button><button class="btn" data-acc="descCadena">Descargar el registro (JSON)</button></div></div>
+    <div class="fila-btn"><input type="search" id="buscarBit" aria-label="Buscar en el registro" placeholder="Buscar en el registro" value="${esc(filtroBit)}" style="min-width:220px"><button class="btn" data-acc="verificar">Verificar la cadena</button><button class="btn" data-acc="${simulacion ? 'finSim' : 'simular'}">${simulacion ? 'Terminar la simulación' : 'Simular una alteración'}</button><button class="btn" data-acc="descCadena">Descargar el registro (JSON)</button></div></div>
   <div class="fila-btn" style="margin-bottom:12px">${corte}</div>
   ${banda}${filtros}
   ${simulacion ? `<div class="alerta rojo"><b>Simulación:</b> se cambió la anotación N° ${simulacion.n} (${esc(simulacion.que)}) sin tocar las huellas. La verificación falla desde la N° ${roto}. Nada de esto se guardó.</div>` : roto ? `<div class="alerta rojo">La cadena está rota desde la anotación N° ${roto}.</div>` : `<div class="alerta verde"><b>Cadena íntegra:</b> ${eventos.length} anotaciones verificadas. Huella de cierre: <span class="huella">${esc(eventos[eventos.length - 1].hash)}</span></div>`}
-  <div class="tabla-env"><table class="tabla resp"><thead><tr><th>N°</th><th>Fecha</th><th>Tipo</th><th>Anotación</th><th>Huella</th></tr></thead><tbody>${filas || `<tr><td colspan="5"><div class="vacio">Ninguna anotación coincide. <button class="btn-txt" data-ftrb="">Ver todo</button></div></td></tr>`}</tbody></table></div>
+  <div class="tabla-env"><table class="tabla resp"><thead><tr><th scope="col">N°</th><th scope="col">Fecha</th><th scope="col">Tipo</th><th scope="col">Anotación</th><th scope="col">Huella</th></tr></thead><tbody>${filas || `<tr><td colspan="5"><div class="vacio">Ninguna anotación coincide con la búsqueda. <button class="btn-txt" data-ftrb="">Ver todo el registro</button></div></td></tr>`}</tbody></table></div>
   <p class="nota">En la versión con servidor, la huella de cierre de cada día se sella con un tercero (sello de tiempo) para probar además que nada se reescribió completo después. Los nombres y RUT no van dentro de la cadena: se guarda su huella, así una persona puede pedir la supresión de sus datos sin romper la prueba.</p>`;
 }
 
@@ -1304,10 +1315,10 @@ function vFiscal(c, r) {
   const leidas = consents.filter((e) => e.det.lectura.alFinal).length;
   const prom = consents.length ? Math.round(consents.reduce((s, e) => s + e.det.lectura.segundos, 0) / consents.length) : 0;
   const finIds = Object.keys(r.porFin);
-  const barras = finIds.map((id) => { const v = r.porFin[id], tot = v.otorgado + v.revocado + v.rechazado || 1; return `<div style="margin-bottom:11px"><div style="display:flex;justify-content:space-between;font-size:13.5px"><span>${esc(id)} · ${esc((c.rat.find((t) => t.id === id) || {}).nombre)}</span><span class="mini">${tot}</span></div>
-    <div class="barra"><i style="width:${v.otorgado / tot * 100}%;background:var(--verde)"></i><i style="width:${v.revocado / tot * 100}%;background:var(--rojo)"></i><i style="width:${v.rechazado / tot * 100}%;background:#b8b4aa"></i></div></div>`; }).join('');
+  const barras = finIds.map((id) => { const v = r.porFin[id], tot = v.otorgado + v.revocado + v.rechazado || 1; return `<div style="margin-bottom:11px"><div style="display:flex;justify-content:space-between;font-size:var(--t-base)"><span>${esc(id)} · ${esc((c.rat.find((t) => t.id === id) || {}).nombre)}</span><span class="mini">${tot}</span></div>
+    <div class="barra"><i style="width:${v.otorgado / tot * 100}%;background:var(--verde)"></i><i style="width:${v.revocado / tot * 100}%;background:var(--rojo)"></i><i style="width:${v.rechazado / tot * 100}%;background:#857F72"></i></div></div>`; }).join('');
   const accesos = c.eventos.filter((e) => e.tipo === 'acceso').slice().reverse();
-  return `<div class="fisc-banda"><div><div class="mini">Acceso de solo lectura · ${esc(a.organismo)}</div><b style="font-size:18px">${esc(c.nombre)}</b><div class="mini">RUT ${esc(c.rut)} · ${esc(a.nombre)} · vigente del ${fFecha(a.desde)} al ${fFecha(a.hasta)}</div></div>
+  return `<div class="fisc-banda"><div><div class="mini">Acceso de solo lectura · ${esc(a.organismo)}</div><b style="font-size:var(--t-h2)">${esc(c.nombre)}</b><div class="mini">RUT ${esc(c.rut)} · ${esc(a.nombre)} · vigente del ${fFecha(a.desde)} al ${fFecha(a.hasta)}</div></div>
     <div class="estado"><span class="semaforo ${r.roto ? 'mal' : ''}"></span><div><b>${r.roto ? 'Registro alterado desde N° ' + r.roto : 'Registro íntegro'}</b><div class="mini">${c.eventos.length} anotaciones encadenadas · verificado ${fFechaHora(ahora())}</div></div></div></div>
   <div class="resumen">
     <div class="kpi"><div class="eti">Titulares con respuesta</div><div class="num">${r.tits}</div></div>
@@ -1318,13 +1329,13 @@ function vFiscal(c, r) {
   </div>
   <div class="fisc-grid">
     <div class="caja"><h3>Responsable (art. 14 ter b y c)</h3><dl class="dl"><dt>Razón social</dt><dd>${esc(c.nombre)}</dd><dt>RUT</dt><dd>${esc(c.rut)}</dd><dt>Representante</dt><dd>${esc(c.representante)}</dd><dt>Domicilio</dt><dd>${esc(c.domicilio)}</dd><dt>Canal de derechos</dt><dd>${esc(c.correo)}</dd></dl></div>
-    <div class="caja"><h3>Política de privacidad (art. 14 ter a)</h3><table class="tabla"><thead><tr><th>Versión</th><th>Desde</th><th>Huella</th></tr></thead><tbody>${c.politicas.slice().reverse().map((p) => `<tr><td><button class="btn-txt" data-verpol="${esc(p.version)}">v${esc(p.version)}</button></td><td>${fFecha(p.fecha)}</td><td class="huella">${corta(p.hash)}</td></tr>`).join('')}</tbody></table></div>
+    <div class="caja"><h3>Política de privacidad (art. 14 ter a)</h3><table class="tabla"><thead><tr><th scope="col">Versión</th><th scope="col">Desde</th><th scope="col">Huella</th></tr></thead><tbody>${c.politicas.slice().reverse().map((p) => `<tr><td><button class="btn-txt" data-verpol="${esc(p.version)}">v${esc(p.version)}</button></td><td>${fFecha(p.fecha)}</td><td class="huella">${corta(p.hash)}</td></tr>`).join('')}</tbody></table></div>
     <div class="caja"><h3>Consentimientos por finalidad</h3>${barras || '<p class="nota">Sin datos.</p>'}<div class="leyenda"><span><i style="background:var(--verde)"></i>vigente</span><span><i style="background:var(--rojo)"></i>revocado</span><span><i style="background:#b8b4aa"></i>no autorizó</span></div></div>
   </div>
-  <div class="caja"><h3>Tratamientos y bases de licitud (art. 14 ter d)</h3><div class="tabla-env"><table class="tabla resp"><thead><tr><th>Tratamiento</th><th>Titulares</th><th>Base</th><th>Conservación</th></tr></thead><tbody>${c.rat.map((t) => `<tr><td class="cab" data-et="Tratamiento">${esc(t.id)} · ${esc(t.nombre)}</td><td data-et="Titulares">${esc(TITULARES[t.titulares] || '')}</td><td data-et="Base">${esc(BASES[t.base])}</td><td data-et="Conservación">${esc(t.conservacion)}</td></tr>`).join('')}</tbody></table></div></div>
+  <div class="caja"><h3>Tratamientos y bases de licitud (art. 14 ter d)</h3><div class="tabla-env"><table class="tabla resp"><thead><tr><th scope="col">Tratamiento</th><th scope="col">Titulares</th><th scope="col">Base</th><th scope="col">Conservación</th></tr></thead><tbody>${c.rat.map((t) => `<tr><td class="cab" data-et="Tratamiento">${esc(t.id)} · ${esc(t.nombre)}</td><td data-et="Titulares">${esc(TITULARES[t.titulares] || '')}</td><td data-et="Base">${esc(BASES[t.base])}</td><td data-et="Conservación">${esc(t.conservacion)}</td></tr>`).join('')}</tbody></table></div></div>
   <div class="dos" style="margin-top:16px">
     <div class="caja" id="fiscConsulta"><h3>Consulta por titular (art. 12 inc. 8)</h3><p class="nota" style="margin-top:0">Escriba el RUT de la persona para ver la prueba de su consentimiento.</p>
-      <div class="fila-btn"><input id="fiscRut" placeholder="12.345.678-5" value="${esc(fiscConsulta)}"><button class="btn primario" data-acc="fiscBuscar">Consultar</button></div>
+      <div class="fila-btn"><input id="fiscRut" aria-label="RUT del titular a consultar" placeholder="12.345.678-5" value="${esc(fiscConsulta)}"><button class="btn primario" data-acc="fiscBuscar">Consultar</button></div>
       <p class="nota">Para probar: ${c.titulares.slice(0, 3).map((t) => `<button class="btn-txt" data-rutdemo="${esc(t.rut)}">${esc(t.rut)}</button>`).join(' · ')}</p>
       ${fiscExp ? expedienteHtml(c, fiscExp, true) : ''}</div>
     <div class="caja"><h3>Integridad y descargas</h3><p>Cada anotación incluye la huella de la anterior; cualquier cambio rompe la cadena. El fiscalizador puede descargar el registro completo y verificarlo por su cuenta con cualquier programa SHA-256.</p>
@@ -1336,8 +1347,8 @@ function expedienteHtml(c, t, enPantalla) {
   const m = estados(c, t.id), evs = c.eventos.filter((e) => e.titular === t.id);
   const ok = !verificar(c.eventos);
   return `<div style="margin-top:14px"><h3>${esc(t.nombre)} · ${esc(t.rut)}</h3>
-    <table class="tabla"><thead><tr><th>Finalidad</th><th>Estado</th><th>Otorgado</th><th>Política</th><th>Revocado</th></tr></thead><tbody>${Object.entries(m).map(([id, v]) => `<tr><td>${esc(id)} · ${esc((c.rat.find((x) => x.id === id) || {}).nombre)}</td><td>${enPantalla ? chipEstado(v.estado) : esc(v.estado)}</td><td>${fFechaHora(v.ev.fecha)}</td><td>v${esc(v.version)}</td><td>${v.rev ? fFechaHora(v.rev.fecha) + ' · ' + esc(v.rev.det.canal) : '—'}</td></tr>`).join('')}</tbody></table>
-    <h3 style="margin-top:14px">Anotaciones</h3><table class="tabla"><thead><tr><th>N°</th><th>Fecha</th><th>Detalle</th></tr></thead><tbody>${evs.map((e) => `<tr><td>${e.n}</td><td>${fFechaHora(e.fecha)}</td><td>${describir(c, e)}${e.tipo === 'consentimiento' ? `<br><span class="mini">Política v${esc(e.det.politica.version)} (huella ${corta(e.det.politica.hash)}) · ${e.det.lectura.alFinal ? 'leída hasta el final' : 'abierta, sin llegar al final'} · ${e.det.lectura.segundos} s · declaró haberla leído: ${e.det.lectura.declarada ? 'sí' : 'no'} · canal: ${esc(e.det.canal)} · casillas sin marcar por defecto</span>` : ''}<br><span class="huella">anterior ${esc(e.prev)}<br>esta ${esc(e.hash)}</span></td></tr>`).join('')}</tbody></table>
+    <table class="tabla"><thead><tr><th scope="col">Finalidad</th><th scope="col">Estado</th><th scope="col">Otorgado</th><th scope="col">Política</th><th scope="col">Revocado</th></tr></thead><tbody>${Object.entries(m).map(([id, v]) => `<tr><td>${esc(id)} · ${esc((c.rat.find((x) => x.id === id) || {}).nombre)}</td><td>${enPantalla ? chipEstado(v.estado) : esc(v.estado)}</td><td>${fFechaHora(v.ev.fecha)}</td><td>v${esc(v.version)}</td><td>${v.rev ? fFechaHora(v.rev.fecha) + ' · ' + esc(v.rev.det.canal) : '—'}</td></tr>`).join('')}</tbody></table>
+    <h3 style="margin-top:14px">Anotaciones</h3><table class="tabla"><thead><tr><th scope="col">N°</th><th scope="col">Fecha</th><th scope="col">Detalle</th></tr></thead><tbody>${evs.map((e) => `<tr><td>${e.n}</td><td>${fFechaHora(e.fecha)}</td><td>${describir(c, e)}${e.tipo === 'consentimiento' ? `<br><span class="mini">Política v${esc(e.det.politica.version)} (huella ${corta(e.det.politica.hash)}) · ${e.det.lectura.alFinal ? 'leída hasta el final' : 'abierta, sin llegar al final'} · ${e.det.lectura.segundos} s · declaró haberla leído: ${e.det.lectura.declarada ? 'sí' : 'no'} · canal: ${esc(e.det.canal)} · casillas sin marcar por defecto</span>` : ''}<br><span class="huella">anterior ${esc(e.prev)}<br>esta ${esc(e.hash)}</span></td></tr>`).join('')}</tbody></table>
     <p class="nota">Cadena ${ok ? 'íntegra' : 'alterada'} al ${fFechaHora(ahora())}. Huella de identidad del titular: <span class="huella">${esc(identidadHash(t))}</span></p>
     ${enPantalla ? `<button class="btn primario" data-expediente="${esc(t.id)}">Imprimir o guardar en PDF</button>` : ''}</div>`;
 }
@@ -1350,7 +1361,7 @@ function copiarTexto(texto, mensaje) {
 // Documento HTML autocontenido (se abre en cualquier navegador y se puede guardar o imprimir).
 function documentoHtml(titulo, c, cuerpo) {
   return `<!doctype html><html lang="es"><head><meta charset="utf-8"><title>${esc(titulo)}</title>
-<style>body{font:11.5pt/1.45 -apple-system,Segoe UI,Inter,Arial,sans-serif;color:#111;max-width:820px;margin:28px auto;padding:0 20px}h1{font-size:19pt;margin:0 0 4pt}h2,h3{font-size:13pt;margin:14pt 0 5pt}table{width:100%;border-collapse:collapse;font-size:9.5pt}th,td{text-align:left;padding:5px 7px;border-bottom:1px solid #D5DAE0;vertical-align:top}th{font-size:8.5pt;text-transform:uppercase;letter-spacing:.04em;color:#555}.mini,.nota{font-size:9pt;color:#555}.huella,.mono{font-family:ui-monospace,Consolas,monospace;font-size:8.5pt;word-break:break-all}.codigo{font-family:ui-monospace,Consolas,monospace;font-size:22pt;letter-spacing:.08em;margin:6px 0}.marca{display:flex;align-items:center;gap:10px;margin-bottom:14px}.sello{display:inline-grid;place-items:center;width:38px;height:38px;border-radius:50%;color:#fff;font-weight:700;font-size:13px}@media print{body{margin:0}}</style></head>
+<style>body{font:11.5pt/1.45 -apple-system,Segoe UI,Inter,Arial,sans-serif;color:#111;max-width:820px;margin:28px auto;padding:0 20px}h1{font-size:19pt;margin:0 0 4pt}h2,h3{font-size:13pt;margin:14pt 0 5pt}table{width:100%;border-collapse:collapse;font-size:9.5pt}th,td{text-align:left;padding:5px 7px;border-bottom:1px solid #D5DAE0;vertical-align:top}th{font-size:8.5pt;text-transform:uppercase;letter-spacing:.04em;color:#555}.mini,.nota{font-size:9pt;color:#555}.huella,.mono{font-family:ui-monospace,Consolas,monospace;font-size:8.5pt;word-break:break-all}.codigo{font-family:ui-monospace,Consolas,monospace;font-size:22pt;letter-spacing:.08em;margin:6px 0}.marca{display:flex;align-items:center;gap:10px;margin-bottom:14px}.sello{display:inline-grid;place-items:center;width:38px;height:38px;border-radius:50%;color:#fff;font-weight:700;font-size:var(--t-meta)}@media print{body{margin:0}}</style></head>
 <body><div class="marca"><span class="sello" style="background:${esc(c.color)}">${esc(c.sigla)}</span><div><b>${esc(c.nombre)}</b><div class="mini">RUT ${esc(c.rut)} · emitido el ${fFechaHora(ahora())} desde la plataforma de MLV Abogados (prototipo, datos ficticios)</div></div></div>
 ${cuerpo}</body></html>`;
 }
@@ -1363,12 +1374,12 @@ function descargarComprobante(c, e) {
 <p class="huella">Huella del registro: ${esc(e.hash)}</p>
 <p class="nota">Puede retirar su autorización cuando quiera, gratis y por el mismo medio, con su RUT y este código (art. 12 inc. 4 y 5, Ley 19.628 modificada por la Ley 21.719).</p>`;
   descargar(`comprobante-${e.det.comprobante}.html`, documentoHtml('Comprobante de consentimiento', c, cuerpo), 'text/html;charset=utf-8');
-  aviso('Comprobante descargado');
+  aviso('Comprobante descargado como archivo');
 }
 function descargarExpediente(tid) {
   const c = cli(), t = c.titulares.find((x) => x.id === tid); if (!t) return;
   descargar(`expediente-${t.id}.html`, documentoHtml(`Expediente de consentimiento · ${t.nombre}`, c, `<h1>Expediente de consentimiento</h1>${expedienteHtml(c, t, false)}`), 'text/html;charset=utf-8');
-  aviso('Expediente descargado');
+  aviso('Expediente descargado como archivo');
 }
 function imprimirExpediente(tid) {
   const c = cli(), t = c.titulares.find((x) => x.id === tid);
@@ -1409,7 +1420,7 @@ function pintarTitular() {
       <label class="campo"><span>RUT</span><input id="tRut" value="${esc(T.rut)}" placeholder="12.345.678-5" autocomplete="off"></label>
       <label class="campo"><span>Correo para recibir el comprobante</span><input id="tCorreo" value="${esc(T.correo)}" type="email" autocomplete="off"></label></div>
       <p class="nota" id="tErr" style="color:var(--rojo)"></p>
-      <div class="fila-btn"><button class="t-btn" data-t="paso2">Continuar</button><button class="t-btn sec" data-t="relleno">Rellenar con datos ficticios</button></div>`;
+      <div class="fila-btn"><button class="t-btn" data-t="paso2">Continuar</button><button class="t-link" data-t="relleno">Rellenar con datos ficticios (demo)</button></div>`;
     if (T.paso === 2) cuerpo = `${pasos}<h2>Política de privacidad</h2><p class="lead">Versión ${esc(pol.version)}, vigente desde el ${fFecha(pol.fecha)}. Léala antes de decidir.</p>
       <div class="pol-caja" id="polCaja" tabindex="0">${polHtml(pol.texto)}</div>
       <div class="pol-avance" id="polAvance">${T.pol.alFinal ? '✓ Llegó al final del texto.' : 'Desplácese para leer el texto completo.'}</div>
@@ -1468,7 +1479,7 @@ function accionTitular(k, el) {
     case 'relleno': { const n = NOMBRES[Math.floor(Math.random() * NOMBRES.length)].split(' '); const nom = `${['Daniela', 'Pablo', 'Carolina', 'Andrés', 'Paula', 'Rodrigo'][Math.floor(Math.random() * 6)]} ${n[1]} ${n[2]}`; T.nombre = nom; T.rut = fmtRut(10000000 + Math.floor(Math.random() * 12000000)); T.correo = norm(nom).split(' ').slice(0, 2).join('.') + '@correo.ejemplo'; break; }
     case 'paso1': pararReloj(); T.paso = 1; break;
     case 'paso2': {
-      if (T.paso === 1) { leer1(); const rut = limpiarRut(T.rut); const err = !T.nombre.trim() ? 'Escriba su nombre.' : !rut ? 'El RUT no es válido.' : !/^\S+@\S+\.\S+$/.test(T.correo) ? 'Revise el correo.' : ''; if (err) { $('tErr').textContent = err; return; } T.rut = rut; }
+      if (T.paso === 1) { leer1(); const rut = limpiarRut(T.rut); const err = !T.nombre.trim() ? 'Escriba su nombre completo.' : !rut ? 'El RUT no es válido. Revise el dígito verificador (ejemplo: 12.345.678-5).' : !/^\S+@\S+\.\S+$/.test(T.correo) ? 'El correo no tiene el formato esperado (ejemplo: nombre@empresa.cl).' : ''; if (err) { $('tErr').textContent = err; return; } T.rut = rut; }
       T.paso = 2; break;
     }
     case 'paso3': pararReloj(); T.paso = 3; break;
@@ -1489,7 +1500,7 @@ function accionTitular(k, el) {
     case 'revBuscar': {
       T.rev.rut = $('rRut').value; T.rev.cod = $('rCod').value;
       const rut = limpiarRut(T.rev.rut), t = c.titulares.find((x) => x.rut === rut);
-      if (!t || t.codigo !== T.rev.cod.trim().toUpperCase()) { T.rev.error = 'El RUT y el código no coinciden.'; break; }
+      if (!t || t.codigo !== T.rev.cod.trim().toUpperCase()) { T.rev.error = 'El RUT y el código no coinciden. Revise el comprobante que recibió al autorizar.'; break; }
       T.rev.tit = t; T.rev.error = ''; T.rev.sel = {}; break;
     }
     case 'revocar': { const ids = Object.keys(T.rev.sel).filter((k2) => T.rev.sel[k2]); if (!ids.length) return; T.rev.hecho = revocar(c, T.rev.tit, ids, 'Formulario web (mismo medio)'); guardar(); break; }
@@ -1526,7 +1537,7 @@ document.addEventListener('click', (ev) => {
   if (d.verpol) { verPolitica(c, c.politicas.find((p) => p.version === d.verpol)); return; }
   if (d.rutdemo) { $('fiscRut').value = d.rutdemo; return; }
   if (d.usuario) { dialogoUsuario(d.usuario); return; }
-  if (d.ayuda) { abrirDialogo(el.closest('.sec-tit').querySelector('h1').textContent, `<p style="font-size:14.5px;line-height:1.55;margin:0">${AYUDA[d.ayuda] || ''}</p>`, [['ok', 'Entendido', 'primario']]); return; }
+  if (d.ayuda) { abrirDialogo(el.closest('.sec-tit').querySelector('h1').textContent, `<p style="font-size:var(--t-lead);line-height:1.55;margin:0">${AYUDA[d.ayuda] || ''}</p>`, [['ok', 'Entendido', 'primario']]); return; }
   switch (d.acc) {
     case 'reiniciar': if (confirm('¿Borrar los cambios y volver a los datos de ejemplo?')) { db = semilla(); fichaId = null; render(); } break;
     case 'recorrido': irPaso(0); break;
@@ -1564,7 +1575,7 @@ document.addEventListener('click', (ev) => {
       fiscConsulta = $('fiscRut').value; const rut = limpiarRut(fiscConsulta), t = c.titulares.find((x) => x.rut === rut);
       fiscExp = t || null;
       if (t) registrar(c, 'acceso', { quien: c.accesoFiscal.nombre, accion: `Consultó el expediente de ${t.id}` });
-      else alert(rut ? 'No hay registros para ese RUT.' : 'El RUT no es válido.');
+      else alert(rut ? 'No hay registros para ese RUT en este cliente.' : 'El RUT no es válido.');
       render(); break;
     }
     default: break;
@@ -1645,7 +1656,7 @@ function pintarPaleta() {
   paletaIdx = Math.min(paletaIdx, Math.max(0, paletaOps.length - 1));
   $('paletaLista').innerHTML = paletaOps.length
     ? paletaOps.map((o, i) => `<li role="option" data-pi="${i}" aria-selected="${i === paletaIdx}"><span class="g">${esc(o.grupo)}</span><span class="t">${esc(o.titulo)}<span class="s">${esc(o.sub)}</span></span></li>`).join('')
-    : '<li class="vacio-p">Nada coincide. Prueba con un nombre, un RUT, «T-03» o «fiscalizador».</li>';
+    : '<li class="vacio-p">Sin resultados. Pruebe con un nombre, un RUT, «T-03» o «fiscalizador».</li>';
   const sel = $('paletaLista').querySelector('[aria-selected="true"]'); if (sel) sel.scrollIntoView({ block: 'nearest' });
 }
 function abrirPaleta() { const p = $('paleta'); if (p.open) return; $('paletaInput').value = ''; paletaIdx = 0; pintarPaleta(); p.showModal(); $('paletaInput').focus(); }
