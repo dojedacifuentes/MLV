@@ -807,7 +807,7 @@ function aplicarTema(t) { document.documentElement.dataset.tema = t; try { local
 let avisoTemp = null;
 function aviso(texto) {
   const el = $('avisoFlot'); el.innerHTML = `${ICONOS.check}<span>${esc(texto)}</span>`; el.classList.add('ver');
-  clearTimeout(avisoTemp); avisoTemp = setTimeout(() => el.classList.remove('ver'), 2600);
+  clearTimeout(avisoTemp); avisoTemp = setTimeout(() => el.classList.remove('ver'), 5000);
 }
 let ultimoRegistro = { id: null, n: 0 };
 
@@ -820,21 +820,25 @@ function simularAlteracion(c) {
   simulacion = { eventos: copia, n: obj.n, que: obj.tipo === 'revocacion' ? 'se corrió un mes la fecha de una revocación' : 'se cambió la hora' };
 }
 
-/* ───────── Recorrido guiado (siete pasos por la plataforma) ───────── */
+/* ───────── Recorrido guiado (ocho pasos por la plataforma, siguiendo a una misma persona) ───────── */
+// La protagonista del recorrido: el formulario se rellena con ella, la ficha la muestra y el fiscalizador consulta su expediente.
+const PROTAGONISTA = { nombre: 'Camila Rojas Fuentes', rut: fmtRut(17654321), correo: 'camila.rojas@correo.ejemplo' };
+const protagonista = (c) => c.titulares.find((t) => t.rut === PROTAGONISTA.rut) || c.titulares[2];
 const RECORRIDO = [
   { t: 'Un panel por cliente', x: 'MLV ve a todos sus clientes en un lugar: consentimientos vigentes, revocados, versión de la política y si el registro está íntegro. Las alertas dicen qué hay que arreglar.', foco: '.cartera', ir: () => { modo = 'mlv'; ruta = 'panel'; } },
   { t: 'El inventario manda', x: 'Cada tratamiento con su base legal. El semáforo dice si corresponde pedir consentimiento: verde sí, gris se informa en la política, ámbar revisar, rojo no sirve aunque se pida. T-07 es salud de trabajadores: prohibido con consentimiento (art. 16 bis inc. 3).', foco: '[data-trat="T-07"]', ir: () => { modo = 'mlv'; ruta = 'rat'; } },
   { t: 'El semáforo cambia mientras escribes', x: 'Abre T-03 (huella digital). Marca «Una ley lo exige» o cambia la base y mira cómo cambia el veredicto y sus razones. Cierra el editor para seguir.', foco: '[data-trat="T-03"]', ir: () => { modo = 'mlv'; ruta = 'rat'; } },
-  { t: 'Lo que ve el trabajador', x: 'La marca es la del cliente, no la de MLV. Prueba: «Rellenar con datos ficticios», lee la política hasta el final, marca una casilla y envía. Recibirás un comprobante con código.', foco: '.t-cuerpo', ir: () => { modo = 'titular'; iniciarTitular(); } },
+  { t: 'Lo que ve la trabajadora', x: 'La marca es la del cliente, no la de MLV. Camila Rojas, trabajadora de la empresa, ya tiene sus datos puestos: pulsa «Continuar», lee la política hasta el final, marca una casilla y envía. Recibirá un comprobante con código.', foco: '.t-cuerpo', ir: () => { modo = 'titular'; iniciarTitular(); Object.assign(T, PROTAGONISTA); } },
+  { t: 'La misma persona, vista por MLV', x: () => (protagonista(cli()).rut === PROTAGONISTA.rut ? 'Lo que Camila acaba de decidir ya está en su ficha: qué autorizó, qué no, con qué versión de la política y cuánto la leyó.' : 'Camila no envió su respuesta, así que mostramos la ficha de otra trabajadora: qué autorizó, qué no, con qué versión de la política y cuánto la leyó.') + ' Desde aquí se anota una revocación recibida por otro medio o se descarga su expediente.', foco: '.sec-cab', ir: () => { const c = cli(); modo = 'mlv'; ruta = 'titulares'; const t = protagonista(c); fichaId = t ? t.id : null; } },
   { t: 'Una cadena que delata cambios', x: 'Cada anotación lleva la huella de la anterior. Acabamos de simular que alguien corrió un mes la fecha de una revocación: la verificación falla desde ahí y las filas afectadas quedan en rojo. Nada se guardó.', foco: '.alerta.rojo', ir: () => { modo = 'mlv'; ruta = 'bitacora'; simularAlteracion(cli()); } },
-  { t: 'Lo que ve la Agencia', x: 'Acceso de solo lectura con vencimiento. Ya consultamos el expediente de una persona: finalidades, política que vio, lectura medida, huellas. Cada consulta del fiscalizador queda anotada.', foco: '#fiscConsulta', ir: () => { const c = cli(); modo = 'fiscal'; const t = c.titulares[2]; fiscConsulta = t.rut; fiscExp = t; registrar(c, 'acceso', { quien: c.accesoFiscal.nombre, accion: `Consultó el expediente de ${t.id} (recorrido guiado)` }); } },
+  { t: 'Lo que ve la Agencia', x: 'Acceso de solo lectura con vencimiento. El fiscalizador consulta el expediente de la misma Camila: finalidades, política que vio, lectura medida, huellas. Cada consulta queda anotada.', foco: '#fiscConsulta', ir: () => { const c = cli(); modo = 'fiscal'; const t = protagonista(c); fiscConsulta = t.rut; fiscExp = t; registrar(c, 'acceso', { quien: c.accesoFiscal.nombre, accion: `Consultó el expediente de ${t.id} (recorrido guiado)` }); } },
   { t: 'Eso es la plataforma', x: 'Inventario, política, formulario, registro probatorio, revocación y fiscalizador: un solo flujo. En producción se agregan cuentas con doble factor, servidor en Chile, comprobantes por correo y sello de tiempo diario.', foco: '.resumen', ir: () => { modo = 'mlv'; ruta = 'panel'; } },
 ];
 let pasoRec = -1, focoTemp = null;
 function irPaso(i) {
   pasoRec = i; simulacion = null; fichaId = null;
   document.querySelectorAll('.foco-rec').forEach((e) => e.classList.remove('foco-rec'));
-  if (i !== 5) fiscExp = null;
+  if (i !== 6) fiscExp = null;
   RECORRIDO[i].ir();
   history.replaceState(null, '', modo === 'mlv' ? location.pathname : '#' + modo);
   render(); pintarRecorrido();
@@ -848,7 +852,7 @@ function pintarRecorrido() {
   const p = RECORRIDO[pasoRec], ult = pasoRec === RECORRIDO.length - 1;
   el.hidden = false;
   el.innerHTML = `<div class="rec-num">${dos(pasoRec + 1)}<small>/ ${dos(RECORRIDO.length)}</small></div>
-    <div><h3>${esc(p.t)}</h3><p>${esc(p.x)}</p></div>
+    <div><h3>${esc(p.t)}</h3><p>${esc(typeof p.x === 'function' ? p.x() : p.x)}</p></div>
     <div class="rec-der"><div class="rec-puntos">${RECORRIDO.map((_, j) => `<i class="${j <= pasoRec ? 'hecho' : ''} ${j === pasoRec ? 'actual' : ''}"></i>`).join('')}</div>
       ${pasoRec > 0 ? '<button type="button" class="btn chico" data-acc="recAnt">Anterior</button>' : ''}<button type="button" class="btn chico primario" data-acc="recSig">${ult ? 'Terminar' : 'Siguiente'}</button>
       <button type="button" class="rec-x" data-acc="recCerrar" aria-label="Salir del recorrido" title="Salir del recorrido">×</button></div>`;
@@ -1088,7 +1092,7 @@ function vFicha(c, t) {
   const m = estados(c, t.id), evs = c.eventos.filter((e) => e.titular === t.id), rc = porReconfirmar(c, t);
   return `<button class="btn-txt" data-acc="volverTit">← Todos los titulares</button>
   <div class="sec-cab" style="margin-top:8px"><div><h1>${esc(t.nombre)}</h1><p>${esc(t.rut)} · ${esc(TITULARES[t.relacion] || '')} · ${esc(t.correo)} · código de comprobante <span class="mono">${esc(t.codigo)}</span></p></div>
-    <div class="fila-btn"><button class="btn" data-acc="revocarOtro">Anotar revocación recibida por otro medio</button><button class="btn primario" data-expediente="${esc(t.id)}">Imprimir expediente</button></div></div>
+    <div class="fila-btn"><button class="btn" data-acc="revocarOtro">Anotar revocación recibida por otro medio</button><button class="btn" data-acc="descExpediente">Descargar expediente</button><button class="btn primario" data-expediente="${esc(t.id)}">Imprimir o guardar en PDF</button></div></div>
   ${rc ? `<div class="alerta ambar">El formulario agregó ${rc.faltan.map(esc).join(', ')} después de su respuesta (dada con la política v${esc(rc.version)}). Hay que pedirle esa autorización aparte; lo que ya autorizó sigue vigente.</div>` : ''}
   <div class="dos"><div class="caja"><h2>Finalidades</h2><table class="tabla"><thead><tr><th>Finalidad</th><th>Estado</th><th>Desde</th></tr></thead><tbody>${Object.entries(m).map(([id, v]) => `<tr><td>${esc(id)} · ${esc((c.rat.find((x) => x.id === id) || {}).nombre)}</td><td>${chipEstado(v.estado)}</td><td>${fFechaHora((v.rev || v.ev).fecha)}</td></tr>`).join('')}</tbody></table></div>
   <div class="caja"><h2>Historial</h2><ul class="tiempo">${evs.map((e) => `<li class="${e.tipo === 'revocacion' ? 'revoca' : ''}"><div class="cuando">${fFechaHora(e.fecha)} · anotación N° ${e.n}</div>${describir(c, e)}${e.tipo === 'consentimiento' ? `<div class="mini">Política ${e.det.lectura.alFinal ? 'leída hasta el final' : 'abierta, sin llegar al final'} · ${e.det.lectura.segundos} s en pantalla · ${esc(e.det.canal)}</div>` : ''}<div class="huella">${esc(e.hash)}</div></li>`).join('')}</ul></div></div>`;
@@ -1168,6 +1172,35 @@ function expedienteHtml(c, t, enPantalla) {
     <p class="nota">Cadena ${ok ? 'íntegra' : 'alterada'} al ${fFechaHora(ahora())}. Huella de identidad del titular: <span class="huella">${esc(identidadHash(t))}</span></p>
     ${enPantalla ? `<button class="btn primario" data-expediente="${esc(t.id)}">Imprimir o guardar en PDF</button>` : ''}</div>`;
 }
+// Copia al portapapeles; si el navegador no lo permite, muestra el texto para copiarlo a mano.
+function copiarTexto(texto, mensaje) {
+  const alternativa = () => abrirDialogo('Copiar a mano', `<p class="nota">El navegador no permitió copiar. Seleccione y copie este texto:</p><div class="mono" style="word-break:break-all;user-select:all;padding:10px;border:1px dashed #B9C0C8;border-radius:8px">${esc(texto)}</div>`, [['ok', 'Entendido', 'primario']]);
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(texto).then(() => aviso(mensaje), alternativa);
+  else alternativa();
+}
+// Documento HTML autocontenido (se abre en cualquier navegador y se puede guardar o imprimir).
+function documentoHtml(titulo, c, cuerpo) {
+  return `<!doctype html><html lang="es"><head><meta charset="utf-8"><title>${esc(titulo)}</title>
+<style>body{font:11.5pt/1.45 -apple-system,Segoe UI,Inter,Arial,sans-serif;color:#111;max-width:820px;margin:28px auto;padding:0 20px}h1{font-size:19pt;margin:0 0 4pt}h2,h3{font-size:13pt;margin:14pt 0 5pt}table{width:100%;border-collapse:collapse;font-size:9.5pt}th,td{text-align:left;padding:5px 7px;border-bottom:1px solid #D5DAE0;vertical-align:top}th{font-size:8.5pt;text-transform:uppercase;letter-spacing:.04em;color:#555}.mini,.nota{font-size:9pt;color:#555}.huella,.mono{font-family:ui-monospace,Consolas,monospace;font-size:8.5pt;word-break:break-all}.codigo{font-family:ui-monospace,Consolas,monospace;font-size:22pt;letter-spacing:.08em;margin:6px 0}.marca{display:flex;align-items:center;gap:10px;margin-bottom:14px}.sello{display:inline-grid;place-items:center;width:38px;height:38px;border-radius:50%;color:#fff;font-weight:700;font-size:13px}@media print{body{margin:0}}</style></head>
+<body><div class="marca"><span class="sello" style="background:${esc(c.color)}">${esc(c.sigla)}</span><div><b>${esc(c.nombre)}</b><div class="mini">RUT ${esc(c.rut)} · emitido el ${fFechaHora(ahora())} desde la plataforma de MLV Abogados (prototipo, datos ficticios)</div></div></div>
+${cuerpo}</body></html>`;
+}
+function descargarComprobante(c, e) {
+  const si = Object.entries(e.det.finalidades).filter(([, v]) => v).map(([k]) => (c.rat.find((t) => t.id === k) || {}).nombre || k);
+  const cuerpo = `<h1>Comprobante de consentimiento</h1>
+<p class="mini">Código de comprobante (guárdelo para retirar su autorización)</p><div class="codigo">${esc(e.det.comprobante)}</div>
+<p>Fecha: <b>${fFechaHora(e.fecha)}</b> · Política de privacidad v${esc(e.det.politica.version)} (huella ${esc(e.det.politica.hash)})</p>
+<p>Autorizó: <b>${si.length ? si.map(esc).join(', ') : 'ninguna finalidad'}</b></p>
+<p class="huella">Huella del registro: ${esc(e.hash)}</p>
+<p class="nota">Puede retirar su autorización cuando quiera, gratis y por el mismo medio, con su RUT y este código (art. 12 inc. 4 y 5, Ley 19.628 modificada por la Ley 21.719).</p>`;
+  descargar(`comprobante-${e.det.comprobante}.html`, documentoHtml('Comprobante de consentimiento', c, cuerpo), 'text/html;charset=utf-8');
+  aviso('Comprobante descargado');
+}
+function descargarExpediente(tid) {
+  const c = cli(), t = c.titulares.find((x) => x.id === tid); if (!t) return;
+  descargar(`expediente-${t.id}.html`, documentoHtml(`Expediente de consentimiento · ${t.nombre}`, c, `<h1>Expediente de consentimiento</h1>${expedienteHtml(c, t, false)}`), 'text/html;charset=utf-8');
+  aviso('Expediente descargado');
+}
 function imprimirExpediente(tid) {
   const c = cli(), t = c.titulares.find((x) => x.id === tid);
   $('imprimible').innerHTML = `<h1>Expediente de consentimiento</h1><p>${esc(c.nombre)} · RUT ${esc(c.rut)} · emitido el ${fFechaHora(ahora())} desde la plataforma de MLV Abogados (prototipo, datos ficticios).</p>${expedienteHtml(c, t, false)}`;
@@ -1224,7 +1257,8 @@ function pintarTitular() {
         <div class="comprobante"><div class="mini">Código de comprobante (guárdelo para retirar su autorización)</div><div class="codigo">${esc(e.det.comprobante)}</div>
         <p style="margin:10px 0 4px">Fecha: <b>${fFechaHora(e.fecha)}</b> · Política v${esc(e.det.politica.version)}</p>
         <p style="margin:0 0 4px">Autorizó: <b>${si.length ? si.map((id) => esc(c.rat.find((t) => t.id === id).nombre)).join(', ') : 'ninguna finalidad'}</b></p>
-        <div class="huella">Huella del registro: ${esc(e.hash)}</div></div>
+        <div class="huella">Huella del registro: ${esc(e.hash)}</div>
+        <div class="fila-btn" style="margin-top:12px"><button class="t-btn sec" data-t="copiarCod">Copiar código</button><button class="t-btn sec" data-t="descComp">Descargar comprobante</button></div></div>
         <p class="nota">Puede retirar su autorización cuando quiera, gratis y por este mismo medio, en «Retirar o cambiar».</p>
         <div class="fila-btn"><button class="t-btn sec" data-t="otra">Responder como otra persona</button><button class="t-btn" data-t="irRev">Retirar o cambiar</button></div>`;
     }
@@ -1279,6 +1313,8 @@ function accionTitular(k, el) {
       T.paso = 4; guardar(); break;
     }
     case 'otra': iniciarTitular(T.formId); break;
+    case 'copiarCod': copiarTexto(T.hecho.det.comprobante, 'Código copiado'); return;
+    case 'descComp': descargarComprobante(c, T.hecho); return;
     case 'irRev': T.tab = 'rev'; T.rev = { rut: T.rut, cod: T.hecho ? T.hecho.det.comprobante : '', tit: null, sel: {}, hecho: null, error: '' }; break;
     case 'revDemo': { const t = c.titulares.find((x) => Object.values(estados(c, x.id)).some((v) => v.estado === 'otorgado')); if (t) { T.rev.rut = t.rut; T.rev.cod = t.codigo; } break; }
     case 'revBuscar': {
@@ -1330,6 +1366,7 @@ document.addEventListener('click', (ev) => {
     case 'nuevaPol': nuevaPolitica(); break;
     case 'verPol': verPolitica(c); break;
     case 'volverTit': fichaId = null; render(); break;
+    case 'descExpediente': descargarExpediente(fichaId); break;
     case 'revocarOtro': {
       const t = c.titulares.find((x) => x.id === fichaId), vig = Object.entries(estados(c, t.id)).filter(([, v]) => v.estado === 'otorgado');
       if (!vig.length) { alert('No tiene autorizaciones vigentes.'); break; }
@@ -1383,11 +1420,12 @@ document.addEventListener('scroll', (ev) => { if (ev.target.id === 'polCaja') re
 
 db = cargar();
 try { aplicarTema(localStorage.getItem('mlv-tema') || 'sello'); } catch { aplicarTema('sello'); }
-// Enlaces directos para la demostración: #titular abre el formulario; #fiscal, el panel del fiscalizador.
+// Enlaces directos para la demostración: #titular abre el formulario; #fiscal, el panel del fiscalizador; #recorrido inicia el recorrido guiado.
 const inicial = location.hash.replace('#', '');
 if (inicial === 'titular') { modo = 'titular'; iniciarTitular(); } else if (inicial === 'fiscal') modo = 'fiscal';
 else if (['rat', 'formularios', 'titulares', 'bitacora', 'usuarios', 'como'].includes(inicial)) ruta = inicial;
 render();
+if (inicial === 'recorrido') irPaso(0);
 </script>
 </body>
 </html>
